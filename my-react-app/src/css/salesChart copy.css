@@ -1,0 +1,29 @@
+SalesChart.css
+
+.sales-chart-container {
+  background: #fff;
+  border-radius: 16px;
+  padding: 20px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+  margin-top: 20px;
+  width: 97%;
+  height: 100px; /* ✅ Fixed height to avoid overflow */
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+/* Ensures the chart fits properly */
+.sales-chart-container canvas {
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: contain;
+}
+
+/* Optional: responsive spacing */
+@media (max-width: 1024px) {
+  .sales-chart-container {
+    height: 300px;
+    padding: 16px;
+  }
+}

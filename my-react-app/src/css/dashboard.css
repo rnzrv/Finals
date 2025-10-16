@@ -1,0 +1,300 @@
+@import url(./fonts.css);
+@import url(./color.css);
+
+/* h1, h2, h3, h4, h5, h6, p {
+  margin: 0;
+} */
+
+body {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Inter', sans-serif;
+}
+
+/* Main dashboard container */
+.dashboard {
+  display: flex; /* ✅ aligns sidebar and content side-by-side */
+  height: 100vh;
+  width: 100%;
+}
+
+/* Dashboard content area */
+.dashboard-content {
+  margin-left: 235px; /* sidebar width */
+  min-height: 100vh;
+  width: calc(100% - 235px);
+  background-color: #1E1E1E; /* fixed missing # */
+  box-sizing: border-box;
+  transition: all 0.3s ease;
+}
+
+/* Header styling */
+.dashboard-content header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: var(--header-bg-color--);
+  padding: 10px 40px;
+  border-bottom: 1px solid #f0eeee;
+  height: 50px;
+  color: var(--primary-color--);
+  font-family: 'Inter', sans-serif;
+  font-weight: 600;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1); /* subtle shadow */
+}
+
+/* Admin account info */
+.dashboard-account {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.dashboard-account img {
+  height: 35px;
+  width: 35px;
+  border-radius: 50%;
+}
+
+.dashboard-account p {
+  margin: 0;
+  font-weight: 500;
+  color: var(--primary-color--);
+  font-size: 16px;
+}
+
+/* ✅ Flex layout for main content */
+.dashboard-main-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 20px;
+  padding: 40px;
+  height: 100%;
+  background-color: #f9f9f9;
+  flex-wrap: wrap; /* helps it adjust on smaller screens */
+}
+
+/* Left section (chart area) */
+.dashboard-left {
+  flex: 1;
+  min-width: 300px;
+  border-radius: 8px;
+  height: 100%;
+}
+
+.dashboard-left .dashboard-sales-chart {
+  width: 100%;
+  height: 33%;
+  background-color: #ffffff;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.dashboard-left .dashboard-sales-appointments {
+  width: 100%;
+  display: flex;
+  height: 33%;
+  justify-content: space-between;
+  padding: 10px 0;
+  margin: 10px 0 0 0;
+}
+
+.dashboard-sales-overview {
+  flex: 1;
+  background-color: #ffffff;
+  border-radius: 8px;
+  margin-right: 10px;
+  width: 50%;
+  padding: 20px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.dashboard-appointments {
+  flex: 1;
+  background-color: #ffffff;
+  border-radius: 8px;
+  margin-left: 10px;
+  width: 50%;
+  padding: 20px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.dashboard-left .dashboard-recent-sales {
+  width: 100%;
+  height: 300px;
+  background-color: #ffffff;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* Right section (stats or info) */
+.dashboard-right {
+  width: 500px;
+  background-color: #ffffff;
+  border-radius: 8px;
+  padding: 20px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  height: 500px;
+}
+
+/* Sales Overview and Appointments layout */
+.dashboard-sales-overview{
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.sales-overview-top{
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+}
+
+.sales-overview-top p{
+  margin: 0;
+  font-size: 32px;
+  font-weight: 600;
+}
+
+.sales-overview-top a{
+  text-decoration: none;
+  color: var(--secondary-color--);
+  font-weight: 500;
+  font-size: 14px;
+}
+
+.sales-overview-body{
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 20px;
+  padding: 0 10px;
+  height: 70%;
+}
+  
+
+.sales-overview-body p{
+  margin: 0;
+  font-size: 13px;
+  font-weight: 600;
+  font-family: "DmSans", sans-serif;
+}
+
+
+.left h1{
+  margin: 8px;
+  font-size: 28px;
+  font-family: "Poppins", sans-serif;
+  gap: 10px;
+
+}
+
+/* Make the horizontal line full width */
+
+.vertical-divider {
+  border: none;
+  border-left: 2px solid #797878; /* vertical line */
+  height: 210px;      /* how tall the line should be */           /* no width */
+  transform: rotate(0deg); /* Not needed here, but if you used a horizontal border, you'd rotate it */
+  margin: 5px 20px;     /* spacing on left and right */
+}
+
+.overview-right{
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  height: 100%;
+  margin-left: 0px;
+}
+
+.right h1{
+  margin: 8px;
+  font-size: 28px;
+  font-family: "Poppins", sans-serif;
+  gap: 10px;
+
+}
+
+/* Appointment section */
+
+.dashboard-appointments{
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.appointments-header{
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  font-size: 1rem;
+}
+
+.appointments-header p{
+  margin: 0;
+  font-size: 32px;
+  font-weight: 600;
+}
+
+.appointments-header a{
+  text-decoration: none;
+  color: var(--secondary-color--);
+  font-weight: 500;
+  font-size: 14px;
+}
+
+.appointments-body{
+  width: 100%;
+  height: 70%;
+  margin-top: 20px;
+}
+.appointments-list {
+  height: 100%;
+  width: 100%;
+  margin: 20px 10px;
+}
+
+.appointments-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: 'DmSans', sans-serif;
+  font-size: 13px;
+  color: #333;
+}
+
+.appointments-table tbody tr {
+  border-bottom: 1px solid #ddd; /* horizontal line */
+}
+
+.appointments-table td {
+  padding: 10px 0;
+}
+
+.appointments-table td:first-child {
+  text-align: left;
+  padding-left: 10px;
+}
+
+.appointments-table td:last-child {
+  text-align: right;
+  padding-right: 10px;
+  color: #666;
+}
+
+.appointments-table th {
+  display: none; /* hide table headers */
+}

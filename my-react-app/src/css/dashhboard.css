@@ -1,0 +1,222 @@
+@import url(./fonts.css);
+@import url(./color.css);
+
+body {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Inter', sans-serif;
+}
+
+/* Main dashboard container */
+.dashboard {
+  display: flex; /* Sidebar + Content side-by-side */
+  height: 100%;
+  width: 100%;
+}
+
+/* Dashboard content area */
+.dashboard-content {
+  margin-left: 240px; /* sidebar width */
+  height: 100vh; /* fixed height to viewport */
+  width: calc(100% - 240px);
+  background-color: #f9f9f9;
+  box-sizing: border-box;
+  transition: all 0.3s ease;
+  overflow-y: auto; /* scroll if content overflows */
+}
+
+/* Header styling */
+.dashboard-content header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: var(--header-bg-color--);
+  padding: 10px 40px;
+  border-bottom: 1px solid #f0eeee;
+  height: 50px;
+  color: var(--primary-color--);
+  font-family: 'Inter', sans-serif;
+  font-weight: 600;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+}
+
+/* Admin account info */
+.dashboard-account {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.dashboard-account img {
+  height: 35px;
+  width: 35px;
+  border-radius: 50%;
+}
+
+.dashboard-account p {
+  margin: 0;
+  font-weight: 500;
+  color: var(--primary-color--);
+  font-size: 16px;
+}
+
+/* Flex layout for main content */
+.dashboard-bentoGrid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  grid-template-rows: 175px;
+  gap: 3em;
+  grid-template-areas: 
+    "dashBox1 dashBox2 dashBox3 dashBox4";
+  padding: 0;
+  margin: 40px 0;
+}
+
+.card-dashboard {
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+  padding: 20px;
+  font-family: 'DmSans', 'Poppins';
+  flex-direction: column;
+  transition: transform 0.2s;
+  position: relative;
+}
+
+.card-dashboard p {
+  margin: 0;
+  color: var(--text-color--);
+  font-weight: 500;
+  font-size: 18px;
+  left: 5px;
+}
+
+.card-dashboard h3 {
+  margin: 10px 0 0 0;
+  font-size: 28px;
+  color: var(--primary-color--);
+}
+
+.dashBox1 {grid-area: dashBox1; background-color: #FFFFFF;}
+.dashBox2 {grid-area: dashBox2; background-color: #FFFFFF;}
+.dashBox3 {grid-area: dashBox3; background-color: #FFFFFF;}
+.dashBox4 {grid-area: dashBox4; background-color: #FFFFFF;}
+
+/* Dashboard main content - removed fixed height */
+.dashboard-main-content {
+  padding: 0 40px;
+  box-sizing: border-box;
+  /* height removed to avoid overflow */
+}
+
+/* Remove bottom margin on last child to avoid extra space */
+.dashboard-main-content > *:last-child {
+  margin-bottom: 20px;
+}
+
+.dashboard-barGraph-pieGraph {
+  height: 500px;
+  width: 100%;
+  display: flex;
+  gap: 3em;
+  margin-left: 0;
+  padding: 0;
+}
+
+.dashboard-Graph {
+  background-color: #FFFFFF;
+  border-radius: 12px;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+.dashboard-barGraph {
+  height: 100%;
+  width: 65%;
+}
+
+.dashboard-pieGraph {
+  height: 100%;
+  width: 35%;
+}
+
+.appointment-recentSales {
+  display: flex;
+  gap: 3em;
+  margin-top: 3em;
+  height: 500px;
+  width: 100%;
+  margin: 30px 0;
+}
+
+.appointment {
+  background-color: #FFFFFF;
+  border-radius: 12px;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+  height: 100%;
+  width: 50%;
+  display:flex;
+  align-items:center;
+  justify-content: flex-start;
+  flex-direction: column;
+}
+
+.recentSales {
+  background-color: #FFFFFF;
+  border-radius: 12px;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+  height: 100%;
+  width: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  flex-direction: column;
+}
+
+/* Appointment content - removed fixed height */
+
+
+.appointment-header{
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width:90%;
+}
+
+.appointment-header a{
+  color: var(--secondary-color--);
+  text-decoration: none;
+}
+
+.appointment-content{
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+}
+
+
+.recent-header{
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width:90%;
+}
+
+.recent-header a{
+  color: var(--secondary-color--);
+  text-decoration: none;
+}
+
+.recent-content{
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+}
+
