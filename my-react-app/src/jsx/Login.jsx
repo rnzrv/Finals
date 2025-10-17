@@ -3,29 +3,42 @@ import user from '../icons/user.svg'
 import key from '../icons/key.svg'
 import visible from '../icons/visible.svg'
 import invisible from '../icons/invisible.svg'
-import { use, useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from "react-router-dom"; 
 import '../css/Login.css'
-import { useEffect } from 'react'
 
 function Login() {
 
   useEffect(() => {
     document.title = "Login - Beauwitty"
   }, []);
+
   const [showPassword, setShowPassword] = useState(false);
-  const [username, setUsername] = useState("");  // ✅ track username
-  const [password, setPassword] = useState("");  // ✅ track password
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
   const navigate = useNavigate();
 
-  const handleLogin = (e) => {
-    e.preventDefault(); // stop page reload
+  const handleLogin = async (e) => {
+    e.preventDefault();
 
-    // ✅ simple login check
-    if (username === "asd" && password === "123") {
-      navigate("/dashhboard"); // redirect
-    } else {
-      alert("Invalid credentials"); // 🚨 show error
+    try {
+      const response = await fetch("http://localhost:8081/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ username, password }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Invalid credentials");
+      }
+
+      const data = await response.json();
+      console.log("User data:", data);
+
+      alert("Login successful!");
+      navigate("/dashhboard"); // ✅ redirect after success
+    } catch (error) {
+      alert(error.message);
     }
   };
 
@@ -48,7 +61,7 @@ function Login() {
                   id="username" 
                   required 
                   value={username} 
-                  onChange={(e) => setUsername(e.target.value)} // ✅ update state
+                  onChange={(e) => setUsername(e.target.value)}
                 />
                 <label htmlFor="username">username</label>
               </div>
@@ -61,7 +74,7 @@ function Login() {
                   id="password" 
                   required 
                   value={password} 
-                  onChange={(e) => setPassword(e.target.value)} // ✅ update state
+                  onChange={(e) => setPassword(e.target.value)}
                 />
                 <label htmlFor="password">password</label>
                 <img 
