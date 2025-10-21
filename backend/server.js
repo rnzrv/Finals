@@ -45,3 +45,24 @@ app.post('/login', (req, res) => {
     }
   });
 });
+
+
+app.get('/patients',(req,res)=>{
+  const q = "SELECT * FROM patients";
+  db.query(q,(err,data)=>{
+    if(err) return res.json(err);
+    return res.json(data);
+  })
+})
+
+
+// Add a new patient
+app.post("/addPatient", (req, res) => {
+  const { name, email, number, last_visit } = req.body;
+  const q = "INSERT INTO patients (name, email, number, last_visit) VALUES (?, ?, ?, ?)";
+
+  db.query(q, [name, email, number, last_visit], (err, result) => {
+    if (err) return res.status(500).json({ error: err.sqlMessage });
+    return res.status(200).json({ message: "Patient added successfully!" });
+  });
+});

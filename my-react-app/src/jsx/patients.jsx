@@ -1,5 +1,7 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import axios from "axios";
 import Sidebar from "./Sidebar.jsx";
+import AddPatients from "./modal-addPatients.jsx"; // ✅ Import here
 import "../css/patients.css";
 import user from "../icons/user.svg";
 import search from "../icons/search.svg";
@@ -8,26 +10,26 @@ import telephone from "../icons/telephone.svg";
 import email from "../icons/email.svg";
 
 function Patients() {
-  const [patients, setPatients] = useState([
-
-  ]);
+  const [patients, setPatients] = useState([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const patientsPerPage = 12;
 
   const colors = ["#6A5ACD", "#FF69B4", "#BDA55D", "#4CAF50", "#2196F3", "#FF9800"];
-  const RandomColor = () => {
-    return colors[Math.floor(Math.random() * colors.length)];
+  const RandomColor = () => colors[Math.floor(Math.random() * colors.length)];
 
-  }
-
-  const addPatient = () => {
-    const newPatient = {
-      id: patients.length + 1,
-      name: `Patient ${patients.length + 1}`,
-      age: Math.floor(Math.random() * 40) + 20,
-      condition: "Check-up",
-        colors:RandomColor(),
-    };
-    setPatients([...patients, newPatient]);
+  // 🧠 Fetch all patients
+  const getPatients = async () => {
+    try {
+      const response = await axios.get("http://localhost:8081/patients");
+      setPatients(response.data);
+    } catch (error) {
+      console.error("Error fetching patients:", error);
+    }
   };
+
+  useEffect(() => {
+    getPatients();
+  }, []);
 
   const getInitials = (name) => {
     if (!name) return "";
@@ -38,6 +40,10 @@ function Patients() {
       .toUpperCase();
   };
 
+  const indexOfLastPatient = currentPage * patientsPerPage;
+  const indexOfFirstPatient = indexOfLastPatient - patientsPerPage;
+  const currentPatients = patients.slice(indexOfFirstPatient, indexOfLastPatient);
+  const totalPages = Math.ceil(patients.length / patientsPerPage);
 
   return (
     <div className="patients">
@@ -53,7 +59,7 @@ function Patients() {
         </header>
 
         <div className="patients-main-content">
-          {/* Top Summary Boxes */}
+          {/* ✅ Top Summary */}
           <div className="patients-grid-container-top">
             <div className="card-patients">
               <p>Total Patients</p>
@@ -73,62 +79,77 @@ function Patients() {
             </div>
           </div>
 
-          {/* Middle Controls */}
+          {/* ✅ Search + Add Patient */}
           <div className="patients-middle">
             <div className="patient-search">
               <img src={search} alt="" />
               <input type="text" placeholder="Search for patients..." />
             </div>
             <div className="patient-right">
-              <button onClick={addPatient}>Add Patient</button>
+              {/* 🟢 Pass callback to refresh automatically */}
+              <AddPatients onPatientAdded={getPatients} />
             </div>
           </div>
 
-          {/* 🧠 Dynamic Patient Cards */}
+          {/* ✅ Dynamic Patient Cards */}
           <div className="patients-grid-container">
-            {patients.map((patient) => (
+            {currentPatients.map((patient) => (
               <div key={patient.id} className="patients-info">
                 <div className="patients-info-header">
-                    <div className="patients-info-header-left" style={{backgroundColor:patient.colors}}>
-                        <h1>{getInitials(patient.name)}</h1>
-                    </div>
-                    <div className="patients-info-header-right">
-                        <h1>{patient.name}</h1>
-                        <h3>Status</h3>
-                    </div>
+                  <div
+                    className="patients-info-header-left"
+                    style={{ backgroundColor: RandomColor() }}
+                  >
+                    <h1>{getInitials(patient.name)}</h1>
+                  </div>
+                  <div className="patients-info-header-right">
+                    <h1>{patient.name}</h1>
+                    <h3>Status</h3>
+                  </div>
                 </div>
+
                 <div className="patients-info-bottom">
-                    <div className="patients-data">
-                        <div className="data patients-email">
-                            <img src={email} alt="" />
-                            ralfabrau@gmail.com
-                        </div>
-                        <div className="data patients-num">
-                            <img src={telephone} alt="" />
-                            +63 354 456 789
-                        </div>
-                        <div className="data patients-last-visit">
-                            <img src={calendar} alt="" />
-                            Last visit: Sep 15, 2025
-                        </div>
+                  <div className="patients-data">
+                    <div className="data patients-email">
+                      <img src={email} alt="" />
+                      {patient.email}
                     </div>
-                    <div className="patients-card-button patients-btn">
-                        <button>Edit</button>
-                        <button>Delete</button>
-                        <button className="green">Schedule</button>
-                    </div>               
+                    <div className="data patients-num">
+                      <img src={telephone} alt="" />
+                      {patient.number}
+                    </div>
+                    <div className="data patients-last-visit">
+                      <img src={calendar} alt="" />
+                      Last visit:{" "}
+                      {new Date(patient.last_visit).toLocaleDateString()}
+                    </div>
+                  </div>
+                  <div className="patients-card-button patients-btn">
+                    <button>Edit</button>
+                    <button>Delete</button>
+                    <button className="green">Schedule</button>
+                  </div>
                 </div>
-                  
               </div>
-              
             ))}
           </div>
-            <div className="patients-pagination patients-btn">
-                <button>Next</button>
-                <button className="green">Prev</button>
-            </div>
-        </div>
 
+          {/* ✅ Pagination */}
+          <div className="patients-pagination patients-btn">
+            <button onClick={() => setCurrentPage((p) => Math.max(p - 1, 1))}>
+              Prev
+            </button>
+            <span style={{ margin: "0 10px" }}>
+              Page {currentPage} of {totalPages}
+            </span>
+            <button
+              onClick={() => setCurrentPage((p) => Math.min(p + 1, totalPages))}
+              className="green"
+            >
+              Next
+            </button>
+          </div>
+        </div>
       </div>
     </div>
   );
