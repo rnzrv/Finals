@@ -1,0 +1,13 @@
+
+POST http://localhost:8081/users/user/login
+Content-Type: application/json
+
+{
+    "username": "ceo123",
+    "password": "ceo12"
+}
+
+### Response
+
+GET http://localhost:8081/getusers
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImNlbzEyMyIsImlhdCI6MTc2MTE1NDM4MSwiZXhwIjoxNzYxMTcyMzgxfQ.tObg8RWEtDl_vJldrjqmSIMm2I4JLa576EF0SibUfjI

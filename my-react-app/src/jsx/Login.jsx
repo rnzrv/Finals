@@ -22,16 +22,19 @@ function Login() {
     e.preventDefault();
 
     try {
-      const response = await axios.post("http://localhost:8081/login", {
-        username,
-        password,
-      });
+      const response = await axios.post("http://localhost:8081/users/user/login", 
+        {username, password},
+        {withCredentials: true}
+      );
+
+      // Store access token in memory (not localStorage)
+      sessionStorage.setItem("accessToken", response.data.accessToken);
 
       alert("Login successful!");
       navigate("/dashhboard"); // ✅ redirect after success
     } catch (error) {
       // Axios automatically handles non-200 responses as errors
-      alert(error.response?.data?.message || "Invalid credentials");
+      alert(error.response?.data?.message || "Login failed. Please try again.");
     }
   };
 

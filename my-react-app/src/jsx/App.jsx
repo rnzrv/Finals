@@ -3,33 +3,70 @@ import Login from "./Login";
 import Dashhboard from "./dashhboard";
 import Inventory from "./inventory";
 import Purchases from "./purchases";
-import Appointments from "./appointments"
-import Patients from "./patients"
-import Reports from "./reports"
-
+import Appointments from "./appointments";
+import Patients from "./patients";
+import Reports from "./reports";
+import ProtectedRoute from "./protectedRoute";
 
 function App() {
   return (
     <Router>
       <Routes>
-        {/* default page (Login) */}
+        {/* Public route (Login) */}
         <Route path="/" element={<Login />} />
-        {/* after login redirect here */}
-        <Route path="/dashhboard" element={<Dashhboard />} />
-        <Route path="/inventory" element={<Inventory />} />
-        <Route path="/purchases" element={<Purchases />} />
-        <Route path="/appointments" element={<Appointments />} />
-        <Route path="/patients" element={<Patients />} />
-        <Route path="/reports" element={<Reports />} />
 
-
-
-
+        {/* Protected routes */}
+        <Route
+          path="/dashhboard"
+          element={
+            <ProtectedRoute>
+              <Dashhboard />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/inventory"
+          element={
+            <ProtectedRoute>
+              <Inventory />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/purchases"
+          element={
+            <ProtectedRoute>
+              <Purchases />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/appointments"
+          element={
+            <ProtectedRoute>
+              <Appointments />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/patients"
+          element={
+            <ProtectedRoute>
+              <Patients />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/reports"
+          element={
+            <ProtectedRoute>
+              <Reports />
+            </ProtectedRoute>
+          }
+        />
       </Routes>
     </Router>
   );
 }
 
 export default App;
-
-
