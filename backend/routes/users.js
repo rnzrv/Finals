@@ -2,13 +2,14 @@ const express = require('express');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
 const router = express.Router();
+const db = require('../config/db'); // ✅ Import shared DB connection
 
 // ADD USER SIGN UP
 router.post('/user', async (req, res) => {
   try {
     const hashedPassword = await bcrypt.hash(req.body.password, 10);
     const q = "INSERT INTO users (userType, username, password) VALUES (?, ?, ?)";
-    router.db.query(q, [req.body.userType, req.body.username, hashedPassword], (err) => {
+    db.query(q, [req.body.userType, req.body.username, hashedPassword], (err) => {
       if (err) return res.status(500).json({ error: err.sqlMessage });
       return res.status(201).json({ message: 'User created successfully' });
     });
@@ -20,7 +21,7 @@ router.post('/user', async (req, res) => {
 // USER LOGIN AUTHENTICATION
 router.post('/user/login', async (req, res) => {
   const q = "SELECT * FROM users WHERE username = ?";
-  router.db.query(q, [req.body.username], async (err, result) => {
+  db.query(q, [req.body.username], async (err, result) => {
     if (err) return res.status(500).json({ error: 'Server error' });
     if (result.length === 0) return res.status(400).json({ error: 'Invalid username or password' });
 
@@ -33,7 +34,7 @@ router.post('/user/login', async (req, res) => {
       const accessToken = jwt.sign(
         { id: user.id, userType: user.userType, username: user.username },
         process.env.ACCESS_TOKEN_SECRET,
-        { expiresIn: '15m' }
+        { expiresIn: '7d' }
       );
 
       const refreshToken = jwt.sign(
@@ -42,7 +43,7 @@ router.post('/user/login', async (req, res) => {
         { expiresIn: '7d' }
       );
 
-      // Store refresh token in HttpOnly cookie
+      // Store tokens in cookies
       res.cookie('refreshToken', refreshToken, {
         httpOnly: true,
         secure: process.env.NODE_ENV === 'production',
@@ -50,15 +51,14 @@ router.post('/user/login', async (req, res) => {
         path: '/',
       });
 
-      // Also store access token securely
       res.cookie('accessToken', accessToken, {
         httpOnly: true,
         secure: process.env.NODE_ENV === 'production',
         sameSite: 'Strict',
-        maxAge: 15 * 60 * 1000, // 15 minutes
+        
       });
 
-      res.json({ message: 'Login successful' });
+      res.json({ message: '✅ Login successful', accessToken });
     } catch {
       res.status(500).json({ error: 'Server error' });
     }
@@ -97,7 +97,4 @@ router.post("/logout", (req, res) => {
   res.json({ message: "Logged out successfully" });
 });
 
-module.exports = (db) => {
-  router.db = db;
-  return router;
-};
+module.exports = router;

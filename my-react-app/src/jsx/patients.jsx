@@ -1,13 +1,14 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import Sidebar from "./Sidebar.jsx";
-import AddPatients from "./modal-addPatients.jsx"; // ✅ Import here
+import AddPatients from "./modals/modal-addPatients.jsx";
 import "../css/patients.css";
 import user from "../icons/user.svg";
 import search from "../icons/search.svg";
 import calendar from "../icons/calendar.svg";
 import telephone from "../icons/telephone.svg";
 import email from "../icons/email.svg";
+import EditPatients from "./modals/modal-EditPatients.jsx";
 
 function Patients() {
   const [patients, setPatients] = useState([]);
@@ -20,10 +21,16 @@ function Patients() {
   // 🧠 Fetch all patients
   const getPatients = async () => {
     try {
-      const response = await axios.get("http://localhost:8081/patients");
+      const token = sessionStorage.getItem("accessToken");
+      const response = await axios.get("http://localhost:8081/patients/getPatients", {
+        withCredentials: true,
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
       setPatients(response.data);
     } catch (error) {
-      console.error("Error fetching patients:", error);
+      console.error("Error fetching patients:", error.response || error.message);
     }
   };
 
@@ -48,7 +55,6 @@ function Patients() {
   return (
     <div className="patients">
       <Sidebar />
-
       <div className="dashboard-content">
         <header>
           <h2>PATIENTS</h2>
@@ -57,7 +63,6 @@ function Patients() {
             <p>Admin</p>
           </div>
         </header>
-
         <div className="patients-main-content">
           {/* ✅ Top Summary */}
           <div className="patients-grid-container-top">
@@ -78,7 +83,6 @@ function Patients() {
               <h3>2</h3>
             </div>
           </div>
-
           {/* ✅ Search + Add Patient */}
           <div className="patients-middle">
             <div className="patient-search">
@@ -86,11 +90,9 @@ function Patients() {
               <input type="text" placeholder="Search for patients..." />
             </div>
             <div className="patient-right">
-              {/* 🟢 Pass callback to refresh automatically */}
               <AddPatients onPatientAdded={getPatients} />
             </div>
           </div>
-
           {/* ✅ Dynamic Patient Cards */}
           <div className="patients-grid-container">
             {currentPatients.map((patient) => (
@@ -107,7 +109,6 @@ function Patients() {
                     <h3>Status</h3>
                   </div>
                 </div>
-
                 <div className="patients-info-bottom">
                   <div className="patients-data">
                     <div className="data patients-email">
@@ -120,12 +121,11 @@ function Patients() {
                     </div>
                     <div className="data patients-last-visit">
                       <img src={calendar} alt="" />
-                      Last visit:{" "}
-                      {new Date(patient.last_visit).toLocaleDateString()}
+                      Last visit: {new Date(patient.last_visit).toLocaleDateString()}
                     </div>
                   </div>
                   <div className="patients-card-button patients-btn">
-                    <button>Edit</button>
+                    <EditPatients patient={patient} onPatientUpdated={getPatients} />
                     <button>Delete</button>
                     <button className="green">Schedule</button>
                   </div>
@@ -133,7 +133,6 @@ function Patients() {
               </div>
             ))}
           </div>
-
           {/* ✅ Pagination */}
           <div className="patients-pagination patients-btn">
             <button onClick={() => setCurrentPage((p) => Math.max(p - 1, 1))}>

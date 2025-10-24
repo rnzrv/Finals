@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import axios from "axios";
-import "../css/modal-addPatients.css";
+import "../../css/modal/modal-addPatients.css";
 
 function AddPatients({ onPatientAdded }) {
   const [isOpen, setIsOpen] = useState(false);
@@ -14,73 +14,78 @@ function AddPatients({ onPatientAdded }) {
 
   const openModal = () => {
     setIsOpen(true);
-    setMessage(null); // Clear message when opening modal
+    setMessage(null);
     setMessageType(null);
   };
 
   const closeModal = () => {
     setIsOpen(false);
-    setMessage(null); // Clear message when closing modal
+    setMessage(null);
     setMessageType(null);
   };
 
-  const validatePhoneNumber = (number) => {
-    const phoneRegex = /^\+?[\d\s-]{10,11}$/;
-    return phoneRegex.test(number);
+  const validateForm = () => {
+    if (!name || !email || !number || !lastVisit) {
+      return 'All fields are required';
+    }
+
+    const nameRegex = /^[a-zA-Z\s'-]+$/;
+    if (!nameRegex.test(name)) {
+      return 'Name can only contain letters, spaces, hyphens, or apostrophes';
+    }
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      return 'Please enter a valid email address';
+    }
+
+    const phoneRegex = /^(?:\+639|09|639)\d{9}$/;
+    if (!phoneRegex.test(number)) {
+      return 'Phone number must be in the format 09XXXXXXXXX or +639XXXXXXXXX';
+    }
+
+    if (isNaN(new Date(lastVisit).getTime())) {
+      return 'Please enter a valid date';
+    }
+
+    return null;
   };
 
-
-  const validateName = (name) => {
-    const nameRegex = /^[a-zA-Z\s'-]+$/;
-    return nameRegex.test(name);
-  }
-
-  const validateDate = (date) => {
-    return !isNaN(new Date(date).getTime());
-  }
-  
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setMessage(null); // Clear previous message
+    setMessage(null);
     setMessageType(null);
 
-    if (!validatePhoneNumber(number)) {
-      setMessage("Invalid phone number format (must be 10-11 digits, allowing +, spaces, or hyphens)");
-      setMessageType("error");
-      return;
-    }
-
-    if (!validateName(name)) {
-      setMessage("Invalid name format (only letters, spaces, hyphens, and apostrophes are allowed)");
-      setMessageType("error");
-      return;
-    }
-
-    if (!validateDate(lastVisit)) {
-      setMessage("Invalid date format for Last Visit");
+    const validationError = validateForm();
+    if (validationError) {
+      setMessage(validationError);
       setMessageType("error");
       return;
     }
 
     setIsLoading(true);
     try {
-      await axios.post("http://localhost:8081/addPatient", {
-        name,
-        email,
-        number,
-        last_visit: lastVisit,
-      });
-      setMessage("✅ Patient added successfully!");
+      const token = sessionStorage.getItem("accessToken");
+      await axios.post(
+        "http://localhost:8081/patients/addPatient",
+        { name, email, number, last_visit: lastVisit },
+        {
+          headers: { Authorization: `Bearer ${token}` },
+          withCredentials: true,
+        }
+      );
+
+      setMessage("Patient added successfully");
       setMessageType("success");
       if (onPatientAdded) onPatientAdded();
       setName("");
       setEmail("");
       setNumber("");
       setLastVisit("");
-      setTimeout(closeModal, 1000); // Close modal after 1s for success
+      setTimeout(closeModal, 1000);
     } catch (error) {
-      const errorMessage = error.response?.data?.error || "Unknown error occurred";
-      setMessage(`❌ ${errorMessage}`);
+      const errorMessage = error.response?.data?.error || "An unexpected error occurred";
+      setMessage(errorMessage);
       setMessageType("error");
       console.error("Error adding patient:", error.response?.data || error.message);
     } finally {

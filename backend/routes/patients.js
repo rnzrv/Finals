@@ -1,54 +1,117 @@
 const express = require('express');
 const jwt = require('jsonwebtoken');
 const router = express.Router();
+const verifyToken = require('../middleware/middleware');
+const db = require('../config/db');
 
-const authenticateToken = (req, res, next) => {
-  const token = req.cookies.auth_token;
-  if (!token) return res.status(401).json({ error: 'No token provided' });
-  jwt.verify(token, process.env.JWT_SECRET, (err, user) => {
-    if (err) return res.status(403).json({ error: 'Invalid token' });
-    req.user = user;
-    next();
-  });
-};
 
-router.get('/', authenticateToken, (req, res) => {
+
+router.get('/getPatients', verifyToken,(req,res) => {
   const q = "SELECT * FROM patients";
-  req.db.query(q, (err, data) => {
+  db.query(q, (err, data) => {
     if (err) return res.status(500).json({ error: err.sqlMessage });
     return res.json(data);
   });
-});
 
-router.post('/addPatient', authenticateToken, (req, res) => {
+})
+
+router.post('/addPatient', verifyToken, (req, res) => {
   const { name, email, number, last_visit } = req.body;
-  const check = "SELECT * FROM patients WHERE name = ? OR email = ? OR number = ?";
-  const q = "INSERT INTO patients (name, email, number, last_visit) VALUES (?, ?, ?, ?)";
 
-  req.db.query(check, [name, email, number], (err, result) => {
-    if (err) return res.status(500).json({ error: err.sqlMessage });
-    if (result.length > 0) {
-      return res.status(409).json({ error: "Patient already exists check your input data" });
+  // Validate input
+  if (!name || !email || !number || !last_visit) {
+    return res.status(400).json({ error: 'All fields are required' });
+  }
+
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!emailRegex.test(email)) {
+    return res.status(400).json({ error: 'Please enter a valid email address' });
+  }
+
+  const phoneRegex = /^(?:\+639|09|639)\d{9}$/;
+  if (!phoneRegex.test(number)) {
+    return res.status(400).json({ error: 'Phone number must be in the format 09XXXXXXXXX or +639XXXXXXXXX' });
+  }
+
+  const nameRegex = /^[a-zA-Z\s'-]+$/;
+  if (!nameRegex.test(name)) {
+    return res.status(400).json({ error: 'Name can only contain letters, spaces, hyphens, or apostrophes' });
+  }
+
+  if (isNaN(new Date(last_visit).getTime())) {
+    return res.status(400).json({ error: 'Please enter a valid date' });
+  }
+
+  // Check for duplicates
+  const checkQuery = 'SELECT * FROM patients WHERE email = ? OR number = ?';
+  db.query(checkQuery, [email, number], (err, existingPatients) => {
+    if (err) {
+      console.error('Error checking duplicates:', err);
+      return res.status(500).json({ error: err.sqlMessage || 'An unexpected error occurred' });
     }
-    req.db.query(q, [name, email, number, last_visit], (err, result) => {
-      if (err) return res.status(500).json({ error: err.sqlMessage });
-      return res.status(200).json({ message: "Patient added successfully!" });
+
+    if (existingPatients.length > 0) {
+      const duplicates = [];
+      if (existingPatients.some((patient) => patient.name === name)) {
+        duplicates.push('This name is already in use');
+      }
+      if (existingPatients.some((patient) => patient.email === email)) {
+        duplicates.push('This email is already registered');
+      }
+      if (existingPatients.some((patient) => patient.number === number)) {
+        duplicates.push('This phone number is already in use');
+      }
+      return res.status(409).json({ error: duplicates.join(', ') });
+    }
+
+    // Insert new patient
+    const insertQuery = 'INSERT INTO patients (name, email, number, last_visit) VALUES (?, ?, ?, ?)';
+    db.query(insertQuery, [name, email, number, last_visit], (err) => {
+      if (err) {
+        console.error('Error adding patient:', err);
+        return res.status(500).json({ error: err.sqlMessage || 'An unexpected error occurred' });
+      }
+      return res.status(201).json({ message: 'Patient added successfully' });
     });
   });
 });
 
-router.put('/editPatient/:id', authenticateToken, (req, res) => {
-  const patientId = req.params.id;
-  const { name, email, number, last_visit } = req.body;
+
+router.put('/updatePatient/:id', verifyToken, async (req,res)=> {
+  const patientID = req.params.id;
+  const {name, email, number, last_visit} = req.body;
+
+
+   const checkQuery = 'SELECT * FROM patients WHERE (email = ? OR number = ?) AND id != ?';
+  db.query(checkQuery, [email, number, patientID], (err, existingPatients) => {
+    if (err) {
+      console.error('Error checking duplicates:', err);
+      return res.status(500).json({ error: err.sqlMessage || 'Internal server error' });
+    }
+
+    if (existingPatients.length > 0) {
+      const duplicates = [];
+      if (existingPatients.some((patient) => patient.email === email)) duplicates.push('email');
+      if (existingPatients.some((patient) => patient.number === number)) duplicates.push('number');
+      return res.status(409).json({ error: `The following fields are already in use: ${duplicates.join(', ')}` });
+    }
+
   const q = "UPDATE patients SET name = ?, email = ?, number = ?, last_visit = ? WHERE id = ?";
-
-  req.db.query(q, [name, email, number, last_visit, patientId], (err, result) => {
-    if (err) return res.status(500).json({ error: err.sqlMessage });
-    return res.status(200).json({ message: "Patient updated successfully!" });
-  });
+  db.query(q, [name,email,number,last_visit,patientID], (err, data)=> {
+    if (err) return  res.status(500).json({ error: err.sqlMessage });
+    return res.json({ message: "Patient updated successfully" });
+  })
 });
+})
 
-module.exports = (db) => {
-  router.db = db;
-  return router;
-};
+
+router.delete('deletePatient/:id', verifyToken, (req,res) => {
+  const patientID = req.params.id;
+  const q = "DELETE FROM patients WHERE id = ?";
+  db.query(q, [patientID], (err,data) => {
+    if (err) return res.status(500).json({ error: err.sqlMessage });
+    return res.json({ message: "Patient deleted successfully" });
+  })
+})
+
+module.exports = router;

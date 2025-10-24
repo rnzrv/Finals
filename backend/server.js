@@ -1,8 +1,9 @@
 require('dotenv').config();
 const express = require('express');
-const mysql = require('mysql');
 const cors = require('cors');
 const cookieParser = require('cookie-parser');
+const db = require('./config/db');
+const verifyToken = require('./middleware/middleware');
 
 
 const app = express();
@@ -11,17 +12,11 @@ console.log("Allowed frontend:", process.env.FRONTEND_URL);
 app.use(express.json());
 app.use(cookieParser());
 
-const db = mysql.createConnection({
-  host: process.env.DB_HOST,
-  user: process.env.DB_USER,
-  password: process.env.DB_PASSWORD,
-  database: process.env.DB_NAME
-});
+
 
 // Import routes
-const userRoutes = require('./routes/users')(db);
-const patientRoutes = require('./routes/patients')(db);
-const verifyToken = require('./middleware/middleware');
+const userRoutes = require('./routes/users');
+const patientRoutes = require('./routes/patients');
 
 
 // Use routes
