@@ -9,6 +9,7 @@ import calendar from "../icons/calendar.svg";
 import telephone from "../icons/telephone.svg";
 import email from "../icons/email.svg";
 import EditPatients from "./modals/modal-EditPatients.jsx";
+import DeletePatient from "./modals/modal-deletepatient.jsx";
 
 function Patients() {
   const [patients, setPatients] = useState([]);
@@ -119,14 +120,19 @@ function Patients() {
                       <img src={telephone} alt="" />
                       {patient.number}
                     </div>
-                    <div className="data patients-last-visit">
+                    <div className="data patients-last-visit" >
                       <img src={calendar} alt="" />
-                      Last visit: {new Date(patient.last_visit).toLocaleDateString()}
+                      <p className={isNaN(new Date(patient.last_visit).getTime()) ? "Invalid" : "Valid"}>
+                          Last visit: {isNaN(new Date(patient.last_visit).getTime())
+                          ? "Invalid date"
+                          : new Date(patient.last_visit).toLocaleDateString()}
+                      </p>
+
                     </div>
                   </div>
                   <div className="patients-card-button patients-btn">
                     <EditPatients patient={patient} onPatientUpdated={getPatients} />
-                    <button>Delete</button>
+                    <DeletePatient patient={patient} onPatientDeleted={getPatients} />
                     <button className="green">Schedule</button>
                   </div>
                 </div>

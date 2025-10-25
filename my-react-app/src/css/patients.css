@@ -224,3 +224,25 @@
   color: var(--primary-color--);
 
 }
+
+.data p{
+  margin: 0;
+  padding: 5px;
+  border-radius: 8px;
+  font-family: "DmSans", "Poppins";
+  font-size: 16px;
+  font-weight: 300;
+  
+}
+
+.data p.Invalid {
+  background-color: red;
+  color: white;
+  border-radius: 8px;
+}
+
+/* .data p.Valid {
+  background-color: green;
+  color: white;
+  border-radius: 8px;
+} */

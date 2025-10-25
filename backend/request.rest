@@ -27,9 +27,9 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyVHlwZSI6ImFkb
 Content-Type: application/json
 
 {
-    "name": 123,
-    "email": "john@example.com",
-    "number": "09090909095",
+    "name": "vania",
+    "email": "jhvjhghhfchgjgjhghjg@example.com",
+    "number": "09545485763",
     "last_visit": "2023-10-01"
 }
 
@@ -41,6 +41,11 @@ Content-Type: application/json
 {
     "name": "Ronz Arvie",
     "email": "john@exam.com",
-    "number": "12345698730",
+    "number": "09545485762",
     "last_visit": "2023-10-01"
 }
+
+### 
+DELETE http://localhost:8081/patients/deletePatient/59
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyVHlwZSI6ImFkbWluIiwidXNlcm5hbWUiOiJjZW8xMjMiLCJpYXQiOjE3NjEzMjY0MzYsImV4cCI6MTc2MTkzMTIzNn0.PGtYIDliB5mmnI7FpKBqaUhCxLGgFgdCFF4d3Y7dRJo
+Content-Type: application/json
