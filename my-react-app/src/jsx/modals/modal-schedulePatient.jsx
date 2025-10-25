@@ -22,15 +22,17 @@ function ModalSchedulePatient({ patient }) {
     email: "",
     contact: "",
   });
+
+
+  const today = new Date().toISOString().split("T")[0];
+  
   const openButtonRef = useRef(null);
 
-  // Map backend id to patient_id if needed
+
   const patientId = patient?.patient_id || patient?.id;
 
-  // Fetch patient info when modal opens
   useEffect(() => {
     if (isOpen && patientId) {
-      console.log("Fetching patient info for ID:", patientId);
       const fetchPatientInfo = async () => {
         try {
           const token = sessionStorage.getItem("accessToken");
@@ -52,7 +54,6 @@ function ModalSchedulePatient({ patient }) {
     }
   }, [isOpen, patientId]);
 
-  // Sync form with patient ID
   useEffect(() => {
     if (isOpen && patientId) {
       setFormData((prev) => ({ ...prev, patient_id: patientId }));
@@ -61,7 +62,6 @@ function ModalSchedulePatient({ patient }) {
     }
   }, [isOpen, patientId]);
 
-  // Modal mount/unmount
   useEffect(() => {
     if (isOpen) {
       setIsMounted(true);
@@ -73,7 +73,6 @@ function ModalSchedulePatient({ patient }) {
     }
   }, [isOpen]);
 
-  // Handle Escape key
   useEffect(() => {
     const handleKeyDown = (e) => {
       if (e.key === "Escape" && isOpen) {
@@ -98,6 +97,7 @@ function ModalSchedulePatient({ patient }) {
       openButtonRef.current?.focus();
     }
   };
+
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -127,7 +127,7 @@ function ModalSchedulePatient({ patient }) {
         { headers: { Authorization: `Bearer ${token}` }, withCredentials: true }
       );
 
-      setMessage("Appointment scheduled successfully");
+      setMessage("Appointment booked successfully");
       setMessageType("success");
       setFormData({
         patient_id: patientId,
@@ -141,9 +141,8 @@ function ModalSchedulePatient({ patient }) {
 
       setTimeout(() => setIsOpen(false), 1000);
     } catch (error) {
-      console.error("Scheduling error:", error.response?.data || error.message);
-      const errorMessage =
-        error.response?.data?.error || "An unexpected error occurred";
+      console.error("Booking error:", error.response?.data || error.message);
+      const errorMessage = error.response?.data?.error || "An unexpected error occurred";
       setMessage(errorMessage);
       setMessageType("error");
     }
@@ -151,10 +150,10 @@ function ModalSchedulePatient({ patient }) {
 
   const modalContent = (
     <div
-      className={`sched-modal-patient ${isOpen ? "open" : "closed"}`}
+      className={`book-appointment-modal ${isOpen ? "open" : "closed"}`}
       onClick={handleOverlayClick}
     >
-      <div className="sched-modal-content">
+      <div className="book-appointment-content">
         <h2>Schedule Appointment</h2>
         {message && <p className={`message ${messageType}`}>{message}</p>}
 
@@ -180,11 +179,11 @@ function ModalSchedulePatient({ patient }) {
           </label>
           <label>
             Date
-            <input name="date" type="date" value={formData.date} onChange={handleInputChange} required />
+            <input name="date" min={today} type="date" value={formData.date} onChange={handleInputChange} required />
           </label>
           <label>
             Time
-            <input name="time" type="time" value={formData.time} onChange={handleInputChange} required />
+            <input name="time" min="09:00" max="21:00"type="time" value={formData.time} onChange={handleInputChange} required />
           </label>
           <label>
             Service Type
@@ -199,7 +198,7 @@ function ModalSchedulePatient({ patient }) {
             <input name="notes" type="text" value={formData.notes} onChange={handleInputChange} />
           </label>
 
-          <div className="modal-buttons">
+          <div className="book-appointment-buttons">
             <button type="button" onClick={() => setIsOpen(false)}>Cancel</button>
             <button type="submit">Schedule</button>
           </div>
@@ -212,7 +211,7 @@ function ModalSchedulePatient({ patient }) {
     <>
       <button
         ref={openButtonRef}
-        className="sched-patients-button"
+        className="book-appointment-button"
         onClick={() => setIsOpen(true)}
       >
         Schedule
@@ -221,5 +220,6 @@ function ModalSchedulePatient({ patient }) {
     </>
   );
 }
+
 
 export default ModalSchedulePatient;

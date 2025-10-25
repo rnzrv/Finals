@@ -1,17 +1,16 @@
-/* Reset and base styles */
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
 }
 
-.sched-modal-patient {
+.book-appointment-modal {
   position: fixed;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
-  background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent overlay */
+  background-color: rgba(0, 0, 0, 0.5);
   display: flex;
   justify-content: center;
   align-items: center;
@@ -21,26 +20,25 @@
   z-index: 1000;
 }
 
-.sched-modal-patient.open {
+.book-appointment-modal.open {
   opacity: 1;
   visibility: visible;
   transition: opacity 0.3s ease;
 }
 
-.sched-modal-patient.closed {
+.book-appointment-modal.closed {
   opacity: 0;
   visibility: hidden;
   transition: opacity 0.3s ease, visibility 0s linear 0.3s;
 }
 
-.sched-modal-content {
+.book-appointment-content {
   background-color: white;
   padding: 20px;
   border-radius: 8px;
   width: 90%;
   max-width: 500px;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  position: relative;
   animation: slideIn 0.3s ease-out;
 }
 
@@ -55,7 +53,7 @@
   }
 }
 
-.sched-modal-content h2 {
+.book-appointment-content h2 {
   font-size: 1.5rem;
   margin-bottom: 15px;
   color: #333;
@@ -94,8 +92,7 @@ label {
   color: #555;
 }
 
-label input,
-label select {
+label input {
   padding: 8px;
   margin-top: 5px;
   border: 1px solid #ddd;
@@ -103,21 +100,20 @@ label select {
   font-size: 0.9rem;
 }
 
-label input:focus,
-label select:focus {
+label input:focus {
   outline: none;
   border-color: #007bff;
   box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
 }
 
-.modal-buttons {
+.book-appointment-buttons {
   display: flex;
   justify-content: flex-end;
   gap: 10px;
   margin-top: 20px;
 }
 
-.modal-buttons button {
+.book-appointment-buttons button {
   padding: 10px 20px;
   border: none;
   border-radius: 4px;
@@ -125,33 +121,27 @@ label select:focus {
   font-size: 0.9rem;
 }
 
-.modal-buttons button[type="button"] {
+.book-appointment-buttons button[type="button"] {
   background-color: #6c757d;
   color: white;
 }
 
-.modal-buttons button[type="submit"] {
+.book-appointment-buttons button[type="submit"] {
   background-color: #28a745;
   color: white;
 }
 
-.modal-buttons button:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-}
-
-.modal-buttons button:hover:not(:disabled) {
+.book-appointment-buttons button:hover:not(:disabled) {
   opacity: 0.9;
 }
 
-/* Responsive design */
 @media (max-width: 480px) {
-  .sched-modal-content {
+  .book-appointment-content {
     width: 95%;
     padding: 15px;
   }
 
-  .modal-buttons button {
+  .book-appointment-buttons button {
     padding: 8px 15px;
     font-size: 0.85rem;
   }

@@ -11,34 +11,70 @@ import email from "../icons/email.svg";
 import EditPatients from "./modals/modal-EditPatients.jsx";
 import DeletePatient from "./modals/modal-deletepatient.jsx";
 import ModalSchedulePatient from "./modals/modal-schedulePatient.jsx";
+import ModalPatientHistory from "./modals/modal-patientHistory.jsx";
 
 function Patients() {
   const [patients, setPatients] = useState([]);
+  const [appointments, setAppointments] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const patientsPerPage = 12;
 
   const colors = ["#6A5ACD", "#FF69B4", "#BDA55D", "#4CAF50", "#2196F3", "#FF9800"];
   const RandomColor = () => colors[Math.floor(Math.random() * colors.length)];
 
-  // 🧠 Fetch all patients
+  // ✅ Fetch patients
   const getPatients = async () => {
     try {
       const token = sessionStorage.getItem("accessToken");
-      const response = await axios.get("http://localhost:8081/patients/getPatients", {
+      const res = await axios.get("http://localhost:8081/patients/getPatients", {
         withCredentials: true,
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
+        headers: { Authorization: `Bearer ${token}` },
       });
-      setPatients(response.data);
-    } catch (error) {
-      console.error("Error fetching patients:", error.response || error.message);
+      setPatients(res.data);
+    } catch (err) {
+      console.error("Error fetching patients:", err);
+    }
+  };
+
+  // ✅ Fetch appointments
+  const getAppointments = async () => {
+    try {
+      const token = sessionStorage.getItem("accessToken");
+      const res = await axios.get("http://localhost:8081/appointments/getAppointments", {
+        withCredentials: true,
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      setAppointments(res.data);
+    } catch (err) {
+      console.error("Error fetching appointments:", err);
     }
   };
 
   useEffect(() => {
     getPatients();
+    getAppointments();
   }, []);
+
+  // ✅ Derived stats
+  const today = new Date();
+  const startOfWeek = new Date(today);
+  startOfWeek.setDate(today.getDate() - today.getDay()); // Sunday start
+  const endOfWeek = new Date(startOfWeek);
+  endOfWeek.setDate(startOfWeek.getDate() + 6); // Saturday end
+
+  const scheduledToday = appointments.filter((a) => {
+    const date = new Date(a.date);
+    return (
+      date.getFullYear() === today.getFullYear() &&
+      date.getMonth() === today.getMonth() &&
+      date.getDate() === today.getDate()
+    );
+  }).length;
+
+  const newThisWeek = patients.filter((p) => {
+    const created = new Date(p.created_at);
+    return created >= startOfWeek && created <= endOfWeek;
+  }).length;
 
   const getInitials = (name) => {
     if (!name) return "";
@@ -65,6 +101,7 @@ function Patients() {
             <p>Admin</p>
           </div>
         </header>
+
         <div className="patients-main-content">
           {/* ✅ Top Summary */}
           <div className="patients-grid-container-top">
@@ -74,17 +111,18 @@ function Patients() {
             </div>
             <div className="card-patients">
               <p>Scheduled Today</p>
-              <h3>8</h3>
+              <h3>{scheduledToday}</h3>
             </div>
             <div className="card-patients">
               <p>New This Week</p>
-              <h3>7</h3>
+              <h3>{newThisWeek}</h3>
             </div>
             <div className="card-patients">
               <p>Pending Follow Ups</p>
-              <h3>2</h3>
+              <h3>—</h3>
             </div>
           </div>
+
           {/* ✅ Search + Add Patient */}
           <div className="patients-middle">
             <div className="patient-search">
@@ -95,7 +133,8 @@ function Patients() {
               <AddPatients onPatientAdded={getPatients} />
             </div>
           </div>
-          {/* ✅ Dynamic Patient Cards */}
+
+          {/* ✅ Patient Cards */}
           <div className="patients-grid-container">
             {currentPatients.map((patient) => (
               <div key={patient.id} className="patients-info">
@@ -111,6 +150,7 @@ function Patients() {
                     <h3>Status</h3>
                   </div>
                 </div>
+
                 <div className="patients-info-bottom">
                   <div className="patients-data">
                     <div className="data patients-email">
@@ -121,30 +161,30 @@ function Patients() {
                       <img src={telephone} alt="" />
                       {patient.contact_number}
                     </div>
-                    <div className="data patients-last-visit" >
+                    <div className="data patients-last-visit">
                       <img src={calendar} alt="" />
-                      <p className={isNaN(new Date(patient.last_visit).getTime()) ? "Invalid" : "Valid"}>
-                          Last visit: {isNaN(new Date(patient.last_visit).getTime())
-                          ? "Invalid date"
-                          : new Date(patient.last_visit).toLocaleDateString()}
+                      <p>
+                        Last visit:{" "}
+                        {patient.last_visit
+                          ? new Date(patient.last_visit).toLocaleDateString()
+                          : "No record"}
                       </p>
-
                     </div>
                   </div>
                   <div className="patients-card-button patients-btn">
                     <EditPatients patient={patient} onPatientUpdated={getPatients} />
                     <DeletePatient patient={patient} onPatientDeleted={getPatients} />
-                    <ModalSchedulePatient patient = {patient}/>
+                    <ModalSchedulePatient patient={patient} />
+                    <ModalPatientHistory patient={patient} />
                   </div>
                 </div>
               </div>
             ))}
           </div>
+
           {/* ✅ Pagination */}
           <div className="patients-pagination patients-btn">
-            <button onClick={() => setCurrentPage((p) => Math.max(p - 1, 1))}>
-              Prev
-            </button>
+            <button onClick={() => setCurrentPage((p) => Math.max(p - 1, 1))}>Prev</button>
             <span style={{ margin: "0 10px" }}>
               Page {currentPage} of {totalPages}
             </span>
