@@ -10,6 +10,7 @@ import telephone from "../icons/telephone.svg";
 import email from "../icons/email.svg";
 import EditPatients from "./modals/modal-EditPatients.jsx";
 import DeletePatient from "./modals/modal-deletepatient.jsx";
+import ModalSchedulePatient from "./modals/modal-schedulePatient.jsx";
 
 function Patients() {
   const [patients, setPatients] = useState([]);
@@ -72,15 +73,15 @@ function Patients() {
               <h3>{patients.length}</h3>
             </div>
             <div className="card-patients">
-              <p>Admitted</p>
+              <p>Scheduled Today</p>
               <h3>8</h3>
             </div>
             <div className="card-patients">
-              <p>Outpatients</p>
+              <p>New This Week</p>
               <h3>7</h3>
             </div>
             <div className="card-patients">
-              <p>Critical</p>
+              <p>Pending Follow Ups</p>
               <h3>2</h3>
             </div>
           </div>
@@ -118,7 +119,7 @@ function Patients() {
                     </div>
                     <div className="data patients-num">
                       <img src={telephone} alt="" />
-                      {patient.number}
+                      {patient.contact_number}
                     </div>
                     <div className="data patients-last-visit" >
                       <img src={calendar} alt="" />
@@ -133,7 +134,7 @@ function Patients() {
                   <div className="patients-card-button patients-btn">
                     <EditPatients patient={patient} onPatientUpdated={getPatients} />
                     <DeletePatient patient={patient} onPatientDeleted={getPatients} />
-                    <button className="green">Schedule</button>
+                    <ModalSchedulePatient patient = {patient}/>
                   </div>
                 </div>
               </div>

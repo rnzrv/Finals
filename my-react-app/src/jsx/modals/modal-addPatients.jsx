@@ -6,11 +6,15 @@ function AddPatients({ onPatientAdded }) {
   const [isOpen, setIsOpen] = useState(false);
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
-  const [number, setNumber] = useState("");
-  const [lastVisit, setLastVisit] = useState(""); // stores DD/MM/YYYY
+  const [contact_number, setContactNumber] = useState("");
+  const [age, setAge] = useState(0);
+  const [gender, setGender] = useState("");
+  const [medical_notes, setMedicalNotes] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [message, setMessage] = useState(null);
   const [messageType, setMessageType] = useState(null); // "success" or "error"
+
+
 
   const openModal = () => {
     setIsOpen(true);
@@ -24,34 +28,9 @@ function AddPatients({ onPatientAdded }) {
     setMessageType(null);
   };
 
-  // ✅ Convert ISO (YYYY-MM-DD) → DD/MM/YYYY
-  const formatToDMY = (isoDate) => {
-    if (!isoDate) return "";
-    const [year, month, day] = isoDate.split("-");
-    return `${day}/${month}/${year}`;
-  };
-
-  // ✅ Convert DD/MM/YYYY → ISO (YYYY-MM-DD)
-  const formatToISO = (displayDate) => {
-    if (!displayDate.includes("/")) return displayDate;
-    const [day, month, year] = displayDate.split("/");
-    return `${year}-${month.padStart(2, "0")}-${day.padStart(2, "0")}`;
-  };
-
-  // ✅ Handle date input change
-  const handleDateChange = (e) => {
-    const isoValue = e.target.value; // always YYYY-MM-DD
-    const dmyValue = formatToDMY(isoValue);
-    setLastVisit(dmyValue);
-  };
-
-  // ✅ Set min and max date for current year
-  const currentYear = new Date().getFullYear();
-  const minDate = `${currentYear}-01-01`;
-  const maxDate = `${currentYear}-12-31`;
-
+  // ✅ Validate form (removed date-related validation)
   const validateForm = () => {
-    if (!name || !email || !number || !lastVisit) {
+    if (!name || !email || !contact_number) {
       return "All fields are required";
     }
 
@@ -66,27 +45,13 @@ function AddPatients({ onPatientAdded }) {
     }
 
     const phoneRegex = /^(?:\+639|09|639)\d{9}$/;
-    if (!phoneRegex.test(number)) {
+    if (!phoneRegex.test(contact_number)) {
       return "Phone number must be in the format 09XXXXXXXXX or +639XXXXXXXXX";
     }
 
-    const dateRegex = /^(0?[1-9]|[12]\d|3[01])\/(0?[1-9]|1[0-2])\/\d{4}$/; // DD/MM/YYYY
-    if (!dateRegex.test(lastVisit)) {
-      return "Please enter a valid date (DD/MM/YYYY)";
-    }
-
-    const [day, month, year] = lastVisit.split("/");
-    const parsedDate = new Date(`${year}-${month}-${day}`);
-    if (isNaN(parsedDate.getTime())) {
-      return "Invalid date value";
-    }
-
-    // ✅ Check if date is within the current year
-    const startOfYear = new Date(currentYear, 0, 1);
-    const endOfYear = new Date(currentYear, 11, 31);
-    if (parsedDate < startOfYear || parsedDate > endOfYear) {
-      return "Date must be within the current year (Jan 1 to Dec 31)";
-    }
+    if (isNaN(age) || age < 0 || age > 150) {
+      return "Age must be a valid number between 0 and 150";
+    }  
 
     return null;
   };
@@ -107,12 +72,15 @@ function AddPatients({ onPatientAdded }) {
     try {
       const token = sessionStorage.getItem("accessToken");
       await axios.post(
-        "http://localhost:8081/patients/addPatient",
+        "http://localhost:8081/patients/addPatient", // Adjusted to match previous backend setup
         {
           name,
           email,
-          number,
-          last_visit: lastVisit, // send as DD/MM/YYYY
+          contact_number,
+          age,
+          gender,
+          medical_notes,
+          status: "active" // Default status as per schema
         },
         {
           headers: { Authorization: `Bearer ${token}` },
@@ -125,8 +93,10 @@ function AddPatients({ onPatientAdded }) {
       if (onPatientAdded) onPatientAdded();
       setName("");
       setEmail("");
-      setNumber("");
-      setLastVisit("");
+      setContactNumber("");
+      setAge("");
+      setGender("");
+      setMedicalNotes("");
       setTimeout(closeModal, 1000);
     } catch (error) {
       const errorMessage =
@@ -135,7 +105,7 @@ function AddPatients({ onPatientAdded }) {
       setMessageType("error");
       console.error("Error adding patient:", error.response?.data || error.message);
     } finally {
-      setIsLoading(false);
+    setIsLoading(false);
     }
   };
 
@@ -180,19 +150,38 @@ function AddPatients({ onPatientAdded }) {
               <input
                 type="text"
                 placeholder="Enter phone number"
-                value={number}
-                onChange={(e) => setNumber(e.target.value)}
+                value={contact_number}
+                onChange={(e) => setContactNumber(e.target.value)}
                 required
               />
 
-              <label>Last Visit</label>
+              <label>Age</label>
               <input
-                type="date"
-                min={minDate}
-                max={maxDate}
-                value={formatToISO(lastVisit)}
-                onChange={handleDateChange}
+                type="number"
+                placeholder="Enter age"
+                value={age}
+                onChange={(e) => setAge(e.target.value)}
                 required
+              />
+
+              <label>Gender</label>
+              <select
+                value={gender}
+                onChange={(e) => setGender(e.target.value)}
+                required
+              >
+                <option value="">Select Gender</option>
+                <option value="Male">Male</option>
+                <option value="Female">Female</option>
+                <option value="Other">Other</option>
+              </select>
+
+              <label>Medical Notes</label>
+              <input
+                type="text"
+                placeholder="Enter medical notes"
+                value={medical_notes}
+                onChange={(e) => setMedicalNotes(e.target.value)}
               />
 
               <div className="modal-buttons">

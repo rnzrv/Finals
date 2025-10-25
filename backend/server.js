@@ -17,12 +17,13 @@ app.use(cookieParser());
 // Import routes
 const userRoutes = require('./routes/users');
 const patientRoutes = require('./routes/patients');
+const appointmentRoutes = require('./routes/appointment')
 
 
 // Use routes
 app.use('/users', userRoutes);
 app.use('/patients', patientRoutes);
-
+app.use('/appointments', appointmentRoutes);
 // Test route
 app.get('/', (req, res) => {
   return res.json("Backend is running");

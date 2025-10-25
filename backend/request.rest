@@ -23,29 +23,50 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyVHlwZSI6ImFkb
 ###
 
 POST http://localhost:8081/patients/addPatient
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyVHlwZSI6ImFkbWluIiwidXNlcm5hbWUiOiJjZW8xMjMiLCJpYXQiOjE3NjEzMjY0MzYsImV4cCI6MTc2MTkzMTIzNn0.PGtYIDliB5mmnI7FpKBqaUhCxLGgFgdCFF4d3Y7dRJo
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyVHlwZSI6ImFkbWluIiwidXNlcm5hbWUiOiJjZW8xMjMiLCJpYXQiOjE3NjE0MTE0ODcsImV4cCI6MTc2MjAxNjI4N30.rxd3syPwlavLVf9xGCViGmGuO5Z7cOJe6phUIwnX9mE
 Content-Type: application/json
 
 {
-    "name": "vania",
+    "name": "akjsghfkjania",
     "email": "jhvjhghhfchgjgjhghjg@example.com",
-    "number": "09545485763",
-    "last_visit": "2023-10-01"
+    "contact_number": "09545485760",
+    "age" : 25,
+    "gender": "Female",
+    "medical_notes": "No known allergies"
 }
 
-### {{$aadToken}}
-PUT http://localhost:8081/patients/updatePatient/59
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyVHlwZSI6ImFkbWluIiwidXNlcm5hbWUiOiJjZW8xMjMiLCJpYXQiOjE3NjEzMjY0MzYsImV4cCI6MTc2MTkzMTIzNn0.PGtYIDliB5mmnI7FpKBqaUhCxLGgFgdCFF4d3Y7dRJo
-Content-Type: application/json
-
-{
-    "name": "Ronz Arvie",
-    "email": "john@exam.com",
-    "number": "09545485762",
-    "last_visit": "2023-10-01"
-}
 
 ### 
 DELETE http://localhost:8081/patients/deletePatient/59
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyVHlwZSI6ImFkbWluIiwidXNlcm5hbWUiOiJjZW8xMjMiLCJpYXQiOjE3NjEzMjY0MzYsImV4cCI6MTc2MTkzMTIzNn0.PGtYIDliB5mmnI7FpKBqaUhCxLGgFgdCFF4d3Y7dRJo
 Content-Type: application/json
+
+### a
+PUT http://localhost:8081/patients/updatePatient/7
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyVHlwZSI6ImFkbWluIiwidXNlcm5hbWUiOiJjZW8xMjMiLCJpYXQiOjE3NjE0MTE0ODcsImV4cCI6MTc2MjAxNjI4N30.rxd3syPwlavLVf9xGCViGmGuO5Z7cOJe6phUIwnX9mE
+Content-Type: application/json
+
+{
+    "name": "Updated Naame",
+    "email": "s.email@example.com",
+    "contact_number": "09876548874",
+    "age" : 30,
+    "gender": "Male",
+    "medical_notes": "Updated medical notes",
+    "status": "Recovered"
+}
+
+### asdas
+POST http://localhost:8081/appointments/setAppointment
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyVHlwZSI6ImFkbWluIiwidXNlcm5hbWUiOiJjZW8xMjMiLCJpYXQiOjE3NjE0MTE0ODcsImV4cCI6MTc2MjAxNjI4N30.rxd3syPwlavLVf9xGCViGmGuO5Z7cOJe6phUIwnX9mE
+Content-Type: application/json
+
+{
+  "patient_id": 1,
+  "doctor": "Dr. Smith",
+  "date": "2025-10-26",
+  "time": "14:30",
+  "service_type": "Consultation",
+  "status": "Scheduled",
+  "notes": "Follow-up visit"
+}

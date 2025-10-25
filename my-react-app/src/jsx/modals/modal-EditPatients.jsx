@@ -6,11 +6,15 @@ import "../../css/modal/editPatient.css";
 function EditPatients({ patient, onPatientUpdated }) {
   const [isOpen, setIsOpen] = useState(false);
   const [isMounted, setIsMounted] = useState(false);
+
   const [formData, setFormData] = useState({
     name: "",
     email: "",
-    number: "",
-    last_visit: "",
+    contact_number: "",
+    age: "",
+    gender: "",
+    medical_notes: "",
+    status: "",
   });
 
   const [message, setMessage] = useState(null);
@@ -19,30 +23,25 @@ function EditPatients({ patient, onPatientUpdated }) {
   const ANIMATION_MS = 300;
   const openButtonRef = useRef(null);
 
-  // Current year for date input restrictions
-  const currentYear = new Date().getFullYear();
-  const minDate = `${currentYear}-01-01`;
-  const maxDate = `${currentYear}-12-31`;
-
-  // Keep form in sync with patient when modal opens
+  // Sync form with patient data when modal opens
   useEffect(() => {
     if (isOpen && patient) {
       console.log("Patient prop:", patient); // Debug
-      const normalizedDate = patient.last_visit?.includes("T")
-        ? patient.last_visit.slice(0, 10)
-        : patient.last_visit || "";
       setFormData({
         name: patient.name || "",
         email: patient.email || "",
-        number: patient.number || "",
-        last_visit: normalizedDate,
+        contact_number: patient.contact_number || "", // Match backend field name
+        age: patient.age || "",
+        gender: patient.gender || "",
+        medical_notes: patient.medical_notes || "",
+        status: patient.status || "",
       });
       setMessage(null);
       setMessageType(null);
     }
   }, [isOpen, patient]);
 
-  // Manage mount/unmount for smooth transitions
+  // Manage mount/unmount for transitions
   useEffect(() => {
     if (isOpen) {
       setIsMounted(true);
@@ -54,7 +53,7 @@ function EditPatients({ patient, onPatientUpdated }) {
     }
   }, [isOpen]);
 
-  // Allow closing via Escape key
+  // Handle Escape key to close
   useEffect(() => {
     const onKeyDown = (e) => {
       if (e.key === "Escape" && isOpen) {
@@ -66,7 +65,7 @@ function EditPatients({ patient, onPatientUpdated }) {
     return () => window.removeEventListener("keydown", onKeyDown);
   }, [isOpen]);
 
-  // Form input handler
+  // Handle input changes
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
@@ -80,43 +79,34 @@ function EditPatients({ patient, onPatientUpdated }) {
     if (!value && patient[name]) {
       setFormData((prev) => ({ ...prev, [name]: patient[name] || "" }));
     }
-    // Validate date on blur
-    if (name === "last_visit" && value) {
-      const dateRegex = /^\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01])$/;
-      if (!dateRegex.test(value) || isNaN(new Date(value).getTime())) {
-        setMessage(`Please enter a valid date in YYYY-MM-DD format (e.g., ${currentYear}-01-01)`);
-        setMessageType("error");
-      } else if (new Date(value).getFullYear() !== currentYear) {
-        setMessage(`Date must be within ${currentYear}`);
-        setMessageType("error");
-      }
-    }
   };
 
-  // Validation logic
+  // Validation logic (aligned with backend)
   const validateForm = () => {
-    const { name, email, number, last_visit } = formData;
-    if (!name || !email || !number || !last_visit) {
-      console.log("Empty fields:", { name, email, number, last_visit }); // Debug
-      return "All fields are required";
+    const { name, email, contact_number, age, gender, medical_notes, status } = formData;
+    if (!name || !email || !contact_number) {
+      console.log("Empty fields:", { name, email, contact_number });
+      return "Name, email, and contact number are required";
     }
 
-    if (!/^[a-zA-Z\s'-]+$/.test(name))
+    if (!/^[a-zA-Z\s'-]+$/.test(name)) {
       return "Name can only contain letters, spaces, hyphens, or apostrophes";
-
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))
-      return "Please enter a valid email address";
-
-    if (!/^(?:\+639|09|639)\d{9}$/.test(number))
-      return "Phone number must be in the format 09XXXXXXXXX or +639XXXXXXXXX";
-
-    const dateRegex = /^\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01])$/;
-    if (!last_visit || !dateRegex.test(last_visit) || isNaN(new Date(last_visit).getTime())) {
-      return `Please enter a valid date in YYYY-MM-DD format (e.g., ${currentYear}-01-01)`;
     }
 
-    if (new Date(last_visit).getFullYear() !== currentYear) {
-      return `Date must be within ${currentYear}`;
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      return "Please enter a valid email address";
+    }
+
+    if (!/^(?:\+639|09|639)\d{9}$/.test(contact_number)) {
+      return "Phone number must be in the format 09XXXXXXXXX or +639XXXXXXXXX";
+    }
+
+    if (age && (isNaN(age) || age < 0 || age > 150)) {
+      return "Age must be a valid number between 0 and 150";
+    }
+
+    if (gender && !['Male', 'Female', 'Other'].includes(gender)) {
+      return "Gender must be Male, Female, or Other";
     }
 
     return null;
@@ -151,7 +141,7 @@ function EditPatients({ patient, onPatientUpdated }) {
 
       setMessage("Patient updated successfully");
       setMessageType("success");
-      onPatientUpdated(response.data);
+      onPatientUpdated(response.data); // Backend returns { message: ... }
       setTimeout(() => setIsOpen(false), 1000);
     } catch (err) {
       console.error("Update error:", err.response?.data || err.message);
@@ -173,7 +163,7 @@ function EditPatients({ patient, onPatientUpdated }) {
 
   // Modal open with validation
   const handleOpenModal = () => {
-    if (!patient || !patient.id || !patient.name || !patient.email || !patient.number || !patient.last_visit) {
+    if (!patient || !patient.id || !patient.name || !patient.email || !patient.contact_number) {
       setMessage("Invalid patient data");
       setMessageType("error");
       return;
@@ -221,11 +211,11 @@ function EditPatients({ patient, onPatientUpdated }) {
           </label>
 
           <label>
-            Phone Number
+            Contact Number
             <input
-              name="number"
+              name="contact_number" // Updated to match backend
               type="tel"
-              value={formData.number}
+              value={formData.contact_number}
               onChange={handleInputChange}
               onBlur={handleInputBlur}
               disabled={isLoading}
@@ -234,17 +224,54 @@ function EditPatients({ patient, onPatientUpdated }) {
           </label>
 
           <label>
-            Last Visit
+            Age
             <input
-              name="last_visit"
-              type="date"
-              value={formData.last_visit}
+              name="age"
+              type="number"
+              value={formData.age}
               onChange={handleInputChange}
               onBlur={handleInputBlur}
               disabled={isLoading}
-              min={minDate}
-              max={maxDate}
-              required
+            />
+          </label>
+
+          <label>
+            Gender
+            <select
+              name="gender"
+              value={formData.gender}
+              onChange={handleInputChange}
+              onBlur={handleInputBlur}
+              disabled={isLoading}
+            >
+              <option value="">Select Gender</option>
+              <option value="Male">Male</option>
+              <option value="Female">Female</option>
+              <option value="Other">Other</option>
+            </select>
+          </label>
+
+          <label>
+            Medical Notes
+            <input
+              name="medical_notes"
+              type="text"
+              value={formData.medical_notes}
+              onChange={handleInputChange}
+              onBlur={handleInputBlur}
+              disabled={isLoading}
+            />
+          </label>
+
+          <label>
+            Status
+            <input
+              name="status"
+              type="text"
+              value={formData.status}
+              onChange={handleInputChange}
+              onBlur={handleInputBlur}
+              disabled={isLoading}
             />
           </label>
 
