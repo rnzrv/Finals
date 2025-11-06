@@ -15,7 +15,7 @@ GET
 ### Response
 
 GET http://localhost:8081/getusers
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyVHlwZSI6ImFkbWluIiwidXNlcm5hbWUiOiJjZW8xMjMiLCJpYXQiOjE3NjEzMjY0MzYsImV4cCI6MTc2MTkzMTIzNn0.PGtYIDliB5mmnI7FpKBqaUhCxLGgFgdCFF4d3Y7dRJo
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyVHlwZSI6ImFkbWluIiwidXNlcm5hbWUiOiJjZW8xMjMiLCJpYXQiOjE3NjE1MTIwOTEsImV4cCI6MTc2MjExNjg5MX0.ayoN-6nuUX5pcDh8VfGLIDLccdgDbkq4jRCUDVz9gbg
 ###
 
 GET http://localhost:8081/patients/getPatients
@@ -27,9 +27,9 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyVHlwZSI6ImFkb
 Content-Type: application/json
 
 {
-    "name": "akjsghfkjania",
-    "email": "jhvjhghhfchgjgjhghjg@example.com",
-    "contact_number": "09545485760",
+    "name": "jacopal",
+    "email": "sssd@example.d",
+    "contact_number": "09876586454",
     "age" : 25,
     "gender": "Female",
     "medical_notes": "No known allergies"
@@ -70,3 +70,15 @@ Content-Type: application/json
   "status": "Scheduled",
   "notes": "Follow-up visit"
 }
+
+### Get Last Visit
+GET http://localhost:8081/appointments/lastVisit/14
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyVHlwZSI6ImFkbWluIiwidXNlcm5hbWUiOiJjZW8xMjMiLCJpYXQiOjE3NjE5MDcyMDAsImV4cCI6MTc2MjUxMjAwMH0.Gwz6DctIJTPSM_jmlVtLFmlgV70YxEFQX2_7XvB8Qsg
+
+### Get Appointment Stats
+GET http://localhost:8081/appointments/stats
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyVHlwZSI6ImFkbWluIiwidXNlcm5hbWUiOiJjZW8xMjMiLCJpYXQiOjE3NjE5MDcyMDAsImV4cCI6MTc2MjUxMjAwMH0.Gwz6DctIJTPSM_jmlVtLFmlgV70YxEFQX2_7XvB8Qsg
+
+### Get Appointments for Appointment Page
+GET http://localhost:8081/appointments/getAppointments/appointmentPage
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyVHlwZSI6ImFkbWluIiwidXNlcm5hbWUiOiJjZW8xMjMiLCJpYXQiOjE3NjE5NTc0MTcsImV4cCI6MTc2MjU2MjIxN30.7KKyLyJE-9M57p069aR6ZwyiffD0MYgIgcvviY-u3UU

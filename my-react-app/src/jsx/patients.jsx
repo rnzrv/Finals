@@ -15,12 +15,18 @@ import ModalPatientHistory from "./modals/modal-patientHistory.jsx";
 
 function Patients() {
   const [patients, setPatients] = useState([]);
+  const [filteredPatients, setFilteredPatients] = useState([]);
   const [appointments, setAppointments] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
-  const patientsPerPage = 12;
+  const [latestVisitData, setLastVisitData] = useState({});
+  const [stats, setStats] = useState({
+    total_patients: 0,
+    scheduled_today: 0,
+    new_this_week: 0,
+  });
 
+  const patientsPerPage = 12;
   const colors = ["#6A5ACD", "#FF69B4", "#BDA55D", "#4CAF50", "#2196F3", "#FF9800"];
-  const RandomColor = () => colors[Math.floor(Math.random() * colors.length)];
 
   // ✅ Fetch patients
   const getPatients = async () => {
@@ -30,7 +36,15 @@ function Patients() {
         withCredentials: true,
         headers: { Authorization: `Bearer ${token}` },
       });
-      setPatients(res.data);
+
+      // Assign fixed colors to patients
+      const coloredPatients = res.data.map((p) => ({
+        ...p,
+        color: colors[Math.floor(Math.random() * colors.length)],
+      }));
+
+      setPatients(coloredPatients);
+      setFilteredPatients(coloredPatients);
     } catch (err) {
       console.error("Error fetching patients:", err);
     }
@@ -50,31 +64,67 @@ function Patients() {
     }
   };
 
+  // ✅ Fetch latest visit per patient
+  const latestVisit = async (patientId) => {
+    try {
+      const token = sessionStorage.getItem("accessToken");
+      const res = await axios.get(`http://localhost:8081/appointments/lastVisit/${patientId}`, {
+        withCredentials: true,
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      setLastVisitData((prev) => ({
+        ...prev,
+        [patientId]: res.data,
+      }));
+    } catch (err) {
+      console.error("Error fetching last visit:", err);
+    }
+  };
+
+  // ✅ Fetch stats
+  const fetchStats = async () => {
+    try {
+      const token = sessionStorage.getItem("accessToken");
+      const res = await axios.get(`http://localhost:8081/appointments/stats`, {
+        withCredentials: true,
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      setStats(res.data);
+    } catch (err) {
+      console.error("Error fetching stats:", err);
+    }
+  };
+
+  // ✅ Initial fetch
   useEffect(() => {
     getPatients();
     getAppointments();
   }, []);
 
-  // ✅ Derived stats
-  const today = new Date();
-  const startOfWeek = new Date(today);
-  startOfWeek.setDate(today.getDate() - today.getDay()); // Sunday start
-  const endOfWeek = new Date(startOfWeek);
-  endOfWeek.setDate(startOfWeek.getDate() + 6); // Saturday end
+  // ✅ Fetch last visit when patients load
+  useEffect(() => {
+    if (patients.length > 0) {
+      patients.forEach((p) => latestVisit(p.id));
+    }
+  }, [patients]);
 
-  const scheduledToday = appointments.filter((a) => {
-    const date = new Date(a.date);
-    return (
-      date.getFullYear() === today.getFullYear() &&
-      date.getMonth() === today.getMonth() &&
-      date.getDate() === today.getDate()
+  // ✅ Fetch stats automatically when patients or appointments change
+  useEffect(() => {
+    fetchStats();
+  }, [patients, appointments]);
+
+  // ✅ Search
+  const handleSearch = (e) => {
+    const query = e.target.value.toLowerCase();
+    const filtered = patients.filter(
+      (patient) =>
+        patient.name.toLowerCase().includes(query) ||
+        patient.email.toLowerCase().includes(query) ||
+        patient.contact_number.toLowerCase().includes(query)
     );
-  }).length;
-
-  const newThisWeek = patients.filter((p) => {
-    const created = new Date(p.created_at);
-    return created >= startOfWeek && created <= endOfWeek;
-  }).length;
+    setFilteredPatients(filtered);
+    setCurrentPage(1); // Reset to first page on search
+  };
 
   const getInitials = (name) => {
     if (!name) return "";
@@ -87,8 +137,8 @@ function Patients() {
 
   const indexOfLastPatient = currentPage * patientsPerPage;
   const indexOfFirstPatient = indexOfLastPatient - patientsPerPage;
-  const currentPatients = patients.slice(indexOfFirstPatient, indexOfLastPatient);
-  const totalPages = Math.ceil(patients.length / patientsPerPage);
+  const currentPatients = filteredPatients.slice(indexOfFirstPatient, indexOfLastPatient);
+  const totalPages = Math.ceil(filteredPatients.length / patientsPerPage);
 
   return (
     <div className="patients">
@@ -107,19 +157,15 @@ function Patients() {
           <div className="patients-grid-container-top">
             <div className="card-patients">
               <p>Total Patients</p>
-              <h3>{patients.length}</h3>
+              <h3>{stats.total_patients}</h3>
             </div>
             <div className="card-patients">
               <p>Scheduled Today</p>
-              <h3>{scheduledToday}</h3>
+              <h3>{stats.scheduled_today}</h3>
             </div>
             <div className="card-patients">
               <p>New This Week</p>
-              <h3>{newThisWeek}</h3>
-            </div>
-            <div className="card-patients">
-              <p>Pending Follow Ups</p>
-              <h3>—</h3>
+              <h3>{stats.new_this_week}</h3>
             </div>
           </div>
 
@@ -127,7 +173,7 @@ function Patients() {
           <div className="patients-middle">
             <div className="patient-search">
               <img src={search} alt="" />
-              <input type="text" placeholder="Search for patients..." />
+              <input type="text" placeholder="Search for patients..." onChange={handleSearch} />
             </div>
             <div className="patient-right">
               <AddPatients onPatientAdded={getPatients} />
@@ -141,7 +187,7 @@ function Patients() {
                 <div className="patients-info-header">
                   <div
                     className="patients-info-header-left"
-                    style={{ backgroundColor: RandomColor() }}
+                    style={{ backgroundColor: patient.color }}
                   >
                     <h1>{getInitials(patient.name)}</h1>
                   </div>
@@ -165,16 +211,22 @@ function Patients() {
                       <img src={calendar} alt="" />
                       <p>
                         Last visit:{" "}
-                        {patient.last_visit
-                          ? new Date(patient.last_visit).toLocaleDateString()
-                          : "No record"}
+                        {latestVisitData[patient.id]?.last_visit
+                          ? new Date(latestVisitData[patient.id].last_visit).toLocaleDateString()
+                          : "N/A"}
                       </p>
                     </div>
                   </div>
                   <div className="patients-card-button patients-btn">
                     <EditPatients patient={patient} onPatientUpdated={getPatients} />
                     <DeletePatient patient={patient} onPatientDeleted={getPatients} />
-                    <ModalSchedulePatient patient={patient} />
+                    <ModalSchedulePatient
+                      patient={patient}
+                      onScheduleUpdated={() => {
+                        getAppointments();
+                        latestVisit(patient.id);
+                      }}
+                    />
                     <ModalPatientHistory patient={patient} />
                   </div>
                 </div>

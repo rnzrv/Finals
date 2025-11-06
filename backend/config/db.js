@@ -1,17 +1,90 @@
 const mysql = require('mysql');
+require('dotenv').config();
 
+const dbConfig = {
+  host: process.env.DB_HOST,
+  user: process.env.DB_USER,
+  password: process.env.DB_PASSWORD,
+  database: process.env.DB_NAME,
+};
 
-const db = mysql.createConnection({
-    host: process.env.DB_HOST,
-    user: process.env.DB_USER,
-    password: process.env.DB_PASSWORD,
-    database: process.env.DB_NAME
-})
+const connection = mysql.createConnection({
+  host: dbConfig.host,
+  user: dbConfig.user,
+  password: dbConfig.password,
+});
 
+connection.connect((err) => {
+  if (err) {
+    console.error('❌ Error connecting to MySQL:', err);
+    return;
+  }
+  console.log('✅ Connected to MySQL server.');
 
-db.connect((err) =>{
-    if(err) return console.error('Error connecting to database:', err);
-    console.log('Connected to database');
-})
+  // Step 1: Create database if not exists
+  connection.query(`CREATE DATABASE IF NOT EXISTS \`${dbConfig.database}\``, (err) => {
+    if (err) throw err;
+    console.log(`✅ Database '${dbConfig.database}' is ready.`);
 
-module.exports = db;
+    // Step 2: Switch to the database
+    connection.changeUser({ database: dbConfig.database }, (err) => {
+      if (err) throw err;
+
+      // Step 3: Create tables if not exist
+      const createPatientsTable = `
+        CREATE TABLE IF NOT EXISTS patients (
+          id INT AUTO_INCREMENT PRIMARY KEY,
+          name VARCHAR(100) NOT NULL,
+          email VARCHAR(100) NOT NULL UNIQUE,
+          contact_number VARCHAR(20),
+          age INT,
+          gender ENUM('Male', 'Female', 'Other'),
+          medical_notes TEXT,
+          last_visit DATE,
+          status ENUM('active', 'inactive', 'scheduled') NOT NULL DEFAULT 'active',
+          created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+          updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+        )`;
+
+      const createAppointmentsTable = `
+        CREATE TABLE IF NOT EXISTS appointments (
+          id INT AUTO_INCREMENT PRIMARY KEY,
+          patient_id INT NOT NULL,
+          doctor VARCHAR(100) NOT NULL,
+          date DATE NOT NULL,
+          time TIME NOT NULL,
+          service_type ENUM('Spa', 'Facial Services', 'Massage Therapy', 'Other') NOT NULL,
+          status ENUM('Pending', 'Completed', 'Cancelled') NOT NULL DEFAULT 'Pending',
+          notes TEXT,
+          created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+          updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+          FOREIGN KEY (patient_id) REFERENCES patients(id) ON DELETE CASCADE
+        )`;
+
+      const createUsersTable = `
+        CREATE TABLE IF NOT EXISTS users (
+          userId INT AUTO_INCREMENT PRIMARY KEY,
+          userType VARCHAR(50) NOT NULL,
+          username VARCHAR(50) NOT NULL,
+          password VARCHAR(255) NOT NULL
+        )`;
+
+      connection.query(createPatientsTable, (err) => {
+        if (err) throw err;
+        console.log('✅ patients table ready.');
+      });
+
+      connection.query(createAppointmentsTable, (err) => {
+        if (err) throw err;
+        console.log('✅ appointments table ready.');
+      });
+
+      connection.query(createUsersTable, (err) => {
+        if (err) throw err;
+        console.log('✅ users table ready.');
+      });
+    });
+  });
+});
+
+module.exports = connection;

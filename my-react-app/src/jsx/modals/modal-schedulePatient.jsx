@@ -3,7 +3,7 @@ import { createPortal } from "react-dom";
 import axios from "axios";
 import "../../css/modal/schedPatient.css";
 
-function ModalSchedulePatient({ patient }) {
+function ModalSchedulePatient({ patient, onScheduleUpdated }) {
   const [isOpen, setIsOpen] = useState(false);
   const [isMounted, setIsMounted] = useState(false);
   const [message, setMessage] = useState(null);
@@ -100,53 +100,57 @@ function ModalSchedulePatient({ patient }) {
 
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
-    setMessage(null);
-    setMessageType(null);
+  e.preventDefault();
+  setMessage(null);
+  setMessageType(null);
 
-    if (
-      !formData.patient_id ||
-      !formData.doctor ||
-      !formData.date ||
-      !formData.time ||
-      !formData.service_type ||
-      !formData.status
-    ) {
-      setMessage("All fields except notes are required");
-      setMessageType("error");
-      return;
-    }
+  if (
+    !formData.patient_id ||
+    !formData.doctor ||
+    !formData.date ||
+    !formData.time ||
+    !formData.service_type ||
+    !formData.status
+  ) {
+    setMessage("All fields except notes are required");
+    setMessageType("error");
+    return;
+  }
 
-    try {
-      const token = sessionStorage.getItem("accessToken");
-      if (!token) throw new Error("Not authenticated");
+  try {
+    const token = sessionStorage.getItem("accessToken");
+    if (!token) throw new Error("Not authenticated");
 
-      await axios.post(
-        "http://localhost:8081/appointments/setAppointment",
-        formData,
-        { headers: { Authorization: `Bearer ${token}` }, withCredentials: true }
-      );
+    await axios.post(
+      "http://localhost:8081/appointments/setAppointment",
+      formData,
+      { headers: { Authorization: `Bearer ${token}` }, withCredentials: true }
+    );
 
-      setMessage("Appointment booked successfully");
-      setMessageType("success");
-      setFormData({
-        patient_id: patientId,
-        doctor: "",
-        date: "",
-        time: "",
-        service_type: "",
-        status: "",
-        notes: "",
-      });
+    setMessage("Appointment booked successfully");
+    setMessageType("success");
+    setFormData({
+      patient_id: patientId,
+      doctor: "",
+      date: "",
+      time: "",
+      service_type: "",
+      status: "",
+      notes: "",
+    });
 
-      setTimeout(() => setIsOpen(false), 1000);
-    } catch (error) {
-      console.error("Booking error:", error.response?.data || error.message);
-      const errorMessage = error.response?.data?.error || "An unexpected error occurred";
-      setMessage(errorMessage);
-      setMessageType("error");
-    }
-  };
+    // ✅ Trigger parent to refresh
+    if (typeof onScheduleUpdated === "function") onScheduleUpdated();
+
+    setTimeout(() => setIsOpen(false), 1000);
+  } catch (error) {
+    console.error("Booking error:", error.response?.data || error.message);
+    const errorMessage = error.response?.data?.error || "An unexpected error occurred";
+    setMessage(errorMessage);
+    setMessageType("error");
+  }
+};
+
 
   const modalContent = (
     <div

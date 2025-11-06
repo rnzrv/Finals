@@ -70,4 +70,61 @@ router.get('/history/:id', (req, res) => {
   });
 });
 
+
+// =====Last Visit===
+router.get('/lastVisit/:id', (req, res) => {
+  const patientId = req.params.id;
+  const q = `SELECT MAX(date) AS last_visit FROM appointments WHERE patient_id = ?`;
+
+  db.query(q, [patientId], (err, data) => {
+    if (err) return res.status(500).json({ error: 'Database error' });
+    res.json({ last_visit: data[0]?.last_visit || null });
+  });
+});
+
+
+// ==== Stats === (total patients, schduled today, new this week)
+
+router.get('/stats', verifyToken, (req,res) => {
+  const totalPatientsQuery = 'SELECT COUNT(*) AS total_patients FROM patients';
+  const scheduledTodayQuery = `
+    SELECT COUNT(*) AS scheduled_today 
+    FROM appointments 
+    WHERE date = CURDATE()
+  `;
+  const newThisWeekQuery = `
+    SELECT COUNT(*) AS new_this_week 
+    FROM patients 
+    WHERE DATE(created_at) >= DATE_SUB(CURDATE(), INTERVAL 7 DAY)
+  `;
+
+
+  db.query(totalPatientsQuery, (err, totalPatientsResult) => {
+    if (err) return res.status(500).json({ error: 'Database error' });
+    db.query(scheduledTodayQuery, (err, scheduledTodayResult) => {
+      if (err) return res.status(500).json({ error: 'Database error' });
+      db.query(newThisWeekQuery, (err, newThisWeekResult) => {
+        if (err) return res.status(500).json({ error: 'Database error' });
+        res.json({
+          total_patients: totalPatientsResult[0].total_patients,
+          scheduled_today: scheduledTodayResult[0].scheduled_today,
+          new_this_week: newThisWeekResult[0].new_this_week,
+        });
+      });
+    });
+  });
+});
+
+
+router.get('/getAppointments/appointmentPage', verifyToken, (req,res) => {
+  const q = 'SELECT * FROM appointments ORDER BY date DESC, time DESC';
+
+  db.query(q, (err, data) => {
+    if (err) return res.status(500).json({ error: 'Database error' });
+    res.json(data);
+  });
+})
+
+
+
 module.exports = router;

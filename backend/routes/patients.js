@@ -142,6 +142,22 @@ router.get('/getPatientsdata/:patientId', verifyToken, (req, res) => {
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 router.delete('/deletePatient/:id', verifyToken, (req, res) => {
   const patientID = req.params.id;
   const q = "DELETE FROM patients WHERE id = ?";
