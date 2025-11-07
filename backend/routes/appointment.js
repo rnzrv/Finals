@@ -51,9 +51,10 @@ router.post('/setAppointment', verifyToken, (req, res) => {
 });
 
 
-// ============================
+
 // 2️⃣  Get Appointment History
-// ============================
+
+
 router.get('/history/:id', (req, res) => {
   const patientId = req.params.id;
   const q = `
@@ -115,15 +116,25 @@ router.get('/stats', verifyToken, (req,res) => {
   });
 });
 
+// appointment page calendar
 
 router.get('/getAppointments/appointmentPage', verifyToken, (req,res) => {
-  const q = 'SELECT * FROM appointments ORDER BY date DESC, time DESC';
+  // const q = 'SELECT * FROM appointments ORDER BY date DESC, time DESC';
 
-  db.query(q, (err, data) => {
-    if (err) return res.status(500).json({ error: 'Database error' });
-    res.json(data);
-  });
+  // db.query(q, (err, data) => {
+  //   if (err) return res.status(500).json({ error: 'Database error' });
+  //   res.json(data);
+  // });
+
+  // GET YEAR/MONTH/WEEK
+
+  // GET TIME 
+
+  // GET DOCTOR/ SESSION/ PATIENT NAME
 })
+
+
+// router.get('/getAppointments/')
 
 
 

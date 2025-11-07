@@ -237,7 +237,7 @@ function Patients() {
           {/* ✅ Pagination */}
           <div className="patients-pagination patients-btn">
             <button onClick={() => setCurrentPage((p) => Math.max(p - 1, 1))}>Prev</button>
-            <span style={{ margin: "0 10px" }}>
+            <span style={{ margin: "0 10px", fontSize: "12px"}}>
               Page {currentPage} of {totalPages}
             </span>
             <button

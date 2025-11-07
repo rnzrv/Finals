@@ -49,7 +49,7 @@ function AddPatients({ onPatientAdded }) {
       return "Phone number must be in the format 09XXXXXXXXX or +639XXXXXXXXX";
     }
 
-    if (isNaN(age) || age < 0 || age > 150) {
+    if (isNaN(age) || age < 0 || age > 100) {
       return "Age must be a valid number between 0 and 150";
     }  
 

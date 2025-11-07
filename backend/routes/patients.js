@@ -42,7 +42,7 @@ router.post('/addPatient', verifyToken, (req, res) => {
   }
 
   // Optional validation for age
-  if (age && (isNaN(age) || age < 0 || age > 150)) {
+  if (age && (isNaN(age) || age < 0 || age > 100)) {
     return res.status(400).json({ error: 'Age must be a valid number between 0 and 150' });
   }
 
@@ -139,21 +139,6 @@ router.get('/getPatientsdata/:patientId', verifyToken, (req, res) => {
     res.json(results[0]); // returns { name, email, contact_number }
   });
 });
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
