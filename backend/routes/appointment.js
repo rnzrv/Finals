@@ -4,9 +4,7 @@ const router = express.Router();
 const verifyToken = require('../middleware/middleware');
 const db = require('../config/db');
 
-// ============================
-// 1️⃣  Set a New Appointment
-// ============================
+
 router.post('/setAppointment', verifyToken, (req, res) => {
   const { patient_id, doctor, date, time, service_type, status, notes } = req.body;
 
@@ -18,6 +16,10 @@ router.post('/setAppointment', verifyToken, (req, res) => {
   const dateRegex = /^\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01])$/;
   if (!dateRegex.test(date) || isNaN(new Date(date).getTime())) {
     return res.status(400).json({ error: 'Please enter a valid date in YYYY-MM-DD format' });
+  }
+
+  if (new Date(date) < new Date().setHours(0,0,0,0)) {
+    return res.status(400).json({ error: 'Appointment date cannot be in the past' });
   }
 
   // Validate time format (HH:MM)
@@ -116,21 +118,38 @@ router.get('/stats', verifyToken, (req,res) => {
   });
 });
 
+
 // appointment page calendar
 
+/* [
+  {
+    "doctorName": "Dr. John Doe",
+    "sessionType": "Session 1",
+    "patient": "Marvelous Jaco",
+    "date": "2025-11-05",
+    "time": "10:00 PM",
+    "status": "confirmed"
+  }
+]
+*/
+
 router.get('/getAppointments/appointmentPage', verifyToken, (req,res) => {
-  // const q = 'SELECT * FROM appointments ORDER BY date DESC, time DESC';
+  const q = `
+    SELECT 
+      doctor AS doctorName, 
+      service_type AS sessionType, 
+      patient_id AS patient, 
+      DATE_FORMAT(date, '%Y-%m-%d') AS date, 
+      DATE_FORMAT(time, '%H:%i') AS time, 
+      status 
+    FROM appointments 
+    ORDER BY date DESC, time DESC
+  `;
+  db.query(q, (err, data) => {
+    if (err) return res.status(500).json({ error: 'Database error' });
+    res.json(data);
+  });
 
-  // db.query(q, (err, data) => {
-  //   if (err) return res.status(500).json({ error: 'Database error' });
-  //   res.json(data);
-  // });
-
-  // GET YEAR/MONTH/WEEK
-
-  // GET TIME 
-
-  // GET DOCTOR/ SESSION/ PATIENT NAME
 })
 
 

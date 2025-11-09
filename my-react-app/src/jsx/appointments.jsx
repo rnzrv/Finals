@@ -2,36 +2,118 @@ import Sidebar from "./Sidebar";
 import user from "../icons/user.svg";
 import "../css/appointment.css"; // ✅ new CSS file for styling
 import search from "../icons/search.svg"
+import React, {useState, useEffect} from "react";
+import axios from "axios";
 
 function Appointments() {
+
+  const Months = [
+    "January", "February", "March", "April", "May", "June",
+    "July", "August", "September", "October", "November", "December"
+  ];
+  
+  const color = ["#BDA55D", "rgba(206, 3, 3, 0.8)",]
+
+  const [selectedMonth, setSelectedMonth] = useState(Months[new Date().getMonth()]);
+  const [selectedWeek, setSelectedWeek] = useState(Math.ceil(new Date().getDate() / 7));
+
+  const currentYear = new Date().getFullYear();
+  const [daysInMonth, setDaysInMonth] = useState([]);
+
+  const Week = [1, 2, 3, 4, 5];
+
+  useEffect(() => {
+    const monthIndex = Months.indexOf(selectedMonth);
+    const days = new Date(currentYear, monthIndex + 1, 0).getDate();
+    setDaysInMonth(Array.from({ length: days }, (_, i) => i + 1));
+  }, [selectedMonth, currentYear]);
+
   const timeSlots = [
-    "10:00 PM", "9:00 PM", "8:00 PM", "7:00 PM", "6:00 PM", "5:00 PM",
-    "4:00 PM", "3:00 PM", "2:00 PM", "1:00 PM", "12:00 PM", "11:00 AM",
-    "10:00 AM", "9:00 AM"
+    "9:00 AM", "10:00 AM", "11:00 AM", "12:00 PM", "1:00 PM", "2:00 PM",
+    "3:00 PM", "4:00 PM", "5:00 PM", "6:00 PM", "7:00 PM", "8:00 PM",
+    "9:00 PM", "10:00 PM"
   ];
 
-  const weekDays = [
-    { short: "01 Mon" },
-    { short: "02 Tue" },
-    { short: "03 Wed"},
-    { short: "04 Thu" },
-    { short: "05 Fri" },
-    { short: "06 Sat" },
-    { short: "07 Sun" }
-  ];
+  /* Map week numbers to their corresponding days
+   * Week 1: 01 Mon - 07 Sun
+   * Week 2: 08 Mon - 14 Sun
+   * Week 3: 15 Mon - 21 Sun
+   * Week 4: 22 Mon - 28 Sun
+   * Week 5: 29 Mon - 31 Sun (if applicable)
+   */
+  
+  const [weekDays, setWeekDays] = useState([]);
+  const [appointments, setAppointments] = useState([]);
 
-  const appointments = [
-    { id: 1, doctorName: "Dr. John Doe", sessionType: "Session 1", patient: "Marvelous Jaco",  time: "10:00 PM", day: "05 Fri", color: "#FCD34D", textColor: "#333" },
-    { id: 2, doctorName: "Dr. John Doe", sessionType: "Session 1", patient: "Ronz Arvie Remoroza", time: "9:00 PM", day: "02 Tue", color: "#FCD34D", textColor: "#333" },
-    { id: 3, doctorName: "Dr. John Doe", sessionType: "Session 1", patient: "Ronz Arvie Remoroza",time: "7:00 PM", day: "03 Wed", color: "#FCD34D", textColor: "#333" },
-    { id: 4, doctorName: "Dr. John Doe", sessionType: "Session 1", patient: "Ronz Arvie Remoroza",time: "6:00 PM", day: "04 Thu", color: "#FCD34D", textColor: "#333" },
-    { id: 5, doctorName: "Dr. John Doe", sessionType: "Session 1", patient: "Ronz Arvie Remoroza",time: "5:00 PM", day: "01 Mon", color: "#15803D", textColor: "#fff" },
-    { id: 6, doctorName: "Dr. John Doe", sessionType: "Session 1", patient: "Ronz Arvie Remoroza",time: "2:00 PM", day: "01 Mon", color: "#15803D", textColor: "#fff" },
-    { id: 7, doctorName: "Dr. John Doe", sessionType: "Session 1", patient: "Ronz Arvie Remoroza",time: "9:00 AM", day: "01 Mon", color: "#15803D", textColor: "#fff" }
-  ];
+  useEffect(() => {
+    if (daysInMonth.length === 0) return;
+    
+    const monthIndex = Months.indexOf(selectedMonth);
+    const firstDayOfMonth = new Date(currentYear, monthIndex, 1);
+    const firstDayWeekday = firstDayOfMonth.getDay();
+    
+    const mondayOffset = firstDayWeekday === 0 ? 6 : firstDayWeekday - 1;
+    const startDay = (selectedWeek - 1) * 7 + 1 - mondayOffset;
+    const days = [];
+    
+    for (let i = 0; i < 7; i++) {
+      const dayNum = startDay + i;
+      
+      if (dayNum < 1 || dayNum > daysInMonth.length) continue;
+      
+      const date = new Date(currentYear, monthIndex, dayNum);
+      
+      if (date.getMonth() === monthIndex && date.getDate() === dayNum) {
+        days.push({ 
+          short: `${dayNum.toString().padStart(2, '0')} ${date.toLocaleString('en-US', { weekday: 'short' })}` 
+        });
+      }
+    }
+    
+    setWeekDays(days);
+  }, [selectedWeek, selectedMonth, currentYear, daysInMonth]);
 
-  const getAppointment = (time, day) =>
-    appointments.find(a => a.time === time && a.day === day);
+  useEffect(() => {
+    const fetchAppointments = async () => {
+      try {
+        const token = sessionStorage.getItem("accessToken");
+        const res = await axios.get("http://localhost:8081/appointments/getAppointments/appointmentPage", {
+          withCredentials: true,
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        console.log("Fetched Appointments:", res.data);
+        setAppointments(res.data);
+      } catch (error) {
+        console.error("Error fetching appointments:", error);
+      }
+    };
+
+    fetchAppointments();
+  }, []);
+
+  const getAppointment = (time, day) => {
+    // day format: "05 Fri", we need to extract day number and match with date
+    const dayNum = parseInt(day.split(' ')[0]);
+    const monthIndex = Months.indexOf(selectedMonth);
+    const appointmentDate = `${currentYear}-${(monthIndex + 1).toString().padStart(2, '0')}-${dayNum.toString().padStart(2, '0')}`;
+    
+    return appointments.find(a => {
+      // Convert date from DB format (might be datetime object)
+      const dbDate = typeof a.date === 'string' ? a.date.split('T')[0] : a.date;
+      
+      // Convert 24-hour time from DB to 12-hour format for comparison
+      const dbTime = a.time; // e.g., "14:30:00" or "14:30"
+      const [hours, minutes] = dbTime.split(':');
+      let hour = parseInt(hours);
+      const period = hour >= 12 ? 'PM' : 'AM';
+      hour = hour % 12 || 12;
+      const formattedTime = `${hour}:00 ${period}`; // Match format "2:00 PM"
+      
+      console.log('Comparing:', { dbDate, appointmentDate, formattedTime, time, match: dbDate === appointmentDate && formattedTime === time });
+      
+      return dbDate === appointmentDate && formattedTime === time;
+    });
+  };
 
   return (
     <div className="appointments">
@@ -50,9 +132,38 @@ function Appointments() {
           {/* Header Controls */}
           <div className="appointment-header">
             <div className="left">
+                {/* Passing object of the Month and Week */} 
+                 
+                 
                 <h3>August 2024</h3>
-                <button className="month">Month</button>
-                <button className="week">Week</button>  
+                {/* Month + current year */}
+                <div className="month">
+                  <select id="choices" onChange={(e) => setSelectedMonth(e.target.value)}>
+                    {Months.map((month, index) => (
+
+                      <option key={index} value={month}>
+                        {month}
+
+
+                      </option>
+                    ))}
+                  </select>
+                  
+
+                  {/* Pass if what number of the month is selected then will be passed on the backend(drop down the months)*/}
+
+
+                </div>
+                
+                <div className="week">Week</div>
+                {/* Choose week number ( 1 - 4 or 5?) */}
+                    <select name="week" id="week" onChange={(e) => setSelectedWeek(Number(e.target.value))}>
+                      
+                      {Week.map((weekNumber, index) => (
+                        <option key={index} value={weekNumber}>{weekNumber}</option>
+                      ))}
+                    </select>
+                
             </div>
             <div className="search-bar">
               <input type="text" placeholder="Search by Appointment" />
@@ -83,13 +194,13 @@ function Appointments() {
                         <div
                           className="appointment-box"
                           style={{
-                            backgroundColor: appointment.color,
-                            color: appointment.textColor,
+                            backgroundColor: appointment.status === 'Scheduled' ? '#FCD34D' : appointment.status === 'Cancelled' ? 'rgba(206, 3, 3, 0.8)' : '#15803D',
+                            color: appointment.status === 'Scheduled' ? '#333' : '#fff',
                           }}
                         >
                           <div>{appointment.doctorName}</div>
                           <div className="session">{appointment.sessionType}</div>
-                          <div className="patient">{appointment.patient}</div>
+                          <div className="patient">Patient #{appointment.patient}</div>
                         </div>
                       )}
                     </div>

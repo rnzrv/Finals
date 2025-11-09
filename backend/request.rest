@@ -1,94 +1,81 @@
+### User Login
+POST http://localhost:8081/users/user/login
+Content-Type: application/json
 
-    POST http://localhost:8081/users/user/login
-    Content-Type: application/json
+{
+    "username": "ceo123",
+    "password": "ceo12"
+}
 
-    {
-        "username": "ceo123",
-        "password": "ceo12"
-    }
+### Create User
+POST http://localhost:8081/users/user
+Content-Type: application/json
 
-### asds
-
-    POST http://localhost:8081/users/user
-    Content-Type: application/json
 {
     "userType": "ceo",
     "username": "ceo123",
     "password": "ceo12"
 }
 
-    ###
-    GET 
+### Get All Users
+GET http://localhost:8081/getusers
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyVHlwZSI6ImFkbWluIiwidXNlcm5hbWUiOiJjZW8xMjMiLCJpYXQiOjE3NjE1MTIwOTEsImV4cCI6MTc2MjExNjg5MX0.ayoN-6nuUX5pcDh8VfGLIDLccdgDbkq4jRCUDVz9gbg
 
+### Get All Patients
+GET http://localhost:8081/patients/getPatients
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyVHlwZSI6ImFkbWluIiwidXNlcm5hbWUiOiJjZW8xMjMiLCJpYXQiOjE3NjEzMjY0MzYsImV4cCI6MTc2MTkzMTIzNn0.PGtYIDliB5mmnI7FpKBqaUhCxLGgFgdCFF4d3Y7dRJo
 
+### Add Patient
+POST http://localhost:8081/patients/addPatient
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyVHlwZSI6ImFkbWluIiwidXNlcm5hbWUiOiJjZW8xMjMiLCJpYXQiOjE3NjE0MTE0ODcsImV4cCI6MTc2MjAxNjI4N30.rxd3syPwlavLVf9xGCViGmGuO5Z7cOJe6phUIwnX9mE
+Content-Type: application/json
 
-    ### Response
+{
+    "name": "jacopal",
+    "email": "sssd@example.d",
+    "contact_number": "09876586454",
+    "age": 25,
+    "gender": "Female",
+    "medical_notes": "No known allergies"
+}
 
-    GET http://localhost:8081/getusers
-    Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyVHlwZSI6ImFkbWluIiwidXNlcm5hbWUiOiJjZW8xMjMiLCJpYXQiOjE3NjE1MTIwOTEsImV4cCI6MTc2MjExNjg5MX0.ayoN-6nuUX5pcDh8VfGLIDLccdgDbkq4jRCUDVz9gbg
-    ###
+### Delete Patient
+DELETE http://localhost:8081/patients/deletePatient/59
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyVHlwZSI6ImFkbWluIiwidXNlcm5hbWUiOiJjZW8xMjMiLCJpYXQiOjE3NjEzMjY0MzYsImV4cCI6MTc2MTkzMTIzNn0.PGtYIDliB5mmnI7FpKBqaUhCxLGgFgdCFF4d3Y7dRJo
 
-    GET http://localhost:8081/patients/getPatients
-    Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyVHlwZSI6ImFkbWluIiwidXNlcm5hbWUiOiJjZW8xMjMiLCJpYXQiOjE3NjEzMjY0MzYsImV4cCI6MTc2MTkzMTIzNn0.PGtYIDliB5mmnI7FpKBqaUhCxLGgFgdCFF4d3Y7dRJo
-    ###
+### Update Patient
+PUT http://localhost:8081/patients/updatePatient/7
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyVHlwZSI6ImFkbWluIiwidXNlcm5hbWUiOiJjZW8xMjMiLCJpYXQiOjE3NjE0MTE0ODcsImV4cCI6MTc2MjAxNjI4N30.rxd3syPwlavLVf9xGCViGmGuO5Z7cOJe6phUIwnX9mE
+Content-Type: application/json
 
-    POST http://localhost:8081/patients/addPatient
-    Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyVHlwZSI6ImFkbWluIiwidXNlcm5hbWUiOiJjZW8xMjMiLCJpYXQiOjE3NjE0MTE0ODcsImV4cCI6MTc2MjAxNjI4N30.rxd3syPwlavLVf9xGCViGmGuO5Z7cOJe6phUIwnX9mE
-    Content-Type: application/json
+{
+    "name": "Updated Naame",
+    "email": "s.email@example.com",
+    "contact_number": "09876548874",
+    "age": 30,
+    "gender": "Male",
+    "medical_notes": "Updated medical notes",
+    "status": "Recovered"
+}
 
-    {
-        "name": "jacopal",
-        "email": "sssd@example.d",
-        "contact_number": "09876586454",
-        "age" : 25,
-        "gender": "Female",
-        "medical_notes": "No known allergies"
-    }
+### Set Appointment
+POST http://localhost:8081/appointments/setAppointment
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyVHlwZSI6ImFkbWluIiwidXNlcm5hbWUiOiJjZW8xMjMiLCJpYXQiOjE3NjI2OTY1MTUsImV4cCI6MTc2MzMwMTMxNX0.C3gFZqsQfYCo6iTqu6AWxnq4FA-Del6V_J_ilgVK4FE
+Content-Type: application/json
 
-
-    ### 
-    DELETE http://localhost:8081/patients/deletePatient/59
-    Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyVHlwZSI6ImFkbWluIiwidXNlcm5hbWUiOiJjZW8xMjMiLCJpYXQiOjE3NjEzMjY0MzYsImV4cCI6MTc2MTkzMTIzNn0.PGtYIDliB5mmnI7FpKBqaUhCxLGgFgdCFF4d3Y7dRJo
-    Content-Type: application/json
-
-    ### a
-    PUT http://localhost:8081/patients/updatePatient/7
-    Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyVHlwZSI6ImFkbWluIiwidXNlcm5hbWUiOiJjZW8xMjMiLCJpYXQiOjE3NjE0MTE0ODcsImV4cCI6MTc2MjAxNjI4N30.rxd3syPwlavLVf9xGCViGmGuO5Z7cOJe6phUIwnX9mE
-    Content-Type: application/json
-
-    {
-        "name": "Updated Naame",
-        "email": "s.email@example.com",
-        "contact_number": "09876548874",
-        "age" : 30,
-        "gender": "Male",
-        "medical_notes": "Updated medical notes",
-        "status": "Recovered"
-    }
-
-    ### asdas
-    POST http://localhost:8081/appointments/setAppointment
-    Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyVHlwZSI6ImFkbWluIiwidXNlcm5hbWUiOiJjZW8xMjMiLCJpYXQiOjE3NjE0MTE0ODcsImV4cCI6MTc2MjAxNjI4N30.rxd3syPwlavLVf9xGCViGmGuO5Z7cOJe6phUIwnX9mE
-    Content-Type: application/json
-
-    {
-    "patient_id": 1,
+{
+    "patient_id": 14,
     "doctor": "Dr. Smith",
-    "date": "2025-10-26",
+    "date": "2025-10-27",
     "time": "14:30",
     "service_type": "Consultation",
     "status": "Scheduled",
     "notes": "Follow-up visit"
-    }
+}
 
-    ### Get Last Visit
-    GET http://localhost:8081/appointments/lastVisit/14
-    Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyVHlwZSI6ImFkbWluIiwidXNlcm5hbWUiOiJjZW8xMjMiLCJpYXQiOjE3NjE5MDcyMDAsImV4cCI6MTc2MjUxMjAwMH0.Gwz6DctIJTPSM_jmlVtLFmlgV70YxEFQX2_7XvB8Qsg
 
-    ### Get Appointment Stats
-    GET http://localhost:8081/appointments/stats
-    Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyVHlwZSI6ImFkbWluIiwidXNlcm5hbWUiOiJjZW8xMjMiLCJpYXQiOjE3NjE5MDcyMDAsImV4cCI6MTc2MjUxMjAwMH0.Gwz6DctIJTPSM_jmlVtLFmlgV70YxEFQX2_7XvB8Qsg
+### Get Appointment
+GET http://localhost:8081/appointments/getAppointments/appointmentPage
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyVHlwZSI6ImFkbWluIiwidXNlcm5hbWUiOiJjZW8xMjMiLCJpYXQiOjE3NjI2OTY1MTUsImV4cCI6MTc2MzMwMTMxNX0.C3gFZqsQfYCo6iTqu6AWxnq4FA-Del6V_J_ilgVK4FE
+Content-Type: application/json
 
-    ### Get Appointments for Appointment Page
-    GET http://localhost:8081/appointments/getAppointments/appointmentPage
-    Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyVHlwZSI6ImFkbWluIiwidXNlcm5hbWUiOiJjZW8xMjMiLCJpYXQiOjE3NjE5NTc0MTcsImV4cCI6MTc2MjU2MjIxN30.7KKyLyJE-9M57p069aR6ZwyiffD0MYgIgcvviY-u3UU
