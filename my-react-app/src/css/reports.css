@@ -1,6 +1,10 @@
 @import url(./fonts.css);
 @import url(./color.css);
 
+*{
+  font-family: 'DmSans', sans-serif;
+}
+
 .reports-container {
   margin: 42px;
 }
@@ -99,3 +103,385 @@
   color: #fff;
   transform: translateY(-2px);
 }
+
+.reports-performance{
+  margin-top: 25px;
+  font-size: 26px;
+  font-weight: 100;
+  color: #3C3C3C;
+}
+
+.reports-essentials{
+  margin-top: 25px;
+  font-size: 26px;
+  font-weight: 100;
+  width: 100%;
+  height: 100%;
+}
+.reports-essential-container{
+  display: grid;
+  grid-template-columns: repeat(4,1fr);
+  gap: 20px;
+  grid-template-rows: auto 1fr auto;
+}
+
+.reports-essential-item{
+  display: flex;
+  background-color: #ffffff;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  border-radius: 12px;
+  padding: 20px;
+  min-height: 200px;
+  align-items: center;
+  gap: 7px;
+  justify-content: space-evenly;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  border-bottom: 3px solid transparent;
+  opacity: 0;
+  animation: slideIn 0.5s ease forwards;
+}
+
+.reports-essential-item:hover{
+  transform: translateY(-5px);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+}
+
+.reports-essential-item1:hover{
+  border-bottom-color: #4CAF50;
+}
+
+.reports-essential-item2:hover{
+  border-bottom-color: #A2C029;
+}
+
+.reports-essential-item3:hover{
+  border-bottom-color: #FF5722;
+}
+
+.reports-essential-item4:hover{
+  border-bottom-color: #5343CF;
+}
+
+.reports-essential-item1 {
+  animation-delay: 0.1s;
+}
+
+.reports-essential-item2 {
+  animation-delay: 0.2s;
+}
+
+.reports-essential-item3 {
+  animation-delay: 0.3s;
+}
+
+.reports-essential-item4 {
+  animation-delay: 0.4s;
+}
+
+.revenue-by-service-type {
+  animation-delay: 0.5s;
+}
+
+.customer-segmentation {
+  animation-delay: 0.6s;
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.reports-essential-item1-logo{
+  color: #4CAF50;
+  margin: 0;
+  gap: 0 7px 0 0;
+}
+
+.reports-essential-item2-logo{
+  width: 80px;
+  height: 80px;
+}
+
+.reports-essential-item3-logo{
+  width: 80px;
+  height: 80px;
+}
+
+.reports-essential-item4-logo{
+  width: 80px;
+  height: 80px;
+}
+
+.reports-essential-item2-logo img,
+.reports-essential-item3-logo img,
+.reports-essential-item4-logo img{
+  width: 100%;
+  height: 100%;
+}
+
+.reports-essential-item1-logo h1{
+  font-weight: 100;
+  font-family: 'DmSans', sans-serif;
+  font-size: 115px;
+}
+
+.reports-essential-item1-title,
+.reports-essential-item2-title,
+.reports-essential-item3-title,
+.reports-essential-item4-title{
+  color: #3c3c3c;
+  font-size: 14px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.reports-essential-item1-title h3,
+.reports-essential-item2-title h3,
+.reports-essential-item3-title h3,
+.reports-essential-item4-title h3 {
+  font-size: 24px;
+  font-family: 'DmSans', sans-serif ;
+  font-weight: 500;
+}
+
+.reports-essential-item1-title h2,
+.reports-essential-item2-title h2,
+.reports-essential-item3-title h2,
+.reports-essential-item4-title h2 {
+  font-size: 36px;
+  font-weight: 600;
+  margin: 8px 0;
+}
+
+.reports-essential-item1-title h1,
+.reports-essential-item2-title h1,
+.reports-essential-item3-title h1,
+.reports-essential-item4-title h1{
+  font-size: 12px;
+  font-family: 'DmSans', 'sans-serif';
+  color: #999;
+  margin: 0;
+}
+
+
+/* Reports and Customer Segmentation */
+.revenue-by-service-type{
+  grid-column: span 2 / span 2;
+  grid-row: span 4 / span 4;
+  width: 100%;
+  height: 100%;
+  background-color: #ffffff;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  border-radius: 12px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+}
+
+.revenue-by-service-type span{
+  font-size: 12px;
+  font-weight: 500;
+  font-family: 'DmSans', 'sans-serif';
+  color: #ffffff;
+}
+
+.revenue-by-service-type-chart{
+  width: 100%;
+  height: 80%;
+  margin-top: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.revenue-by-service-type-title,
+.customer-segmentation-title{
+  text-align: left;
+  margin: 0;
+}
+.revenue-by-service-type-title h3,
+.customer-segmentation-title h3 {
+  font-size: 20px;
+  font-weight: 500;
+  color: #3c3c3c;
+  margin-bottom: 10px;
+}
+
+.revenue-by-service-type-title h1,
+.customer-segmentation-title h1 {
+  font-size: 14px;
+  font-weight: 400;
+  color: #999;
+  margin-bottom: 20px;
+}
+
+.progress-bar-container {
+  width:100%;
+  height: 15px;
+  background-color: #e0e0e0;
+  border-radius: 15px;
+  overflow: hidden;
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
+  margin-top: 10px;
+  font-family: 'DmSans', 'sans-serif';
+}
+.progress-container{
+  margin-top: 15px;
+  width: 100%;
+  opacity: 0;
+  animation: fadeInUp 0.6s ease forwards;
+}
+
+.progress-container:nth-child(1) {
+  animation-delay: 0.1s;
+}
+
+.progress-container:nth-child(2) {
+  animation-delay: 0.2s;
+}
+
+.progress-container:nth-child(3) {
+  animation-delay: 0.3s;
+}
+
+.progress-container:nth-child(4) {
+  animation-delay: 0.4s;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.progress-top{
+  display: flex;
+  justify-content: space-between;
+}
+.progress-bottom{
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 5px;
+  
+}
+.progress-top h1,
+.progress-bottom h1{
+  font-size: 14px;
+  font-weight: 500;
+  color: #3c3c3c;
+  font-family: 'DmSans', 'sans-serif';
+}
+
+.progress-bottom h1{
+  font-size: 14px;
+  font-weight: 500;
+  color: #999;
+  font-family: 'DmSans', 'sans-serif';
+}
+
+.progress-top h2{
+  font-size: 14px;
+  font-weight: 500;
+  font-family: 'DmSans', 'sans-serif';
+}
+
+.progress-bar {
+  height: 100%;
+  background: linear-gradient(90deg, var(--primary-color--), var(--secondary-color--));
+  border-radius: 15px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: width 0.5s ease;
+  animation: fillBar 1.5s ease-in-out;
+  position: relative;
+  overflow: hidden;
+}
+
+.progress-bar::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+  animation: shimmer 2s infinite;
+}
+
+@keyframes fillBar {
+  from {
+    width: 0 !important;
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+.progress-text {
+  color: white;
+  font-weight: bold;
+  font-size: 14px;
+  position: relative;
+  z-index: 1;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+}
+
+.customer-segmentation{
+  width: 100%;
+  height: 100%;
+  background-color: #ffffff;
+  grid-column: span 2 / span 2;
+  grid-row: span 4 / span 4;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  border-radius: 12px;
+  padding: 20px;
+}
+
+.customer-segmentation h3 {
+  font-size: 20px;
+  font-weight: 500;
+  color: #3c3c3c;
+}
+  
+/*customer segmentation*/
+
+.customer-segmentation-body{
+  gap: 30px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 80%;
+}
+
+.customer-segmentation-body-top,
+.customer-segmentation-body-mid,
+.customer-segmentation-body-bottom{
+  display: flex;
+  gap: 10px;
+  border: solid 1px #ccc8c8;
+  border-radius: 15px;
+  width: 100%;
+  height: 100%;
+}
+

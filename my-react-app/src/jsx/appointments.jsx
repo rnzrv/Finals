@@ -135,16 +135,14 @@ function Appointments() {
                 {/* Passing object of the Month and Week */} 
                  
                  
-                <h3>August 2024</h3>
+                <h3>{selectedMonth} {currentYear}</h3>
                 {/* Month + current year */}
                 <div className="month">
-                  <select id="choices" onChange={(e) => setSelectedMonth(e.target.value)}>
+                  <select id="choices" value={selectedMonth} onChange={(e) => setSelectedMonth(e.target.value)}>
                     {Months.map((month, index) => (
 
                       <option key={index} value={month}>
                         {month}
-
-
                       </option>
                     ))}
                   </select>
@@ -157,7 +155,7 @@ function Appointments() {
                 
                 <div className="week">Week</div>
                 {/* Choose week number ( 1 - 4 or 5?) */}
-                    <select name="week" id="week" onChange={(e) => setSelectedWeek(Number(e.target.value))}>
+                    <select name="week" id="week" value={selectedWeek} onChange={(e) => setSelectedWeek(Number(e.target.value))}>
                       
                       {Week.map((weekNumber, index) => (
                         <option key={index} value={weekNumber}>{weekNumber}</option>
