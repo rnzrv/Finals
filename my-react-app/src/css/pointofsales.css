@@ -1,0 +1,84 @@
+@import url(./fonts.css);
+@import url(./color.css);
+
+body {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Inter', sans-serif;
+}
+
+/* Main dashboard container */
+.point-of-sales {
+  display: flex; /* Sidebar + Content side-by-side */
+  height: 100%;
+  width: 100%;
+}
+
+/* Dashboard content area */
+.point-of-sales-content {
+  margin-left: 240px; /* sidebar width */
+  height: 100vh; /* fixed height to viewport */
+  width: calc(100% - 240px);
+  background-color: #f9f9f9;
+  box-sizing: border-box;
+  transition: all 0.3s ease;
+  overflow-y: auto; /* scroll if content overflows */
+}
+
+/* Header styling */
+.point-of-sales-content header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: var(--header-bg-color--);
+  padding: 10px 40px;
+  border-bottom: 1px solid #f0eeee;
+  height: 50px;
+  color: var(--primary-color--);
+  font-family: 'Inter', sans-serif;
+  font-weight: 600;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+}
+
+/* Admin account info */
+.dashboard-account {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.dashboard-account img {
+  height: 35px;
+  width: 35px;
+  border-radius: 50%;
+}
+
+.dashboard-account p {
+  margin: 0;
+  font-weight: 500;
+  color: var(--primary-color--);
+  font-size: 16px;
+}
+
+/* POS left side */
+.point-of-sales-main-content{
+  display: flex;
+  height: 100%; /* full height minus header */
+}
+.POS-left {
+  display: flex;
+  width: 25%;
+  height: 100%;
+  padding: 20px 40px;
+  background-color: #ffffff;
+  justify-content: center;
+}
+
+.POS-left-top {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  width: 100%;
+  align-items: center;
+}

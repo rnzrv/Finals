@@ -6,6 +6,7 @@ import Purchases from "./purchases";
 import Appointments from "./appointments";
 import Patients from "./patients";
 import Reports from "./reports";
+import PointofSales from "./pointofSales";
 import ProtectedRoute from "./protectedRoute";
 
 function App() {
@@ -37,6 +38,15 @@ function App() {
           element={
             <ProtectedRoute>
               <Purchases />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/sales"
+          element={
+            <ProtectedRoute>
+              <PointofSales />
             </ProtectedRoute>
           }
         />

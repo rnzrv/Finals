@@ -11,6 +11,7 @@ import groupPurple from "../icons/group-purple.svg";
 import groupAdd from "../icons/group-add.svg";
 import retention from "../icons/retention.svg";
 import star from "../icons/star.svg";
+import ReportsChart from "./reportsChart.jsx";
 function Reports() {
   return (
     <div className="reports">
@@ -476,8 +477,30 @@ function Reports() {
               </div>
 
               
+            <div className="business-growth-metrics-item6 reports-sales-purchase-trends business-growth-metric-item">
+              <div className="business-growth-metrics-item6-title">
+                <h3>Sales and Purchase Trends</h3>
+
+                <div className="business-growth-metric-item6-title-right">
+                  <div className="business-growth-metric-item6-legend">
+                    <span className="legend-color sales-color"></span> <h1>Sales</h1>
+                  </div>
+                  <div className="business-growth-metric-item6-legend">
+                    <span className="legend-color expenses-color"></span> <h1>Expenses</h1>
+                  </div>
+                </div>
+                
+              </div>
+              
+              <div className="business-growth-metrics-item6-chart">
+                <ReportsChart/>
+              </div>
+
+            </div>              
+
 
             </div>
+
           </div>
         </div>
       </div>

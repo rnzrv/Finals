@@ -1,0 +1,33 @@
+import React from 'react'
+import Sidebar from "./Sidebar.jsx";
+import "../css/pointofSales.css";
+const PointOfSales = () => {
+  return (
+    <div>
+      <Sidebar />
+
+      <div className="point-of-sales-content">
+        <header>
+          <h2>POINT OF SALES</h2>
+        </header>
+
+        <div className="point-of-sales-main-content">
+          <div className="POS-left">
+            <div className="POS-left-top">
+              <h1>Customer</h1>
+              <div className="POS-search-bar">
+                <input type="text" placeholder="Search Customer..." />
+              </div>
+            </div>
+            
+          </div>
+        </div>
+
+
+      </div>
+    </div>
+  )
+}
+
+export default PointOfSales
+ 
