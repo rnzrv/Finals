@@ -16,11 +16,15 @@ const PointOfSales = () => {
             <div className="POS-left-top">
               <h1>Customer</h1>
               <div className="POS-search-bar">
-                <input type="text" placeholder="Search Customer..." />
+                <input type="text" placeholder="" />
               </div>
             </div>
             
+            <div className="br"></div>
+            
           </div>
+
+
         </div>
 
 

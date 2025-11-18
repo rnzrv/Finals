@@ -70,9 +70,10 @@ body {
   display: flex;
   width: 25%;
   height: 100%;
-  padding: 20px 40px;
-  background-color: #ffffff;
-  justify-content: center;
+  background-color: #FFFFFF;
+  justify-content: flex-start;
+  flex-direction: column;
+  
 }
 
 .POS-left-top {
@@ -80,5 +81,34 @@ body {
   flex-direction: column;
   gap: 20px;
   width: 100%;
-  align-items: center;
+  align-items: start;
+  padding: 15px 15px 0 5px;
+}
+
+.POS-left-top h1{
+  font-size: 18px;
+  color: var(--primary-color--);
+}
+
+.POS-left-top .POS-search-bar {
+  display: flex;
+  width: 100%;
+}
+
+.POS-left-top .POS-search-bar input {
+  width: 100%;
+  box-sizing: border-box;
+  border: 1px solid #0B4909;
+  border-radius: 5px;
+  outline: none;
+  padding: 3px;
+}
+
+.br{
+  height: 20px;
+  border-bottom: 0.5px solid #dddada;
+  width: 100%;
+  padding: 0 0 0 0;
+  margin: 0 0 0 0;
+  
 }
