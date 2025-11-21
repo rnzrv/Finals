@@ -116,11 +116,29 @@ body {
 .POS-product-list{
   display: flex;
   height: 100%;
-  padding: 0 0 0 5px;
+  padding: 30px 8px 10px 8px;
 }
 
 .cart-items{
-  background-color: #CFC0C0;
+  background-color: #f9f9f9;
   height: 20%;
   width: 100%;  
+  border-radius: 15px;
+  border: 2px solid #CFC0C0 ;
+  display: flex;
+  justify-content: space-between;
+  padding: 15px;
+}
+
+.product-title h1{
+  font: 22px 'DmSans';
+}
+
+.product-title h3{
+  font: 14px 'DmSans';
+  color: #6A6A6A;
+}
+
+.product-right img{
+  cursor: pointer;
 }

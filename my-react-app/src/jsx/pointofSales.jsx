@@ -1,6 +1,7 @@
 import React from 'react'
 import Sidebar from "./Sidebar.jsx";
 import "../css/pointofSales.css";
+import x from "../icons/x.svg";
 const PointOfSales = () => {
   return (
 
@@ -29,7 +30,17 @@ const PointOfSales = () => {
             
             <div className="POS-product-list">
               <div className="cart-items">
-                <h1>Products</h1>
+                <div className="product-title">
+                  <h1>Products Name</h1>
+                <h3>Product_serial_num</h3>
+
+                </div>
+
+                <div className="product-right">
+                  <img src={x} alt="" />
+                </div>
+                
+                
               </div>
               
             </div>
