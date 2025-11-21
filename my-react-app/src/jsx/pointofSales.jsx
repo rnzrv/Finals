@@ -22,7 +22,12 @@ const PointOfSales = () => {
             
             <div className="br"></div>
             
+            <div className="POS-product-list">
+              <h1>Products</h1>
+            </div>
+
           </div>
+
 
 
         </div>
@@ -34,4 +39,7 @@ const PointOfSales = () => {
 }
 
 export default PointOfSales
+
+
+
  
