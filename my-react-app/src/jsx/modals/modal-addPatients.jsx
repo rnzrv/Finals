@@ -50,7 +50,7 @@ function AddPatients({ onPatientAdded }) {
     }
 
     if (isNaN(age) || age < 0 || age > 100) {
-      return "Age must be a valid number between 0 and 150";
+      return "Age must be a valid number between 0 and 100";
     }  
 
     return null;

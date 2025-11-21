@@ -3,7 +3,12 @@ import Sidebar from "./Sidebar.jsx";
 import "../css/pointofSales.css";
 const PointOfSales = () => {
   return (
-    <div>
+
+    
+    <div className='point-of-sales'>
+      {/* const cart = [{
+
+      }] */}
       <Sidebar />
 
       <div className="point-of-sales-content">
@@ -23,7 +28,10 @@ const PointOfSales = () => {
             <div className="br"></div>
             
             <div className="POS-product-list">
-              <h1>Products</h1>
+              <div className="cart-items">
+                <h1>Products</h1>
+              </div>
+              
             </div>
 
           </div>
