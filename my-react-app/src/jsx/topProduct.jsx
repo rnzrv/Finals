@@ -95,7 +95,7 @@ const TopProduct = () => {
             margin: 0,
           }}
         >
-          Top Selling Products
+          Top Selling Services
         </h2>
       </div>
 
