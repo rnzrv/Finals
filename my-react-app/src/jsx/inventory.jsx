@@ -7,6 +7,7 @@ import search from "../icons/search.svg";
 import eye from "../icons/eye.svg";
 import check from "../icons/checkbook.svg";
 import x from "../icons/x.svg";
+import AddProduct from './modals/modal-addProduct.jsx';
 
 function Inventory() {
   return (
@@ -33,7 +34,7 @@ function Inventory() {
             </div>
 
             <div className="inventory-export-product">
-              <button className="inventory-products-btn">Add product</button>
+              <AddProduct />
               <button className="inventory-export-btn">
                 Export <img src={dropDown} alt="Dropdown Icon" />
               </button>

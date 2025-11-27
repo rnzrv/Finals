@@ -1,0 +1,27 @@
+POST http://localhost:8081/users/user/login
+Content-Type: application/json
+
+{
+    "username": "ceo123",
+    "password": "ceo12"
+}
+### Add Inventory Item
+
+POST http://localhost:8081/inventory/addInventory
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyVHlwZSI6ImFkbWluIiwidXNlcm5hbWUiOiJjZW8xMjMiLCJpYXQiOjE3NjQxOTg4MDcsImV4cCI6MTc2NDgwMzYwN30.eIDoS9KIxaIPcqpwkvv9uy-6sw9c73S-JIvALt39djw
+Content-Type: application/json
+
+{
+    "itemName": "Test Item",
+    "brand": "Test Brand",
+    "code": "TI123",
+    "price": 100,
+    "category": "Test Category",
+    "quantity": 50
+}
+
+
+
+### Get All Inventory Items
+GET http://localhost:8081/inventory/getInventory
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyVHlwZSI6ImFkbWluIiwidXNlcm5hbWUiOiJjZW8xMjMiLCJpYXQiOjE3NjQxOTg4MDcsImV4cCI6MTc2NDgwMzYwN30.eIDoS9KIxaIPcqpwkvv9uy-6sw9c73S-JIvALt39djw

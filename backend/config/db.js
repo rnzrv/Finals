@@ -69,6 +69,20 @@ connection.connect((err) => {
           password VARCHAR(255) NOT NULL
         )`;
 
+      const createInventoryTable = `
+        CREATE TABLE IF NOT EXISTS inventory (
+          itemId INT AUTO_INCREMENT PRIMARY KEY,
+          itemName VARCHAR(100) NOT NULL,
+          brand VARCHAR(100),
+          code VARCHAR(50),
+          price DECIMAL(10, 2),
+          category VARCHAR(100),
+          quantity INT,
+          logo VARCHAR(255),
+          created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+          updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+        )`;
+
       connection.query(createPatientsTable, (err) => {
         if (err) throw err;
         console.log('✅ patients table ready.');
@@ -82,6 +96,11 @@ connection.connect((err) => {
       connection.query(createUsersTable, (err) => {
         if (err) throw err;
         console.log('✅ users table ready.');
+      });
+
+      connection.query(createInventoryTable, (err) => {
+        if (err) throw err;
+        console.log('✅ inventory table ready.');
       });
     });
   });

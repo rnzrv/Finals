@@ -50,13 +50,12 @@ function Purchases() {
               <table className="inventory-table">
                 <thead>
                   <tr>
-                    <th>Date</th>
-                    <th>Reference</th>
-                    <th>Suppliers</th>
-                    <th>Status</th>
+                    <th>Item</th>
+                    <th>Brand</th>
+                    <th>Code</th>
+                    <th>Price</th>
+                    <th>Category</th>
                     <th>Quantity</th>
-                    <th>Grand Total</th>
-                    <th>Due</th>
                     <th>Action</th>
                   </tr>
                 </thead>
@@ -68,7 +67,6 @@ function Purchases() {
                     <td className="inventory-item-text">₱50</td>
                     <td><span className="inventory-category-badge">Hair Care</span></td>
                     <td className="inventory-item-text">120</td>
-                    <td className="inventory-item-text">0</td>
 
                     <td>
                       <div className="inventory-actions-cell">
@@ -91,7 +89,6 @@ function Purchases() {
                     <td className="inventory-item-text">₱50</td>
                     <td><span className="inventory-category-badge">Hair Care</span></td>
                     <td className="inventory-item-text">120</td>
-                    <td className="inventory-item-text">0</td>
                     <td>
                       <div className="inventory-actions-cell">
                         <button className="inventory-action-btn inventory-action-view">

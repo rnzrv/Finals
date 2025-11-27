@@ -18,6 +18,7 @@ app.use(cookieParser());
 const userRoutes = require('./routes/users');
 const patientRoutes = require('./routes/patients');
 const appointmentRoutes = require('./routes/appointment')
+const inventoryRoutes = require('./routes/inventory');
 
 
 
@@ -25,6 +26,7 @@ const appointmentRoutes = require('./routes/appointment')
 app.use('/users', userRoutes);
 app.use('/patients', patientRoutes);
 app.use('/appointments', appointmentRoutes);
+app.use('/inventory', inventoryRoutes);
 // Test route
 
 app.get('/', (req, res) => {
