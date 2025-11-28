@@ -25,3 +25,22 @@ Content-Type: application/json
 ### Get All Inventory Items
 GET http://localhost:8081/inventory/getInventory
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyVHlwZSI6ImFkbWluIiwidXNlcm5hbWUiOiJjZW8xMjMiLCJpYXQiOjE3NjQxOTg4MDcsImV4cCI6MTc2NDgwMzYwN30.eIDoS9KIxaIPcqpwkvv9uy-6sw9c73S-JIvALt39djw
+
+
+### Delete Inventory Item
+DELETE http://localhost:8081/inventory/deleteInventory/1
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyVHlwZSI6ImFkbWluIiwidXNlcm5hbWUiOiJjZW8xMjMiLCJpYXQiOjE3NjQxOTg4MDcsImV4cCI6MTc2NDgwMzYwN30.eIDoS9KIxaIPcqpwkvv9uy-6sw9c73S-JIvALt39djw
+
+### update Inventory Item
+PUT http://localhost:8081/inventory/updateInventory/2
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyVHlwZSI6ImFkbWluIiwidXNlcm5hbWUiOiJjZW8xMjMiLCJpYXQiOjE3NjQxOTg4MDcsImV4cCI6MTc2NDgwMzYwN30.eIDoS9KIxaIPcqpwkvv9uy-6sw9c73S-JIvALt39djw
+Content-Type: application/json
+
+{
+    "itemName": "Updated Item",
+    "brand": "Updated Brand",
+    "code": "UI123",
+    "price": 150,
+    "category": "Updated Category",
+    "quantity": 75
+}

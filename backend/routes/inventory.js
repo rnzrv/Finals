@@ -33,7 +33,7 @@ router.get('/getInventory', verifyToken, (req, res) => {
 
 router.delete('/deleteInventory/:id', verifyToken, (req, res) => {
   const inventoryId = req.params.id;
-    const q = "DELETE FROM inventory WHERE id = ?";
+    const q = "DELETE FROM inventory WHERE itemId = ?";
     db.query(q, [inventoryId], (err) => {
       if (err) return res.status(500).json({ error: err.sqlMessage });
       return res.status(200).json({ message: 'Inventory item deleted successfully' });
@@ -47,7 +47,7 @@ router.put('/updateInventory/:id', verifyToken, (req, res) => {
     const q = `
     UPDATE inventory 
     SET itemName = ?, brand = ?, code = ?, price = ?, category = ?, quantity = ?, logo = ?
-    WHERE id = ?
+    WHERE itemId = ?
   `;
     db.query(q, [itemName, brand, code, price, category, quantity, logo, inventoryId], (err) => {
       if (err) return res.status(500).json({ error: err.sqlMessage });

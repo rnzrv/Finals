@@ -107,31 +107,31 @@ function Dashhboard() {
               <div className="recent-content">
                 <RecentCard
                   name="Janli Arbues"
-                  product="shabu"
+                  product="{sample product}"
                   amount="300"
                   status="paid"
                 />
                 <RecentCard
                   name="Janli Arbues"
-                  product="shabu"
+                  product="{sample product}"
                   amount="300"
                   status="paid"
                 />
                 <RecentCard
                   name="Janli Arbues"
-                  product="shabu"
+                  product="{sample product}"
                   amount="300"
                   status="paid"
                 />
                 <RecentCard
                   name="Janli Arbues"
-                  product="shabu"
+                  product="{sample product}"
                   amount="300"
                   status="paid"
                 />
                 <RecentCard
                   name="Janli Arbues"
-                  product="shabu"
+                  product="{sample product}"
                   amount="300"
                   status="paid"
                 />
