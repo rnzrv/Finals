@@ -7,8 +7,12 @@ import search from "../icons/search.svg";
 import eye from "../icons/eye.svg";
 import check from "../icons/checkbook.svg";
 import x from "../icons/x.svg";
+import PurchaseDeleteModal from "./modals/purchase-modal/delete.jsx";
+import PurchaseEditModal from "./modals/purchase-modal/edit.jsx";
 
 function Purchases() {
+
+
   return (
     <div className="inventory">
       <Sidebar />
@@ -39,7 +43,7 @@ function Purchases() {
 
           <div className="inventory-data">
             <div className="inventory-data-header">
-              <h3>Inventory Overview</h3>
+              <h3>Purchase History</h3>
               <div className="inventory-search">
                 <img src={search} alt="Search Icon" />
                 <input type="text" placeholder = "Search..." />
@@ -50,12 +54,12 @@ function Purchases() {
               <table className="inventory-table">
                 <thead>
                   <tr>
-                    <th>Item</th>
-                    <th>Brand</th>
-                    <th>Code</th>
-                    <th>Price</th>
-                    <th>Category</th>
+                    <th>Date</th>
+                    <th>Reference</th>
+                    <th>Suppliers</th>
                     <th>Quantity</th>
+                    <th>Grand Total</th>
+                    <th>Expiry Date</th>
                     <th>Action</th>
                   </tr>
                 </thead>
@@ -70,9 +74,7 @@ function Purchases() {
 
                     <td>
                       <div className="inventory-actions-cell">
-                        <button className="inventory-action-btn inventory-action-view">
-                          <img src={eye} alt="View" />
-                        </button>
+                       
                         <button className="inventory-action-btn inventory-action-edit">
                           <img src={check} alt="Edit" />
                         </button>
@@ -91,15 +93,9 @@ function Purchases() {
                     <td className="inventory-item-text">120</td>
                     <td>
                       <div className="inventory-actions-cell">
-                        <button className="inventory-action-btn inventory-action-view">
-                          <img src={eye} alt="View" />
-                        </button>
-                        <button className="inventory-action-btn inventory-action-edit">
-                          <img src={check} alt="Edit" />
-                        </button>
-                        <button className="inventory-action-btn inventory-action-delete">
-                          <img src={x} alt="Delete" />
-                        </button>
+                       
+                        <PurchaseEditModal/>
+                       <PurchaseDeleteModal/>
                       </div>
                     </td>
                   </tr>

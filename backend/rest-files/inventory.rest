@@ -8,7 +8,7 @@ Content-Type: application/json
 ### Add Inventory Item
 
 POST http://localhost:8081/inventory/addInventory
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyVHlwZSI6ImFkbWluIiwidXNlcm5hbWUiOiJjZW8xMjMiLCJpYXQiOjE3NjQxOTg4MDcsImV4cCI6MTc2NDgwMzYwN30.eIDoS9KIxaIPcqpwkvv9uy-6sw9c73S-JIvALt39djw
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyVHlwZSI6ImNlbyIsInVzZXJuYW1lIjoiY2VvMTIzIiwiaWF0IjoxNzY0MzA4MzQ1LCJleHAiOjE3NjQ5MTMxNDV9.s-w74IaA2LCnajCFDJKvVgpk24wdOleuMMnZ8UOrL8s
 Content-Type: application/json
 
 {

@@ -30,6 +30,20 @@ function Inventory() {
     }
   }
 
+  const deleteInventoryData = async () => {
+    try{
+      const token = sessionStorage.getItem('accessToken');
+      const res = await axios.get('http://localhost:8081/inventory/deleteInventory/:id', {
+        withCredentials: true,
+        header: {Authorization : `Bearer ${token}`},
+      });
+      setInventory(res.data);
+
+    } catch(error){
+      console.error('Error deleting item')
+    }
+  }
+  
   useEffect(() => {
     getInventoryData();
   }, []);
@@ -139,6 +153,7 @@ function Inventory() {
                     <th>Selling Price</th>
                     <th>Category</th>
                     <th>Quantity</th>
+                    <th>Expiry Date</th>
                     <th>Action</th>
                   </tr>
                 </thead>
@@ -152,6 +167,7 @@ function Inventory() {
                     <td className="inventory-item-text">₱{item.sellingPrice}</td>
                     <td><span className="inventory-category-badge">{item.category}</span></td>
                     <td className="inventory-item-text">{item.quantity}</td>
+                    <td className="inventory-item-text">expiry date</td>
                     <td>
                       <div className="inventory-actions-cell">
                         

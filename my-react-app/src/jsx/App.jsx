@@ -8,6 +8,7 @@ import Patients from "./patients";
 import Reports from "./reports";
 import PointofSales from "./pointofSales";
 import ProtectedRoute from "./protectedRoute";
+import Settings from "./settings";
 
 function App() {
   return (
@@ -71,6 +72,15 @@ function App() {
           element={
             <ProtectedRoute>
               <Reports />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/settings"
+          element={
+            <ProtectedRoute>
+              <Settings />
             </ProtectedRoute>
           }
         />
