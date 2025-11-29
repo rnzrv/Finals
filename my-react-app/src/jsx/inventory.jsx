@@ -7,7 +7,7 @@ import search from "../icons/search.svg";
 import eye from "../icons/eye.svg";
 import check from "../icons/checkbook.svg";
 import x from "../icons/x.svg";
-import AddProduct from './modals/modal-addProduct.jsx';
+import AddProduct from './modals/inventory-modal/modal-addProduct.jsx';
 import React, { useState, useEffect } from 'react';
 import InventoryDeleteAction from './modals/inventory-modal/inventory-action-delete.jsx';
 import InventoryEditAction from './modals/inventory-modal/inventory-action-edit.jsx';
@@ -30,19 +30,7 @@ function Inventory() {
     }
   }
 
-  const deleteInventoryData = async () => {
-    try{
-      const token = sessionStorage.getItem('accessToken');
-      const res = await axios.get('http://localhost:8081/inventory/deleteInventory/:id', {
-        withCredentials: true,
-        header: {Authorization : `Bearer ${token}`},
-      });
-      setInventory(res.data);
 
-    } catch(error){
-      console.error('Error deleting item')
-    }
-  }
   
   useEffect(() => {
     getInventoryData();
@@ -65,16 +53,7 @@ function Inventory() {
   const maxItemsPerPage = 10; // Maximum items to display per page
   const [currentPage, setCurrentPage] = useState(1);
 
-  const handleDelete = (itemId) => {
-  setInventory(inventory.filter(item => item.id !== itemId));
-  
-  // Optional: Reset to page 1 if current page becomes empty after deletion
-  const newInventory = inventory.filter(item => item.id !== itemId);
-  const newTotalPages = Math.ceil(newInventory.length / maxItemsPerPage);
-  if (currentPage > newTotalPages && newTotalPages > 0) {
-    setCurrentPage(newTotalPages);
-  }
-};
+
 
   const totalItems = filterItems.length; // Example total items, replace with actual data length
   const totalPages = Math.ceil(totalItems/maxItemsPerPage);
@@ -173,7 +152,7 @@ function Inventory() {
                         
                         <InventoryEditAction />
                         
-                        <InventoryDeleteAction item={item} onDelete={handleDelete} />
+                        <InventoryDeleteAction item={item} onDelete={getInventoryData} />
                       </div>
                     </td>
                   </tr>

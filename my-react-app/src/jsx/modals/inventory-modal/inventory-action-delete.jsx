@@ -2,14 +2,24 @@ import React, { useState } from 'react'
 import { createPortal } from 'react-dom';
 import x from '../../../icons/x.svg';
 import '../../../css/modal/inventory/delete.css';
+import axios from 'axios';
 
 function InventoryDeleteAction({ item, onDelete }) {
 
   const [isOpen, setIsOpen] = useState(false);
 
-  const handleDelete = () => {
-    onDelete(item.id);
-    setIsOpen(false);
+  const handleDelete = async () => {
+    try{
+      const token = sessionStorage.getItem('accessToken');
+      const res = await axios.delete(`http://localhost:8081/inventory/deleteInventory/${item.itemId}`, {
+        withCredentials: true,
+        headers: {Authorization : `Bearer ${token}`},
+      });
+      onDelete(item.itemId);
+      setIsOpen(false);
+    } catch (error) {
+      console.error('Error deleting item', error);
+    }
   };
 
   const inventoryDeleteModal = (
