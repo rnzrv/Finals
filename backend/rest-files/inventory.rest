@@ -14,10 +14,13 @@ Content-Type: application/json
 {
     "itemName": "Test Item",
     "brand": "Test Brand",
-    "code": "TI123",
-    "price": 100,
+    "code": "TIwad3432",
+    "costUnit": 80,
+    "sellingPrice": 100,
     "category": "Test Category",
-    "quantity": 50
+    "quantity": 50,
+    "expiryDate": "2025-12-31",
+    "logo": null
 }
 
 
@@ -32,12 +35,12 @@ DELETE http://localhost:8081/inventory/deleteInventory/2
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyVHlwZSI6ImFkbWluIiwidXNlcm5hbWUiOiJjZW8xMjMiLCJpYXQiOjE3NjQxOTg4MDcsImV4cCI6MTc2NDgwMzYwN30.eIDoS9KIxaIPcqpwkvv9uy-6sw9c73S-JIvALt39djw
 
 ### update Inventory Item
-PUT http://localhost:8081/inventory/updateInventory/2
+PUT http://localhost:8081/inventory/updateInventory/22
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyVHlwZSI6ImFkbWluIiwidXNlcm5hbWUiOiJjZW8xMjMiLCJpYXQiOjE3NjQxOTg4MDcsImV4cCI6MTc2NDgwMzYwN30.eIDoS9KIxaIPcqpwkvv9uy-6sw9c73S-JIvALt39djw
 Content-Type: application/json
 
 {
-    "itemName": "Updated Item",
+    "itemName": "Updatedasd Item",
     "brand": "Updated Brand",
     "code": "UI123",
     "price": 150,

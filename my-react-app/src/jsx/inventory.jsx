@@ -142,15 +142,15 @@ function Inventory() {
                     <td className="inventory-item-name">{item.itemName}</td>
                     <td className="inventory-item-text">{item.brand}</td>
                     <td className="inventory-item-text">{item.code}</td>
-                    <td className="inventory-item-text">₱{item.price}</td>
+                    <td className="inventory-item-text">₱{item.costUnit}</td>
                     <td className="inventory-item-text">₱{item.sellingPrice}</td>
                     <td><span className="inventory-category-badge">{item.category}</span></td>
                     <td className="inventory-item-text">{item.quantity}</td>
-                    <td className="inventory-item-text">expiry date</td>
+                    <td className="inventory-item-text">{item.expiryDate}</td>
                     <td>
                       <div className="inventory-actions-cell">
                         
-                        <InventoryEditAction />
+                        <InventoryEditAction item={item} onUpdate={getInventoryData} />
                         
                         <InventoryDeleteAction item={item} onDelete={getInventoryData} />
                       </div>

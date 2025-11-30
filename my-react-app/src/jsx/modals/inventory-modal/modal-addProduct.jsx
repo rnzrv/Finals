@@ -13,9 +13,11 @@ function ModalAddProduct({ onProductAdded }) {
     itemName: '',
     brand: '',
     code: '',
+    costUnit: '',
+    sellingPrice: '',
     category: '',
-    price: '',
     quantity: '',
+    expiryDate: '',
     logo: null,
   });
 
@@ -25,18 +27,19 @@ function ModalAddProduct({ onProductAdded }) {
   }, [isOpen]);
 
   const validate = () => {
-    const { itemName, brand, code, category, price, quantity } = formData;
-    const p = Number(price);
-    const q = Number(quantity);
-    if (!itemName.trim() || !brand.trim() || !code.trim() || !category.trim()) {
+    const { itemName, brand, code, costUnit, sellingPrice, category, quantity, expiryDate } = formData;
+    const costUnitNum = Number(costUnit);
+    const sellingPriceNum = Number(sellingPrice);
+    const qtyNum = Number(quantity);
+    if (!itemName.trim() || !brand.trim() || !code.trim() || !category.trim() || !expiryDate.trim()) {
       setErrorMessage('All fields are required.');
       return false;
     }
-    if (!Number.isFinite(p) || p <= 0) {
-      setErrorMessage('Price must be a number greater than 0.');
+    if (!Number.isFinite(costUnitNum) || costUnitNum <= 0) {
+      setErrorMessage('Cost unit must be a number greater than 0.');
       return false;
     }
-    if (!Number.isInteger(q) || q < 0) {
+    if (!Number.isInteger(qtyNum) || qtyNum < 0) {
       setErrorMessage('Quantity must be an integer ≥ 0.');
       return false;
     }
@@ -44,12 +47,16 @@ function ModalAddProduct({ onProductAdded }) {
     return true;
   };
 
+  
+
   const normalize = () => ({
     itemName: formData.itemName.trim(),
     brand: formData.brand.trim(),
     code: formData.code.trim(),
+    costUnit: Number(formData.costUnit),
+    sellingPrice: Number(formData.sellingPrice),
     category: formData.category.trim(),
-    price: Number(formData.price),
+    expiryDate: formData.expiryDate.trim(),
     quantity: Number(formData.quantity),
     logo: null, // send null unless backend supports uploads
   });
@@ -64,7 +71,7 @@ function ModalAddProduct({ onProductAdded }) {
         headers: { Authorization: `Bearer ${token}` },
       });
       onProductAdded && onProductAdded(); // let parent refresh/append
-      setFormData({ itemName:'', brand:'', code:'', category:'', price:'', quantity:'', logo:null });
+      setFormData({ itemName:'', brand:'', code:'', costUnit:'', sellingPrice:'', category:'', quantity:'', expiryDate:'', logo:null });
       setIsOpen(false);
     } catch (error) {
       if (error?.response?.status === 409) setErrorMessage('Product code already exists.');
@@ -89,16 +96,17 @@ function ModalAddProduct({ onProductAdded }) {
         <form className='form' onSubmit={addProductHandle}>
           <div className="form-left">
             <div className="item">
-              <h1>Name</h1>
+              <h1>Item Name:</h1>
               <input
                 type="text"
                 value={formData.itemName}
                 onChange={(e)=>setFormData(f=>({...f, itemName:e.target.value}))}
                 required
               />
+
             </div>
             <div className="item">
-              <h1>Brand</h1>
+              <h1>Brand: </h1>
               <input
                 type="text"
                 value={formData.brand}
@@ -107,11 +115,30 @@ function ModalAddProduct({ onProductAdded }) {
               />
             </div>
             <div className="item">
-              <h1>Code</h1>
+              <h1>Code: </h1>
               <input
                 type="text"
                 value={formData.code}
                 onChange={(e)=>setFormData(f=>({...f, code:e.target.value}))}
+                required
+              />
+            </div>
+            <div className="item">
+              <h1>Cost Unit: </h1>
+              <input
+                type="text"
+                value={formData.costUnit}
+                onChange={(e)=>setFormData(f=>({...f, costUnit:e.target.value}))}
+                required
+              />
+            </div>
+
+            <div className="item">
+              <h1>Selling Price: </h1>
+              <input
+                type="text"
+                value={formData.sellingPrice}
+                onChange={(e)=>setFormData(f=>({...f, sellingPrice:e.target.value}))}
                 required
               />
             </div>
@@ -127,7 +154,7 @@ function ModalAddProduct({ onProductAdded }) {
           </div>
 
           <div className="form-right">
-            <div className="item">
+            {/* <div className="item">
               <h1>Price</h1>
               <input
                 type="number"
@@ -137,7 +164,8 @@ function ModalAddProduct({ onProductAdded }) {
                 onChange={(e)=>setFormData(f=>({...f, price:e.target.value}))}
                 required
               />
-            </div>
+            </div> */}
+
             <div className="item">
               <h1>Quantity</h1>
               <input
@@ -145,6 +173,16 @@ function ModalAddProduct({ onProductAdded }) {
                 min="0"
                 value={formData.quantity}
                 onChange={(e)=>setFormData(f=>({...f, quantity:e.target.value}))}
+                required
+              />
+            </div>
+
+            <div className="item">
+              <h1>Expiry Date: </h1>
+              <input
+                type="date"
+                value={formData.expiryDate}
+                onChange={(e)=>setFormData(f=>({...f, expiryDate:e.target.value}))}
                 required
               />
             </div>
