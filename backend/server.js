@@ -22,6 +22,7 @@ const inventoryRoutes = require('./routes/inventory');
 
 
 
+
 // Use routes
 app.use('/users', userRoutes);
 app.use('/patients', patientRoutes);

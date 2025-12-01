@@ -31,6 +31,7 @@ function ModalAddProduct({ onProductAdded }) {
     const costUnitNum = Number(costUnit);
     const sellingPriceNum = Number(sellingPrice);
     const qtyNum = Number(quantity);
+    const regexDate = /^\d{4}-\d{2}-\d{2}$/;
     if (!itemName.trim() || !brand.trim() || !code.trim() || !category.trim() || !expiryDate.trim()) {
       setErrorMessage('All fields are required.');
       return false;
@@ -43,6 +44,20 @@ function ModalAddProduct({ onProductAdded }) {
       setErrorMessage('Quantity must be an integer ≥ 0.');
       return false;
     }
+    if(!Number.isFinite(sellingPriceNum) || sellingPriceNum <= 0) {
+      setErrorMessage('Selling price must be a number greater than 0.');
+      return false;
+    }
+    if (!regexDate.test(formData.expiryDate.trim())) {
+      setErrorMessage('Expiry date must be in YYYY-MM-DD format.');
+      return false;
+    }
+    const dateNow = new Date();
+    if (new Date(formData.expiryDate.trim()) < dateNow) {
+      setErrorMessage('Expiry date must be a future date.');
+      return false;
+    }
+
     setErrorMessage('');
     return true;
   };
@@ -67,7 +82,20 @@ function ModalAddProduct({ onProductAdded }) {
     setSubmitting(true);
     try {
       const token = sessionStorage.getItem('accessToken');
-      await axios.post('http://localhost:8081/inventory/addInventory', normalize(), {
+      const formDataToSend = new FormData();
+
+      formDataToSend.append('itemName', formData.itemName.trim());
+      formDataToSend.append('brand', formData.brand.trim());
+      formDataToSend.append('code', formData.code.trim());
+      formDataToSend.append('costUnit', Number(formData.costUnit));
+      formDataToSend.append('sellingPrice', Number(formData.sellingPrice));
+      formDataToSend.append('category', formData.category.trim());
+      formDataToSend.append('expiryDate', formData.expiryDate.trim());
+      formDataToSend.append('quantity', Number(formData.quantity));
+      if (formData.logo) {
+        formDataToSend.append('logo', formData.logo);
+      }
+      await axios.post('http://localhost:8081/inventory/addInventory', formDataToSend, {
         headers: { Authorization: `Bearer ${token}` },
       });
       onProductAdded && onProductAdded(); // let parent refresh/append
