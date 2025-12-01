@@ -75,18 +75,32 @@ connection.connect((err) => {
         itemName VARCHAR(100) NOT NULL,
         brand VARCHAR(100) NOT NULL,
         code VARCHAR(50) NOT NULL,
-        costUnit DECIMAL(10,2) NULL,        -- optional: unit cost
-        sellingPrice DECIMAL(10,2) NULL,    -- optional: selling price
+        costUnit DECIMAL(10,2) NULL,        
+        sellingPrice DECIMAL(10,2) NULL,    
         category VARCHAR(100) NOT NULL,
         quantity INT UNSIGNED NOT NULL DEFAULT 0,
-        expiryDate DATE NULL,               -- optional: YYYY-MM-DD
-        logo VARCHAR(255) NULL,             -- store URL/path; use BLOB only if you must store binary
+        expiryDate DATE NULL,               
+        logo VARCHAR(255) NULL,             
         created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
         updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
         PRIMARY KEY (itemId),
         UNIQUE KEY ux_inventory_code (code),
         KEY ix_inventory_category (category)
       )`;
+
+      const createPurchasesTable = `
+        CREATE TABLE IF NOT EXISTS purchases (
+          id INT AUTO_INCREMENT PRIMARY KEY,
+          date DATE NOT NULL,
+          reference VARCHAR(100) NOT NULL UNIQUE,
+          suppliers VARCHAR(100) NOT NULL,
+          quantity INT NOT NULL,
+          grandTotal DECIMAL(10,2) NOT NULL,
+          expiryDate DATE,
+          created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+          updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+        )`;
+
 
       connection.query(createPatientsTable, (err) => {
         if (err) throw err;
@@ -106,6 +120,11 @@ connection.connect((err) => {
       connection.query(createInventoryTable, (err) => {
         if (err) throw err;
         console.log('✅ inventory table ready.');
+      });
+
+      connection.query(createPurchasesTable, (err) => {
+        if (err) throw err;
+        console.log('✅ purchases table ready.');
       });
     });
   });

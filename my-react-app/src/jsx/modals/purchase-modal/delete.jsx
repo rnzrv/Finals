@@ -2,11 +2,11 @@
 import React, {useState} from 'react';
 import { createPortal } from 'react-dom';
 
-import '../../../css/modal/inventory/delete.css';
+import '../../../css/modal/purchase/delete.css';
 import x from '../../../icons/x.svg';
 
 
-function PurchaseDeleteModal(){
+function PurchaseDeleteModal({item}) {
 
     const [isOpen , setIsOpen] = useState(false);
 
@@ -14,12 +14,12 @@ function PurchaseDeleteModal(){
         <div className="inventory-delete-action-modal-overlay">
           <div className="inventory-delete-action-modal">
             <div className="inventory-delete-modal-header">
-              <h2 className="inventory-delete-action-modal-header">Delete Inventory Item</h2>
+              <h2 className="inventory-delete-action-modal-header">Delete Purchase Item</h2>
               <img src={x} alt="Close" onClick={()=> setIsOpen(false)}/>
             </div>
             
             <p className="inventory-delete-action-modal-message">
-              {/* Are you sure you want to delete <strong>{item?.itemName}</strong>? */}Purchase
+               Are you sure you want to delete <strong>{item?.itemName}</strong>? 
             </p>
             <div className="modal-actions">
               <button onClick={() => setIsOpen(false)}>No</button>

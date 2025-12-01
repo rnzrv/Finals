@@ -9,8 +9,27 @@ import check from "../icons/checkbook.svg";
 import x from "../icons/x.svg";
 import PurchaseDeleteModal from "./modals/purchase-modal/delete.jsx";
 import PurchaseEditModal from "./modals/purchase-modal/edit.jsx";
+import React, {useState} from 'react';
+
 
 function Purchases() {
+
+  // create state for purchases
+  // fetch purchases from backend
+  // map through purchases and display in table
+  const items = [{
+    itemName: 'Item 1', date: '2024-06-01', reference: 'REF123', suppliers: 'Supplier A', quantity: 10, grandTotal: 5000, expiryDate: '2025-06-01'
+  },
+  {
+    itemName: 'Item 2', date: '2024-06-05', reference: 'REF124', suppliers: 'Supplier B', quantity: 5, grandTotal: 2500, expiryDate: '2025-06-05'
+  },
+  {
+    itemName: 'Item 3', date: '2024-06-10', reference: 'REF125', suppliers: 'Supplier C', quantity: 8, grandTotal: 4000, expiryDate: '2025-06-10'
+  }];
+
+  const [purchases, setPurchases] = useState([]);
+
+
 
 
   return (
@@ -36,6 +55,8 @@ function Purchases() {
               </div>
             </div>
 
+            <button>Add purchases</button>
+
             <button className="inventory-export-btn">
                 Export <img src={dropDown} alt="Dropdown Icon" />
             </button>
@@ -54,6 +75,7 @@ function Purchases() {
               <table className="inventory-table">
                 <thead>
                   <tr>
+                    <th>Item Name</th>
                     <th>Date</th>
                     <th>Reference</th>
                     <th>Suppliers</th>
@@ -64,7 +86,24 @@ function Purchases() {
                   </tr>
                 </thead>
                 <tbody>
-                  <tr>
+                  {items.map((item, index) => (
+                    <tr key={index}>
+                      <td className="inventory-item-name">{item.itemName}</td>
+                      <td className="inventory-item-text">{item.date}</td>
+                      <td className="inventory-item-text">{item.reference}</td>
+                      <td className="inventory-item-text">{item.suppliers}</td>
+                      <td className="inventory-item-text">{item.quantity}</td>
+                      <td className="inventory-item-text">₱{item.grandTotal}</td>
+                      <td className="inventory-item-text">{item.expiryDate}</td>
+                      <td>
+                        <div className="inventory-actions-cell">
+                          <PurchaseEditModal item={item} />
+                          <PurchaseDeleteModal item={item} />
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                  {/* <tr>
                     <td className="inventory-item-name">Shampoo</td>
                     <td className="inventory-item-text">Miniso</td>
                     <td className="inventory-item-text">C123</td>
@@ -83,8 +122,9 @@ function Purchases() {
                         </button>
                       </div>
                     </td>
-                  </tr>
-                  <tr>
+                  </tr> */}
+                  
+                  {/* <tr>
                     <td className="inventory-item-name">Shampoo</td>
                     <td className="inventory-item-text">Miniso</td>
                     <td className="inventory-item-text">C123</td>
@@ -98,7 +138,7 @@ function Purchases() {
                        <PurchaseDeleteModal/>
                       </div>
                     </td>
-                  </tr>
+                  </tr> */}
                 </tbody>
               </table>
             </div>

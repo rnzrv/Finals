@@ -45,6 +45,15 @@ if (!fs.existsSync(uploadPath)) {
   fs.mkdirSync(uploadPath, { recursive: true });
 }
 
+
+const deleteFile = (filePath) => {
+  fs.unlink(filePath, (err) => {
+    if (err) {
+      console.error('Error deleting file:', err);
+    }
+  });
+};
+
 // ...existing code...
 router.post('/addInventory', verifyToken, upload.single('logo'), (req, res) => {
   let { itemName, brand, code, costUnit, sellingPrice, category, quantity, expiryDate} = req.body;
@@ -256,12 +265,31 @@ router.get('/getInventory', verifyToken, (req, res) => {
 
 router.delete('/deleteInventory/:id', verifyToken, (req, res) => {
   const inventoryId = req.params.id;
-  const q = 'DELETE FROM inventory WHERE itemId = ?';
-  db.query(q, [inventoryId], (err, result) => {
+
+  if (!inventoryId) {
+    return res.status(400).json({ error: 'Inventory ID is required' });
+  }
+
+  const logoQ = 'Select logo FROM inventory WHERE itemId = ?';
+  db.query(logoQ, [inventoryId], (logoErr, logoRes) => {
+    if (logoErr) return res.status(500).json({error: logoErr.sqlMessage});
+    if (logoRes.length === 0) return res.status(404).json({ error: 'Item not found' });
+
+    const logoPath = logoRes[0].logo;
+    if (logoPath) {
+      deleteFile(path.join(__dirname, '..', logoPath));
+    }
+
+     const q = 'DELETE FROM inventory WHERE itemId = ?';
+    db.query(q, [inventoryId], (err, result) => {
     if (err) return res.status(500).json({ error: err.sqlMessage });
     if (result.affectedRows === 0) return res.status(404).json({ error: 'Item not found' });
     return res.status(200).json({ message: 'Inventory item deleted successfully' });
   });
+  });
+ 
+
+  
 });
 
 module.exports = router;

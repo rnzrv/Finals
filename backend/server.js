@@ -19,7 +19,7 @@ const userRoutes = require('./routes/users');
 const patientRoutes = require('./routes/patients');
 const appointmentRoutes = require('./routes/appointment')
 const inventoryRoutes = require('./routes/inventory');
-
+const purchaseRoutes = require('./routes/purchase');
 
 
 
