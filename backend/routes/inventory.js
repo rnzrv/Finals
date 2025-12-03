@@ -56,14 +56,18 @@ const deleteFile = (filePath) => {
 
 // ...existing code...
 router.post('/addInventory', verifyToken, upload.single('logo'), (req, res) => {
-  let { itemName, brand, code, costUnit, sellingPrice, category, quantity, expiryDate} = req.body;
+  let { itemName, brand, code, costUnit, sellingPrice, reference, 
+    suppliers, quantity, grandTotal, expiryDate, category } = req.body;
   let logo = req.file ? `/uploads/${req.file.filename}` : null;
 
-  itemName = typeof itemName === 'string' ? itemName.trim() : '';
+  itemName = typeof itemName === 'string' ? itemName.trim() : ''; 
   brand = typeof brand === 'string' ? brand.trim() : '';
   code = typeof code === 'string' ? code.trim() : '';
   costUnit = costUnit !== undefined ? Number(costUnit) : null;
   sellingPrice = sellingPrice !== undefined ? Number(sellingPrice) : null;
+  reference = typeof reference === 'string' ? reference.trim() : '';
+  suppliers = typeof suppliers === 'string' ? suppliers.trim() : '';
+  grandTotal = grandTotal !== undefined ? Number(grandTotal) : null;
   category = typeof category === 'string' ? category.trim() : '';
   quantity = quantity !== undefined ? Number(quantity) : null;
   expiryDate = typeof expiryDate === 'string' ? expiryDate.trim() : null;
@@ -81,10 +85,18 @@ router.post('/addInventory', verifyToken, upload.single('logo'), (req, res) => {
   const sellingPriceNum = Number(sellingPrice);
   const qtyNum = Number(quantity);
 
-  if (!itemName || !brand || !code || costUnit === undefined || sellingPrice === undefined || quantity === undefined || !category || !expiryDate) {
+  if (!itemName || !brand || !code ||
+     costUnit === undefined || sellingPrice === undefined || 
+     !reference || !suppliers || quantity === undefined ||
+       !grandTotal ||
+     !expiryDate || !category) {
     cleanupFile();
     return res.status(400).json({ error: 'All fields are required' });
   }
+
+
+
+  
 
   if (Number.isNaN(costUnitNum) || costUnitNum <= 0) {
     cleanupFile();
@@ -118,10 +130,10 @@ router.post('/addInventory', verifyToken, upload.single('logo'), (req, res) => {
     return res.status(400).json({ error: 'Expiry date must be a future date' });
   }
 
-  const checkQ = 'SELECT 1 FROM inventory WHERE code = ? LIMIT 1';
+  const checkQ = 'SELECT 1 FROM purchases WHERE code = ? LIMIT 1';
   db.query(checkQ, [code], (checkErr, rows) => {
 
-    if (checkErr) {
+    if (checkErr) { 
       cleanupFile();
       return res.status(500).json({ error: checkErr.sqlMessage });
     }
@@ -131,10 +143,12 @@ router.post('/addInventory', verifyToken, upload.single('logo'), (req, res) => {
     }
 
     const insertQ = `
-      INSERT INTO inventory (itemName, brand, code, costUnit, sellingPrice, category, quantity, expiryDate, logo)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+      INSERT INTO purchases (itemName, brand, code, costUnit,
+       sellingPrice, reference, suppliers, quantity, grandTotal, expiryDate,
+        category, logo)
+      VALUES (?, ?,  ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `;
-    db.query(insertQ, [itemName, brand, code, costUnitNum, sellingPriceNum, category, qtyNum, expiryDate, logo], (err, result) => {
+    db.query(insertQ, [itemName, brand, code, costUnitNum, sellingPriceNum, reference, suppliers, qtyNum, grandTotal, expiryDate, category, logo], (err, result) => {
       if (err) {
         if (err.code === 'ER_DUP_ENTRY') {
           cleanupFile();
@@ -144,7 +158,7 @@ router.post('/addInventory', verifyToken, upload.single('logo'), (req, res) => {
         return res.status(500).json({ error: err.sqlMessage });
       }
       return res.status(201).json({
-        message: 'Product added to inventory successfully',
+        message: 'Product added to purchases successfully',
         data: {
           itemId: result.insertId,
           itemName,

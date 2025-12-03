@@ -89,16 +89,22 @@ connection.connect((err) => {
       )`;
 
       const createPurchasesTable = `
-        CREATE TABLE IF NOT EXISTS purchases (
-          id INT AUTO_INCREMENT PRIMARY KEY,
-          date DATE NOT NULL,
-          reference VARCHAR(100) NOT NULL UNIQUE,
-          suppliers VARCHAR(100) NOT NULL,
-          quantity INT NOT NULL,
-          grandTotal DECIMAL(10,2) NOT NULL,
-          expiryDate DATE,
-          created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-          updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+        Create Table if not exists purchases(
+        itemId INT AUTO_INCREMENT PRIMARY KEY,
+        itemName VARCHAR(100) NOT NULL,
+        brand VARCHAR(100) NOT NULL,
+        code VARCHAR(50) NOT NULL,
+        costUnit DECIMAL(10,2) NULL,
+        sellingPrice DECIMAL(10,2) NULL,
+        reference VARCHAR(100) NOT NULL UNIQUE,
+        suppliers VARCHAR(100) NOT NULL,
+        quantity INT NOT NULL,
+        grandTotal DECIMAL(10,2) NOT NULL,
+        expiryDate DATE,
+        category ENUM('Product', 'Service') NOT NULL,
+        logo VARCHAR(255) NULL,
+        created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+        updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
         )`;
 
 

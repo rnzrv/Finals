@@ -10,6 +10,7 @@ import x from "../icons/x.svg";
 import PurchaseDeleteModal from "./modals/purchase-modal/delete.jsx";
 import PurchaseEditModal from "./modals/purchase-modal/edit.jsx";
 import React, {useState} from 'react';
+import AddProduct from './modals/inventory-modal/modal-addProduct.jsx';
 
 
 function Purchases() {
@@ -18,13 +19,13 @@ function Purchases() {
   // fetch purchases from backend
   // map through purchases and display in table
   const items = [{
-    itemName: 'Item 1', date: '2024-06-01', reference: 'REF123', suppliers: 'Supplier A', quantity: 10, grandTotal: 5000, expiryDate: '2025-06-01'
+    itemName: 'Item 1', date: '2024-06-01', reference: 'REF123', suppliers: 'Supplier A', quantity: 10, grandTotal: 5000, expiryDate: '2025-06-01', category: 'Product'
   },
   {
-    itemName: 'Item 2', date: '2024-06-05', reference: 'REF124', suppliers: 'Supplier B', quantity: 5, grandTotal: 2500, expiryDate: '2025-06-05'
+    itemName: 'Item 2', date: '2024-06-05', reference: 'REF124', suppliers: 'Supplier B', quantity: 5, grandTotal: 2500, expiryDate: '2025-06-05', category: 'Product'
   },
   {
-    itemName: 'Item 3', date: '2024-06-10', reference: 'REF125', suppliers: 'Supplier C', quantity: 8, grandTotal: 4000, expiryDate: '2025-06-10'
+    itemName: 'Item 3', date: '2024-06-10', reference: 'REF125', suppliers: 'Supplier C', quantity: 8, grandTotal: 4000, expiryDate: '2025-06-10', category: 'Service'
   }];
 
   const [purchases, setPurchases] = useState([]);
@@ -55,8 +56,7 @@ function Purchases() {
               </div>
             </div>
 
-            <button>Add purchases</button>
-
+            <AddProduct />
             <button className="inventory-export-btn">
                 Export <img src={dropDown} alt="Dropdown Icon" />
             </button>
@@ -82,6 +82,7 @@ function Purchases() {
                     <th>Quantity</th>
                     <th>Grand Total</th>
                     <th>Expiry Date</th>
+                    <th>Category</th>
                     <th>Action</th>
                   </tr>
                 </thead>
@@ -95,6 +96,7 @@ function Purchases() {
                       <td className="inventory-item-text">{item.quantity}</td>
                       <td className="inventory-item-text">₱{item.grandTotal}</td>
                       <td className="inventory-item-text">{item.expiryDate}</td>
+                      <td className="inventory-item-text">{item.category}</td>
                       <td>
                         <div className="inventory-actions-cell">
                           <PurchaseEditModal item={item} />

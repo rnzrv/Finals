@@ -15,9 +15,12 @@ function ModalAddProduct({ onProductAdded }) {
     code: '',
     costUnit: '',
     sellingPrice: '',
-    category: '',
+    reference: '',
+    suppliers: '',
     quantity: '',
+    grandTotal: '',
     expiryDate: '',
+    category: '',
     logo: null,
   });
 
@@ -27,7 +30,7 @@ function ModalAddProduct({ onProductAdded }) {
   }, [isOpen]);
 
   const validate = () => {
-    const { itemName, brand, code, costUnit, sellingPrice, category, quantity, expiryDate } = formData;
+    const { itemName, brand, code, costUnit, sellingPrice, date, reference, suppliers, quantity, grandTotal, expiryDate, category } = formData;
     const costUnitNum = Number(costUnit);
     const sellingPriceNum = Number(sellingPrice);
     const qtyNum = Number(quantity);
@@ -48,33 +51,28 @@ function ModalAddProduct({ onProductAdded }) {
       setErrorMessage('Selling price must be a number greater than 0.');
       return false;
     }
-    if (!regexDate.test(formData.expiryDate.trim())) {
-      setErrorMessage('Expiry date must be in YYYY-MM-DD format.');
-      return false;
-    }
-    const dateNow = new Date();
-    if (new Date(formData.expiryDate.trim()) < dateNow) {
-      setErrorMessage('Expiry date must be a future date.');
+
+    if (category.trim() !== 'Product' && category.trim() !== 'Service') {
+      setErrorMessage("Category must be either 'Product' or 'Service'.");
       return false;
     }
 
+    if (category.trim() === 'Product') {
+      if (!expiryDate.trim() || !regexDate.test(expiryDate.trim())) {
+        setErrorMessage('Expiry date (YYYY-MM-DD) is required for products.');
+        return false;
+      }
+      const today = new Date();
+      const exp = new Date(expiryDate.trim());
+      if (exp < today) {
+        setErrorMessage('Expiry date must be a future date.');
+        return false;
+      }
+    }
     setErrorMessage('');
     return true;
   };
 
-  
-
-  const normalize = () => ({
-    itemName: formData.itemName.trim(),
-    brand: formData.brand.trim(),
-    code: formData.code.trim(),
-    costUnit: Number(formData.costUnit),
-    sellingPrice: Number(formData.sellingPrice),
-    category: formData.category.trim(),
-    expiryDate: formData.expiryDate.trim(),
-    quantity: Number(formData.quantity),
-    logo: null, // send null unless backend supports uploads
-  });
 
   const addProductHandle = async (e) => {
     e.preventDefault();
@@ -89,9 +87,12 @@ function ModalAddProduct({ onProductAdded }) {
       formDataToSend.append('code', formData.code.trim());
       formDataToSend.append('costUnit', Number(formData.costUnit));
       formDataToSend.append('sellingPrice', Number(formData.sellingPrice));
-      formDataToSend.append('category', formData.category.trim());
-      formDataToSend.append('expiryDate', formData.expiryDate.trim());
+      formDataToSend.append('reference', formData.reference.trim());
+      formDataToSend.append('suppliers', formData.suppliers.trim());
       formDataToSend.append('quantity', Number(formData.quantity));
+      formDataToSend.append('grandTotal', Number(formData.grandTotal));  
+      formDataToSend.append('expiryDate', formData.expiryDate.trim());
+      formDataToSend.append('category', formData.category.trim());
       if (formData.logo) {
         formDataToSend.append('logo', formData.logo);
       }
@@ -99,7 +100,7 @@ function ModalAddProduct({ onProductAdded }) {
         headers: { Authorization: `Bearer ${token}` },
       });
       onProductAdded && onProductAdded(); // let parent refresh/append
-      setFormData({ itemName:'', brand:'', code:'', costUnit:'', sellingPrice:'', category:'', quantity:'', expiryDate:'', logo:null });
+      setFormData({ itemName:'', brand:'', code:'', costUnit:'', sellingPrice:'', date:'', reference:'', suppliers:'', quantity:'', grandTotal:'', expiryDate:'', category:'', logo:null });
       setIsOpen(false);
     } catch (error) {
       if (error?.response?.status === 409) setErrorMessage('Product code already exists.');
@@ -170,15 +171,7 @@ function ModalAddProduct({ onProductAdded }) {
                 required
               />
             </div>
-            <div className="item">
-              <h1>Category</h1>
-              <input
-                type="text"
-                value={formData.category}
-                onChange={(e)=>setFormData(f=>({...f, category:e.target.value}))}
-                required
-              />
-            </div>
+            
           </div>
 
           <div className="form-right">
@@ -193,6 +186,25 @@ function ModalAddProduct({ onProductAdded }) {
                 required
               />
             </div> */}
+            <div className="item">
+              <h1>Reference: </h1>
+              <input
+                type="text"
+                value={formData.reference}
+                onChange={(e)=>setFormData(f=>({...f, reference:e.target.value}))}
+                required
+              />
+            </div>
+
+            <div className="item">
+              <h1>Suppliers: </h1>
+              <input
+                type="text"
+                value={formData.suppliers}
+                onChange={(e)=>setFormData(f=>({...f, suppliers:e.target.value}))}
+                required
+              />
+            </div>
 
             <div className="item">
               <h1>Quantity</h1>
@@ -206,6 +218,16 @@ function ModalAddProduct({ onProductAdded }) {
             </div>
 
             <div className="item">
+              <h1>Grand Total:</h1>
+              <input
+                type="number"
+                min="0"
+                value={formData.grandTotal}
+                onChange={(e)=>setFormData(f=>({...f, grandTotal:e.target.value}))}
+                required
+              />
+            </div>
+            <div className="item">
               <h1>Expiry Date: </h1>
               <input
                 type="date"
@@ -214,6 +236,23 @@ function ModalAddProduct({ onProductAdded }) {
                 required
               />
             </div>
+            <div className="item">
+              <h1>Category</h1>
+              <select
+                value={formData.category}
+                onChange={(e)=>setFormData(f=>({...f, category:e.target.value}))}
+                required
+              >
+
+              <option value="">Select...</option>
+              <option value="Product">Product</option>
+              <option value="Service">Service</option>
+              </select>
+            </div>
+
+            
+
+            
             <div className="item-right">
               <h1>Logo (Optional)</h1>
               <input
