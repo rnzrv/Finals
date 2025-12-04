@@ -46,3 +46,66 @@ Content-Type: application/json
     "category": "Updated Category",
     "quantity": 75
 }
+
+
+### Get All Purchases
+GET http://localhost:8081/inventory/Purchases/inventory
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyVHlwZSI6ImFkbWluIiwidXNlcm5hbWUiOiJjZW8xMjMiLCJpYXQiOjE3NjQ4NDE1MjUsImV4cCI6MTc2NTQ0NjMyNX0.qT-PwyImZcQDJABcLRyPgqF5a4BbpsuZPoN1bjbjarY
+Content-Type: application/json
+
+### Addd Purchase Record
+POST http://localhost:8081/inventory/addInventory
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyVHlwZSI6ImFkbWluIiwidXNlcm5hbWUiOiJjZW8xMjMiLCJpYXQiOjE3NjQ4NjI3NzEsImV4cCI6MTc2NTQ2NzU3MX0.2X6siBpac0nsMsnUBpR3J9psjTR24Rcjalq11p12WMg
+Content-Type: multipart/form-data; boundary=WebKitFormBoundary123
+
+--WebKitFormBoundary123
+Content-Disposition: form-data; name="itemName"
+
+Test Purchase Item
+--WebKitFormBoundary123
+Content-Disposition: form-data; name="brand"
+
+Test Purchase Brand
+--WebKitFormBoundary123
+Content-Disposition: form-data; name="code"
+
+TP-001
+--WebKitFormBoundary123
+Content-Disposition: form-data; name="costUnit"
+
+70
+--WebKitFormBoundary123
+Content-Disposition: form-data; name="sellingPrice"
+
+90
+--WebKitFormBoundary123
+Content-Disposition: form-data; name="reference"
+
+TP-REF-001
+--WebKitFormBoundary123
+Content-Disposition: form-data; name="suppliers"
+
+Test Supplier
+--WebKitFormBoundary123
+Content-Disposition: form-data; name="quantity"
+
+30
+--WebKitFormBoundary123
+Content-Disposition: form-data; name="grandTotal"
+
+15
+--WebKitFormBoundary123
+Content-Disposition: form-data; name="expiryDate"
+
+2026-06-15
+--WebKitFormBoundary123
+Content-Disposition: form-data; name="category"
+
+Product
+--WebKitFormBoundary123
+Content-Disposition: form-data; name="logo"; filename="sample.jpg"
+Content-Type: image/jpeg
+
+@./sample.jpg
+--WebKitFormBoundary123--
+

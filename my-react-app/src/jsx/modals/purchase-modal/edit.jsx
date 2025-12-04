@@ -19,9 +19,27 @@ function InventoryEditAction({item}) {
                     Item Name:
                     <input type="text" name="itemName" defaultValue={item?.itemName} />
                   </label>
+
+                  <label>
+                    Brand:
+                    <input type="text" name="brand" defaultValue={item?.brand} />
+                  </label>
+
+
+                  <label>
+                    Code:
+                    <input type="text" name="code" defaultValue={item?.code} />
+                  </label>
+
+                  <label> 
+                    Cost Unit:
+                    <input type="text" name="costUnit" defaultValue={item?.costUnit} />
+                  </label>
+
+
                     <label>
-                    Date:
-                    <input type="text" name="itemName" defaultValue={item?.date}/>
+                    Selling Price:
+                    <input type="text" name="sellingPrice" defaultValue={item?.sellingPrice}/>
                     </label>
                 
 
@@ -29,6 +47,8 @@ function InventoryEditAction({item}) {
                     Reference:
                     <input type="text" name="reference" defaultValue={item?.reference} />
                     </label>
+
+
                 </div>
                 <div className="inventory-edit-action-middle">
                     <label>
@@ -52,11 +72,27 @@ function InventoryEditAction({item}) {
                     Expiry Date:
                     <input type="Date" name="expiryDate" defaultValue={item?.expiryDate} />
                     </label>
+
+                    <label>
+                      Category:
+                      {(() => {
+                        const current = item?.category === 'Service' ? 'Service' : 'Product';
+                        const other = current === 'Product' ? 'Service' : 'Product';
+                        return (
+                          <select name="category" defaultValue={current}>
+                            <option value={current}>{current}</option>
+                            <option value={other}>{other}</option>
+                          </select>
+                        );
+                      })()}
+                    </label>
+
                 </div>
             </form>
             
             </div>
             <button onClick={()=> setIsOpen(false)}>Close</button>
+            <button>Save</button>
 
           </div>
         </div>

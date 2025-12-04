@@ -96,7 +96,7 @@ connection.connect((err) => {
         code VARCHAR(50) NOT NULL,
         costUnit DECIMAL(10,2) NULL,
         sellingPrice DECIMAL(10,2) NULL,
-        reference VARCHAR(100) NOT NULL UNIQUE,
+        reference VARCHAR(100) NOT NULL,
         suppliers VARCHAR(100) NOT NULL,
         quantity INT NOT NULL,
         grandTotal DECIMAL(10,2) NOT NULL,
