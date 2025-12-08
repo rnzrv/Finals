@@ -61,9 +61,10 @@ function ModalAddProduct({ onProductAdded }) {
       setErrorMessage("Category must be either 'Product' or 'Service'.");
       return false;
     }
-    if (category.trim() === 'Product') {
+
+    if (category.trim() === 'Product' || category.trim() === 'Service') {
       if (!expiryDate.trim() || !regexDate.test(expiryDate.trim())) {
-        setErrorMessage('Expiry date (YYYY-MM-DD) is required for products.');
+        setErrorMessage('Expiry date (YYYY-MM-DD) is required for products and services. ');
         return false;
       }
       const today = new Date();
@@ -89,7 +90,7 @@ function ModalAddProduct({ onProductAdded }) {
     fd.append('suppliers', formData.suppliers.trim());
     fd.append('quantity', Number(formData.quantity));
     fd.append('grandTotal', Number(formData.grandTotal));
-    fd.append('expiryDate', formData.category === 'Product' ? formData.expiryDate.trim() : '');
+    fd.append('expiryDate', formData.expiryDate.trim());
     fd.append('category', formData.category.trim());
     if (forceUpdate) fd.append('forceUpdate', 'true');
     if (formData.logo) fd.append('logo', formData.logo);
@@ -236,7 +237,7 @@ function ModalAddProduct({ onProductAdded }) {
             </div>
             <div className="item">
               <h1>Expiry Date:</h1>
-              <input type="date" value={formData.expiryDate} onChange={(e)=>setFormData(f=>({...f, expiryDate:e.target.value}))} required={formData.category === 'Product'} />
+              <input type="date" value={formData.expiryDate} onChange={(e)=>setFormData(f=>({...f, expiryDate:e.target.value}))}  />
             </div>
             <div className="item">
               <h1>Category</h1>

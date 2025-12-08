@@ -1,0 +1,77 @@
+POST http://localhost:8081/users/user/login
+Content-Type: application/json
+
+{
+    "username": "ceo123",
+    "password": "ceo12"
+}
+
+### Add Sale Record
+GET http://localhost:8081/pos/pos
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyVHlwZSI6ImFkbWluIiwidXNlcm5hbWUiOiJjZW8xMjMiLCJpYXQiOjE3NjQ5NTcyMDksImV4cCI6MTc2NTU2MjAwOX0.NuwYLlZnxuacGCauWNK0ILbMnFCHx55_ZZj-FgXHXGQ
+Content-Type: application/json
+
+### SAmple
+POST http://localhost:8081/pos/sales
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyVHlwZSI6ImFkbWluIiwidXNlcm5hbWUiOiJjZW8xMjMiLCJpYXQiOjE3NjQ5NTcyMDksImV4cCI6MTc2NTU2MjAwOX0.NuwYLlZnxuacGCauWNK0ILbMnFCHx55_ZZj-FgXHXGQ
+Content-Type: application/json
+
+{
+  "customerName": "John Doe",
+  "paymentMethod": "Card",
+  "subTotal": 100,
+  "taxAmount": 10,
+  "totalAmount": 110,
+  "changes": 0,
+  "items": [
+    {
+      "code": "asd",
+      "itemName": "Testing",
+      "quantity": 2,
+      "sellingPrice": 150
+    }
+  ]
+}
+
+### test
+GEt http://localhost:8081/services/services
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyVHlwZSI6ImFkbWluIiwidXNlcm5hbWUiOiJjZW8xMjMiLCJpYXQiOjE3NjQ5NTcyMDksImV4cCI6MTc2NTU2MjAwOX0.NuwYLlZnxuacGCauWNK0ILbMnFCHx55_ZZj-FgXHXGQ
+
+
+### add service
+POST http://localhost:8081/services/services
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyVHlwZSI6ImFkbWluIiwidXNlcm5hbWUiOiJjZW8xMjMiLCJpYXQiOjE3NjQ5NTcyMDksImV4cCI6MTc2NTU2MjAwOX0.NuwYLlZnxuacGCauWNK0ILbMnFCHx55_ZZj-FgXHXGQ
+Content-Type: application/json
+
+{
+  "serviceName": "Ultimate Spa Package",
+  "description": "A complete spa experience including massage, facial, and body scrub.",
+  "price": 2500,
+  "logo": "ultimate_spa.jpg",
+  "items": [
+    {
+      "code": "MASS-001",
+      "itemName": "Aromatherapy Massage",
+      "qty": 1,
+      "price": 1200
+    },
+    {
+      "code": "FC-404",
+      "itemName": "Facial Cleanser",
+      "qty": 1,
+      "price": 220
+    },
+    {
+      "code": "VC-101",
+      "itemName": "Vitamin C Serum",
+      "qty": 1,
+      "price": 350
+    },
+    {
+      "code": "SCRUB-002",
+      "itemName": "Body Scrub",
+      "qty": 1,
+      "price": 400
+    }
+  ]
+}

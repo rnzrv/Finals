@@ -52,6 +52,7 @@ function Purchases() {
         const ref = String(item?.reference ?? '').toLowerCase();
         const supp = String(item?.suppliers ?? '').toLowerCase();
         const dt = String(item?.Date ?? item?.date ?? '').toLowerCase();
+        const expdt = String(item?.expiryDate ?? '').toLowerCase();
         return (
           name.includes(q) ||
           brandTxt.includes(q) ||
@@ -59,7 +60,8 @@ function Purchases() {
           cat.includes(q) ||
           ref.includes(q) ||
           supp.includes(q) ||
-          dt.includes(q)
+          dt.includes(q) ||
+          expdt.includes(q)
         );
       })
     : purchases;

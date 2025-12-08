@@ -7,17 +7,7 @@ const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
 
-
-// app.use((err, req, res, next) => {
-//   if (err instanceof multer.MulterError) {
-//     return res.status(400).json({ error: err.message }); // e.g., file too large
-//   }
-//   if (err && err.message && err.message.startsWith('Only image files')) {
-//     return res.status(400).json({ error: err.message });
-//   }
-//   next(err);
-// });
-
+// Multer setup
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
     cb(null, 'uploads/');
@@ -35,26 +25,24 @@ const fileFilter = (req, file, cb) => {
   cb(null, true);
 };
 
-const upload = multer({ storage: storage, fileFilter: fileFilter, limits: { fileSize: 5 * 1024 * 1024 } }); // 5MB limit
-
-
+const upload = multer({
+  storage: storage,
+  fileFilter: fileFilter,
+  limits: { fileSize: 5 * 1024 * 1024 } // 5MB
+});
 
 const uploadPath = path.join(__dirname, '../uploads');
-
 if (!fs.existsSync(uploadPath)) {
   fs.mkdirSync(uploadPath, { recursive: true });
 }
 
-
 const deleteFile = (filePath) => {
   fs.unlink(filePath, (err) => {
-    if (err) {
-      console.error('Error deleting file:', err);
-    }
+    if (err) console.error('Error deleting file:', err);
   });
 };
 
-// ...existing code...
+// ADD INVENTORY
 router.post('/addInventory', verifyToken, upload.single('logo'), (req, res) => {
   let {
     itemName, brand, code, costUnit, sellingPrice,
@@ -95,14 +83,10 @@ router.post('/addInventory', verifyToken, upload.single('logo'), (req, res) => {
   if (!Number.isFinite(grandTotalNum) || grandTotalNum < 0) {
     cleanupFile(); return res.status(400).json({ error: 'Grand total must be ≥ 0' });
   }
-
+  // Expiry required for both Product and Service
   if (!expDate || !ymd.test(expDate) || Number.isNaN(Date.parse(expDate))) {
-      cleanupFile(); return res.status(400).json({ error: 'Expiry date must be valid YYYY-MM-DD' });
-    }
-    
-  
-
-
+    cleanupFile(); return res.status(400).json({ error: 'Expiry date must be valid YYYY-MM-DD' });
+  }
 
   if (category !== 'Product' && category !== 'Service') {
     cleanupFile(); return res.status(400).json({ error: 'Category must be either Product or Service' });
@@ -124,11 +108,10 @@ router.post('/addInventory', verifyToken, upload.single('logo'), (req, res) => {
       if (Number(existing.sellingPrice) !== sellingPriceNum) mismatches.push({ field: 'sellingPrice', existing: Number(existing.sellingPrice), incoming: sellingPriceNum });
       if (existing.category !== category) mismatches.push({ field: 'category', existing: existing.category, incoming: category });
       const existingExpiry = existing.expiryDate ? existing.expiryDate.toISOString().slice(0, 10) : null;
-      const incomingExpiry = category === 'Product' ? expDate : null;
+      const incomingExpiry = expDate;
       if (existingExpiry !== incomingExpiry) mismatches.push({ field: 'expiryDate', existing: existingExpiry, incoming: incomingExpiry });
       if ((existing.logo || null) !== (logo || null)) mismatches.push({ field: 'logo', existing: existing.logo || null, incoming: logo || null });
 
-      // If mismatches and not forced, return 409 with details for frontend prompt
       const forced = String(forceUpdate || '').toLowerCase() === 'true';
       if (mismatches.length && !forced) {
         return res.status(409).json({
@@ -140,27 +123,21 @@ router.post('/addInventory', verifyToken, upload.single('logo'), (req, res) => {
       }
     }
 
-    // 2) Insert into purchases (no date column)
+    // 2) Insert into purchases (store expDate as provided)
     const insertPurchase = `
       INSERT INTO purchases (itemName, brand, code, costUnit, sellingPrice, reference, suppliers, quantity, grandTotal, expiryDate, category, logo)
       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `;
     db.query(
       insertPurchase,
-      [
-        itemName, brand, code, costUnitNum, sellingPriceNum,
-        reference, suppliers, qtyNum, grandTotalNum,
-        category === 'Product' ? expDate : null, category, logo
-      ],
+      [itemName, brand, code, costUnitNum, sellingPriceNum, reference, suppliers, qtyNum, grandTotalNum, expDate, category, logo],
       (pErr, pRes) => {
         if (pErr && pErr.code !== 'ER_DUP_ENTRY') {
           cleanupFile();
           return res.status(500).json({ error: pErr.sqlMessage });
         }
 
-        // 3) Upsert inventory:
-        // - If item exists and mismatches found with forceUpdate=true: update fields and add quantity.
-        // - If no mismatches or new item: insert or add quantity via ON DUPLICATE KEY.
+        // 3) Upsert inventory (store expDate for both Product and Service)
         const upsertInventory = `
           INSERT INTO inventory (itemName, brand, code, costUnit, sellingPrice, category, quantity, expiryDate, logo)
           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
@@ -176,16 +153,12 @@ router.post('/addInventory', verifyToken, upload.single('logo'), (req, res) => {
         `;
         db.query(
           upsertInventory,
-          [
-            itemName, brand, code, costUnitNum, sellingPriceNum, category,
-            qtyNum, category === 'Product' ? expDate : null, logo
-          ],
+          [itemName, brand, code, costUnitNum, sellingPriceNum, category, qtyNum, expDate, logo],
           (iErr) => {
             if (iErr) {
               cleanupFile();
               return res.status(500).json({ error: iErr.sqlMessage });
             }
-            // Response indicates whether fields were updated
             return res.status(201).json({
               message: existing
                 ? (mismatches.length ? 'Inventory fields updated and quantity added' : 'Inventory quantity added')
@@ -204,8 +177,7 @@ router.post('/addInventory', verifyToken, upload.single('logo'), (req, res) => {
   });
 });
 
-
-// ...existing code...
+// UPDATE INVENTORY
 router.put('/updateInventory/:id', verifyToken, upload.single('logo'), (req, res) => {
   const inventoryId = req.params.id;
   let { itemName, brand, code, costUnit, sellingPrice, category, quantity, expiryDate, forceUpdate } = req.body;
@@ -259,7 +231,6 @@ router.put('/updateInventory/:id', verifyToken, upload.single('logo'), (req, res
 
       // If the code belongs to a different item
       if (existing && existing.itemId !== current.itemId) {
-        // Compare non-quantity fields
         const mismatches = [];
         if (existing.itemName !== itemName) mismatches.push({ field: 'itemName', existing: existing.itemName, incoming: itemName });
         if (existing.brand !== brand) mismatches.push({ field: 'brand', existing: existing.brand, incoming: brand });
@@ -267,11 +238,10 @@ router.put('/updateInventory/:id', verifyToken, upload.single('logo'), (req, res
         if (Number(existing.sellingPrice) !== sellingPriceNum) mismatches.push({ field: 'sellingPrice', existing: Number(existing.sellingPrice), incoming: sellingPriceNum });
         if (existing.category !== category) mismatches.push({ field: 'category', existing: existing.category, incoming: category });
         const existingExpiry = existing.expiryDate ? existing.expiryDate.toISOString().slice(0, 10) : null;
-        const incomingExpiry = category === 'Product' ? expDate : null;
+        const incomingExpiry = expDate;
         if (existingExpiry !== incomingExpiry) mismatches.push({ field: 'expiryDate', existing: existingExpiry, incoming: incomingExpiry });
         if ((existing.logo || null) !== (logo || null)) mismatches.push({ field: 'logo', existing: existing.logo || null, incoming: logo || null });
 
-        // If mismatches and not forced, prompt via 409
         if (mismatches.length && !forced) {
           return res.status(409).json({
             error: 'Existing product code has different details. Confirm to update fields and add quantity.',
@@ -281,7 +251,6 @@ router.put('/updateInventory/:id', verifyToken, upload.single('logo'), (req, res
           });
         }
 
-        // Forced: update that existing item’s fields and add quantity to it
         const updateExistingQ = `
           UPDATE inventory
           SET itemName = ?, brand = ?, costUnit = ?, sellingPrice = ?, category = ?, quantity = quantity + ?, expiryDate = ?, logo = ?
@@ -289,11 +258,9 @@ router.put('/updateInventory/:id', verifyToken, upload.single('logo'), (req, res
         `;
         db.query(
           updateExistingQ,
-          [itemName, brand, costUnitNum, sellingPriceNum, category, qtyNum, category === 'Product' ? expDate : null, logo, existing.itemId],
+          [itemName, brand, costUnitNum, sellingPriceNum, category, qtyNum, expDate, logo, existing.itemId],
           (updErr) => {
             if (updErr) return res.status(500).json({ error: updErr.sqlMessage });
-
-            // Optionally, delete or zero out the current record if code is moving; here we simply keep it untouched
             return res.status(200).json({
               message: 'Existing item updated and quantity added',
               data: { targetItemId: existing.itemId, addedQuantity: qtyNum, updatedFields: mismatches.map(m => m.field) }
@@ -306,9 +273,7 @@ router.put('/updateInventory/:id', verifyToken, upload.single('logo'), (req, res
         db.query(dupQ, [code, inventoryId], (checkErr, rows) => {
           if (checkErr) return res.status(500).json({ error: checkErr.sqlMessage });
           if (rows && rows.length > 0) {
-            // If we get here, mismatches were zero (same fields), permit update of quantity only
-            // Return 409 if you want to force confirm even with same fields; otherwise proceed.
-            // Proceed:
+            // proceed anyway; mismatches were zero
           }
 
           const updateQ = `
@@ -318,7 +283,7 @@ router.put('/updateInventory/:id', verifyToken, upload.single('logo'), (req, res
           `;
           db.query(
             updateQ,
-            [itemName, brand, code, costUnitNum, sellingPriceNum, category, qtyNum, category === 'Product' ? expDate : null, logo, inventoryId],
+            [itemName, brand, code, costUnitNum, sellingPriceNum, category, qtyNum, expDate, logo, inventoryId],
             (err, result) => {
               if (err) return res.status(500).json({ error: err.sqlMessage });
               if (result.affectedRows === 0) return res.status(404).json({ error: 'Item not found' });
@@ -330,8 +295,8 @@ router.put('/updateInventory/:id', verifyToken, upload.single('logo'), (req, res
     });
   });
 });
-// ...existing code...
 
+// LIST PURCHASES
 router.get('/Purchases/inventory', verifyToken, (req, res) => {
   const q = 'SELECT itemId, itemName, DATE_FORMAT(created_at, "%Y-%m-%d") as Date, reference, suppliers, quantity, grandTotal, DATE_FORMAT(expiryDate, "%Y-%m-%d") as expiryDate, category FROM purchases';
 
@@ -341,7 +306,7 @@ router.get('/Purchases/inventory', verifyToken, (req, res) => {
   });
 });
 
-
+// LIST INVENTORY
 router.get('/getInventory', verifyToken, (req, res) => {
   const q = 'SELECT itemId, itemName, brand, code, costUnit, sellingPrice, category, quantity, DATE_FORMAT(expiryDate, "%Y-%m-%d") as expiryDate, logo FROM inventory';
   
@@ -351,8 +316,7 @@ router.get('/getInventory', verifyToken, (req, res) => {
   });
 });
 
-
-
+// DELETE INVENTORY
 router.delete('/deleteInventory/:id', verifyToken, (req, res) => {
   const inventoryId = req.params.id;
 
@@ -370,16 +334,13 @@ router.delete('/deleteInventory/:id', verifyToken, (req, res) => {
       deleteFile(path.join(__dirname, '..', logoPath));
     }
 
-     const q = 'DELETE FROM inventory WHERE itemId = ?';
+    const q = 'DELETE FROM inventory WHERE itemId = ?';
     db.query(q, [inventoryId], (err, result) => {
-    if (err) return res.status(500).json({ error: err.sqlMessage });
-    if (result.affectedRows === 0) return res.status(404).json({ error: 'Item not found' });
-    return res.status(200).json({ message: 'Inventory item deleted successfully' });
+      if (err) return res.status(500).json({ error: err.sqlMessage });
+      if (result.affectedRows === 0) return res.status(404).json({ error: 'Item not found' });
+      return res.status(200).json({ message: 'Inventory item deleted successfully' });
+    });
   });
-  });
- 
-
-  
 });
 
 module.exports = router;

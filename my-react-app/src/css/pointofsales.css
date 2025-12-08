@@ -468,3 +468,19 @@ body {
   cursor: pointer;
   height: 50px;
 }
+
+.product-image {
+  width: 64px;
+  height: 64px;
+  border-radius: 8px;
+  overflow: hidden;
+  background: #f3f3f3; /* neutral */
+}
+
+.product-image img {
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: cover;
+}
+

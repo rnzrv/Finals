@@ -55,57 +55,56 @@ Content-Type: application/json
 
 ### Addd Purchase Record
 POST http://localhost:8081/inventory/addInventory
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyVHlwZSI6ImFkbWluIiwidXNlcm5hbWUiOiJjZW8xMjMiLCJpYXQiOjE3NjQ4NjI3NzEsImV4cCI6MTc2NTQ2NzU3MX0.2X6siBpac0nsMsnUBpR3J9psjTR24Rcjalq11p12WMg
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyVHlwZSI6ImFkbWluIiwidXNlcm5hbWUiOiJjZW8xMjMiLCJpYXQiOjE3NjQ4NDE1MjUsImV4cCI6MTc2NTQ0NjMyNX0.qT-PwyImZcQDJABcLRyPgqF5a4BbpsuZPoN1bjbjarY
 Content-Type: multipart/form-data; boundary=WebKitFormBoundary123
 
 --WebKitFormBoundary123
 Content-Disposition: form-data; name="itemName"
 
-Test Purchase Item
+Body Lotion
 --WebKitFormBoundary123
 Content-Disposition: form-data; name="brand"
 
-Test Purchase Brand
+SmoothSkin
 --WebKitFormBoundary123
 Content-Disposition: form-data; name="code"
 
-TP-001
+BL-505
 --WebKitFormBoundary123
 Content-Disposition: form-data; name="costUnit"
 
-70
+200
 --WebKitFormBoundary123
 Content-Disposition: form-data; name="sellingPrice"
 
-90
+300
 --WebKitFormBoundary123
 Content-Disposition: form-data; name="reference"
 
-TP-REF-001
+PUR-BL505
 --WebKitFormBoundary123
 Content-Disposition: form-data; name="suppliers"
 
-Test Supplier
+BeautyMart
 --WebKitFormBoundary123
 Content-Disposition: form-data; name="quantity"
 
-30
+45
 --WebKitFormBoundary123
 Content-Disposition: form-data; name="grandTotal"
 
-15
+9000
 --WebKitFormBoundary123
 Content-Disposition: form-data; name="expiryDate"
 
-2026-06-15
+2027-09-10
 --WebKitFormBoundary123
 Content-Disposition: form-data; name="category"
 
 Product
 --WebKitFormBoundary123
-Content-Disposition: form-data; name="logo"; filename="sample.jpg"
+Content-Disposition: form-data; name="logo"; filename="body_lotion.jpg"
 Content-Type: image/jpeg
 
-@./sample.jpg
+@./body_lotion.jpg
 --WebKitFormBoundary123--
-

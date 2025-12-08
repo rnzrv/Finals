@@ -107,6 +107,66 @@ connection.connect((err) => {
         updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
         )`;
 
+        const createSalesHistoryTable = `
+        CREATE TABLE IF NOT EXISTS sales (
+        saleId INT AUTO_INCREMENT PRIMARY KEY,
+        reference VARCHAR(100) NOT NULL UNIQUE,
+        customerName VARCHAR(100) NOT NULL, 
+        paymentMethod ENUM('Cash', 'GCash', 'Card') NOT NULL,
+        subTotal DECIMAL(10,2) NOT NULL,
+        taxAmount DECIMAL(10,2) NOT NULL,
+        totalAmount DECIMAL(10,2) NOT NULL,
+        changes DECIMAL(10,2) NOT NULL,
+        saleDate DATETIME DEFAULT CURRENT_TIMESTAMP
+      )`;
+
+        const createSalesItemsTable = `
+          CREATE TABLE IF NOT EXISTS sale_items (
+          id INT AUTO_INCREMENT PRIMARY KEY,
+          saleId INT NOT NULL,
+          itemCode VARCHAR(50) NOT NULL,
+          itemName VARCHAR(100) NOT NULL,
+          qty INT NOT NULL,
+          price DECIMAL(10,2) NOT NULL,
+          FOREIGN KEY (saleId) REFERENCES sales(saleId) ON DELETE CASCADE
+        )`;
+
+        const createServicesTable = `
+        CREATE TABLE IF NOT EXISTS services (
+          serviceId INT AUTO_INCREMENT PRIMARY KEY,
+          serviceName VARCHAR(100) NOT NULL,
+          category VARCHAR(100) NOT NULL,
+          logo VARCHAR(255) NULL,
+          description TEXT,
+          price DECIMAL(10,2) NOT NULL,
+          created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+          updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+        )`;
+
+        const createServiceItemsTable = `
+        CREATE TABLE IF NOT EXISTS service_items (
+          id INT AUTO_INCREMENT PRIMARY KEY,
+          serviceId INT NOT NULL,
+          itemCode VARCHAR(50) NOT NULL,
+          itemName VARCHAR(100) NOT NULL,
+          qty INT NOT NULL,
+          price DECIMAL(10,2) NOT NULL,
+          FOREIGN KEY (serviceId) REFERENCES services(serviceId) ON DELETE CASCADE
+        )`;
+
+        const createSaleServicesTable = `
+        CREATE TABLE IF NOT EXISTS sale_services (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        saleId INT NOT NULL,
+        serviceId INT NOT NULL,
+        serviceName VARCHAR(100) NOT NULL,
+        quantity INT NOT NULL,
+        price DECIMAL(10,2) NOT NULL,
+        FOREIGN KEY (saleId) REFERENCES sales(saleId) ON DELETE CASCADE,
+        FOREIGN KEY (serviceId) REFERENCES services(serviceId) ON DELETE CASCADE
+      )`;
+
+
 
       connection.query(createPatientsTable, (err) => {
         if (err) throw err;
@@ -131,6 +191,31 @@ connection.connect((err) => {
       connection.query(createPurchasesTable, (err) => {
         if (err) throw err;
         console.log('✅ purchases table ready.');
+      });
+
+      connection.query(createSalesHistoryTable, (err) => {
+        if (err) throw err;
+        console.log('✅ sales table ready.');
+      });
+
+      connection.query(createSalesItemsTable, (err) => {
+        if (err) throw err;
+        console.log('✅ sale_items table ready.');
+      });
+
+      connection.query(createServicesTable, (err) => {
+        if(err) throw err;
+        console.log('✅ services table ready.');
+      });
+
+      connection.query(createServiceItemsTable, (err) => {
+        if(err) throw err;
+        console.log('✅ service_items table ready.');
+      });
+
+      connection.query(createSaleServicesTable, (err) => {
+        if(err) throw err;
+        console.log('✅ sale_services table ready.');
       });
     });
   });
