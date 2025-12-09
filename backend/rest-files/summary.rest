@@ -1,0 +1,8 @@
+GET  http://localhost:8081/summary/summary
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyVHlwZSI6ImFkbWluIiwidXNlcm5hbWUiOiJjZW8xMjMiLCJpYXQiOjE3NjQ5NTcyMDksImV4cCI6MTc2NTU2MjAwOX0.NuwYLlZnxuacGCauWNK0ILbMnFCHx55_ZZj-FgXHXGQ
+Content-Type: application/json
+
+### asd
+GET http://localhost:8081/summary/summary?periodType=monthly&month=8&year=2024
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyVHlwZSI6ImFkbWluIiwidXNlcm5hbWUiOiJjZW8xMjMiLCJpYXQiOjE3NjQ5NTcyMDksImV4cCI6MTc2NTU2MjAwOX0.NuwYLlZnxuacGCauWNK0ILbMnFCHx55_ZZj-FgXHXGQ
+Content-Type: application/json

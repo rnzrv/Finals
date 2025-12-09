@@ -14,6 +14,24 @@ function PointOfSales() {
   const [cart, setCart] = useState([]);
   const [search, setSearch] = useState('');
 
+  // get customers
+  const [customers, setCustomers] = useState([]);
+  const [selectedCustomer, setSelectedCustomer] = useState('');
+  useEffect(() => {
+    try {
+      const token = sessionStorage.getItem('accessToken');
+      axios.get('http://localhost:8081/pos/getPatients/Customers', {
+        headers: { Authorization: `Bearer ${token}` },
+        withCredentials: true,
+      }).then(res => {
+        setCustomers(Array.isArray(res.data) ? res.data : []);
+      });
+    } catch (error) {
+      console.error('Error fetching customers:', error);
+      setCustomers([]);
+    }
+  }, []);
+
   // FETCH POS data
   const getPOSData = async () => {
     try {
@@ -105,9 +123,9 @@ function PointOfSales() {
       return;
     }
 
-    const customerNameInput = document.querySelector('input[placeholder="Search customers..."]')?.value.trim();
+    
     const saleData = {
-      customerName: customerNameInput || '',
+      customerName: selectedCustomer || '',
       paymentMethod,
       subTotal: subtotal,
       taxAmount: tax,
@@ -151,7 +169,21 @@ function PointOfSales() {
             <div className="POS-left-top">
               <h1>Customer</h1>
               <div className="POS-search-bar">
-                <input type="text" placeholder="Search customers..." />
+                <input type="text" placeholder="Search customers..." value={selectedCustomer} onChange={e => setSelectedCustomer(e.target.value)} />
+
+               <select value={selectedCustomer} onChange={e => setSelectedCustomer(e.target.value)}>
+
+                  <option value="">Select Customer</option>
+                  {customers
+                      .filter(customer => 
+                        customer.customerName.toLowerCase().includes(selectedCustomer.toLowerCase())
+                      )
+                      .map(customer => (
+                        <option key={customer.id} value={customer.customerName}>
+                          {customer.customerName}
+                        </option>
+                      ))}
+                </select>
               </div>
             </div>
 

@@ -31,6 +31,14 @@ router.get('/pos', verifyToken, (req, res) => {
     });
 });
 
+router.get('/getPatients/Customers', verifyToken, (req, res) => {
+  const q = "SELECT id, name AS customerName FROM patients";
+  db.query(q, (err, data) => {
+    if (err) return res.status(500).json(err);
+    res.status(200).json(data);
+  });
+});
+
 // POST sale (products + services)
 router.post('/sales', verifyToken, (req, res) => {
   const { customerName, paymentMethod, subTotal, taxAmount, totalAmount, changes, items } = req.body;
