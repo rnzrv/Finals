@@ -198,7 +198,7 @@ function Appointments() {
                         >
                           <div>{appointment.doctorName}</div>
                           <div className="session">{appointment.sessionType}</div>
-                          <div className="patient">Patient #{appointment.patient}</div>
+                          <div className="patient">{appointment.patientName}</div>
                         </div>
                       )}
                     </div>

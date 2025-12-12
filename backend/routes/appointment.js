@@ -133,24 +133,28 @@ router.get('/stats', verifyToken, (req,res) => {
 ]
 */
 
-router.get('/getAppointments/appointmentPage', verifyToken, (req,res) => {
+router.get('/getAppointments/appointmentPage', verifyToken, (req, res) => {
   const q = `
     SELECT 
       doctor AS doctorName, 
       service_type AS sessionType, 
-      patient_id AS patient, 
+      p.name AS patientName, 
       DATE_FORMAT(date, '%Y-%m-%d') AS date, 
-      DATE_FORMAT(time, '%H:%i') AS time, 
-      status 
-    FROM appointments 
+      DATE_FORMAT(time, '%H:%i') AS time
+    FROM appointments a
+    LEFT JOIN patients p ON a.patient_id = p.id
     ORDER BY date DESC, time DESC
   `;
+  
   db.query(q, (err, data) => {
-    if (err) return res.status(500).json({ error: 'Database error' });
+    if (err) {
+      console.error('SQL Error:', err);
+      return res.status(500).json({ error: 'Database error' });
+    }
     res.json(data);
   });
+});
 
-})
 
 
 // router.get('/getAppointments/')

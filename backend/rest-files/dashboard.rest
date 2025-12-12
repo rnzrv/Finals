@@ -1,0 +1,13 @@
+
+POST http://localhost:8081/users/user/login
+Content-Type: application/json
+
+{
+    "username": "ceo123",
+    "password": "ceo12"
+}
+
+###
+GET http://localhost:8081/dashboard/getDataMonthly
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyVHlwZSI6ImFkbWluIiwidXNlcm5hbWUiOiJjZW8xMjMiLCJpYXQiOjE3NjQ5NTcyMDksImV4cCI6MTc2NTU2MjAwOX0.NuwYLlZnxuacGCauWNK0ILbMnFCHx55_ZZj-FgXHXGQ
+Content-Type: application/json

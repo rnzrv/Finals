@@ -56,7 +56,7 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 25px;
+  padding: 20px;
 }
 
 .appointment-header .left{
@@ -167,7 +167,9 @@
   font-size: 11px;
   opacity: 0.9;
 }
-
+.recent-header{
+  padding: 20px;
+}
 @media (max-width: 900px) {
   .calendar-row {
     grid-template-columns: 80px repeat(7, 1fr);

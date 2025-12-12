@@ -40,13 +40,18 @@ function Inventory() {
 
   // for handling search
   const [searchQuery, setSearchQuery] = useState('');
-  const filterItems = searchQuery ? inventory.filter(item =>
-    
-    item.itemName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    item.brand.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    item.code.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    item.category.toLowerCase().includes(searchQuery.toLowerCase())
-  ) : inventory;
+ const filterItems = searchQuery
+  ? inventory.filter(item => {
+      const expiry = item.expiryDate ? item.expiryDate.slice(0, 10) : '';
+      return (
+        item.itemName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        item.brand.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        item.code.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        item.category.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        expiry.includes(searchQuery) // user should type YYYY-MM-DD
+      );
+    })
+  : inventory;
 
 
 
@@ -175,3 +180,17 @@ function Inventory() {
 }
 
 export default Inventory;
+
+
+//  <h3>Select Period:</h3>
+//               <input
+//                 type="date"
+//                 value={startDate}
+//                 onChange={(e) => setStartDate(e.target.value)}
+//               />
+//               <span> - </span>
+//               <input
+//                 type="date"
+//                 value={endDate}
+//                 onChange={(e) => setEndDate(e.target.value)}
+//               />

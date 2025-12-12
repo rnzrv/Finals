@@ -23,6 +23,7 @@ const purchaseRoutes = require('./routes/purchase');
 const posRoutes = require('./routes/pos');
 const services = require('./routes/services');
 const summaryRoutes = require('./routes/summary');
+const dashboardRoutes = require('./routes/dashboard');
 
 
 // Use routes
@@ -34,6 +35,7 @@ app.use('/pos', posRoutes);
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 app.use('/services', services);
 app.use('/summary', summaryRoutes);
+app.use('/dashboard', dashboardRoutes);
 // Test route
 
 app.get('/', (req, res) => {

@@ -4,15 +4,32 @@ import ChartDataLabels from "chartjs-plugin-datalabels";
 import "../css/fonts.css";
 import "../css/color.css";
 
-const TopProduct = () => {
+const TopProduct = ({ products = [] }) => {
   const chartRef = useRef(null);
   const chartInstanceRef = useRef(null);
+
+  // Extract labels + values based on your backend JSON
+  const labels = products.map((p) => p.serviceName);
+  const values = products.map((p) => p.totalSold);
+
+  // Auto-generate colors
+  const colors = [
+    "#b88b2d",
+    "#243c26",
+    "#f0e68c",
+    "#90ee90",
+    "#ffd700",
+    "#d8bfd8",
+    "#ffa07a",
+    "#87ceeb",
+  ];
+  
+  const chartColors = labels.map((_, i) => colors[i % colors.length]);
 
   useEffect(() => {
     const ctx = chartRef.current?.getContext("2d");
     if (!ctx) return;
 
-    // Destroy old instance if it exists
     if (chartInstanceRef.current) {
       chartInstanceRef.current.destroy();
     }
@@ -20,12 +37,12 @@ const TopProduct = () => {
     chartInstanceRef.current = new Chart(ctx, {
       type: "pie",
       data: {
-        labels: ["Product A", "Product B", "Product C", "Product D", "Product E"],
+        labels,
         datasets: [
           {
-            label: "Top Products",
-            backgroundColor: ["#b88b2d", "#243c26", "#f0e68c", "#90ee90", "#ffd700"],
-            data: [300, 50, 100, 80, 120],
+            label: "Top Selling Services",
+            data: values,
+            backgroundColor: chartColors,
             borderWidth: 1,
             borderColor: "#fff",
           },
@@ -35,16 +52,13 @@ const TopProduct = () => {
         responsive: true,
         maintainAspectRatio: false,
         plugins: {
-          legend: { display: false }, // hide built-in legend
-          title: { display: false },  // only header will be used
+          legend: { display: false },
           datalabels: {
             color: "#000",
             font: { family: "DmSans", weight: "bold", size: 14 },
             formatter: (value, context) => {
-              const data = context.chart.data.datasets[0].data;
-              const total = data.reduce((a, b) => a + b, 0);
-              const percentage = ((value / total) * 100).toFixed(1);
-              return `${percentage}%`;
+              const total = context.dataset.data.reduce((a, b) => a + b, 0);
+              return `${((value / total) * 100).toFixed(1)}%`;
             },
           },
         },
@@ -53,27 +67,22 @@ const TopProduct = () => {
     });
 
     return () => {
-      if (chartInstanceRef.current) {
-        chartInstanceRef.current.destroy();
-        chartInstanceRef.current = null;
-      }
+      if (chartInstanceRef.current) chartInstanceRef.current.destroy();
     };
-  }, []);
+  }, [products]);
 
-  const legendItems = [
-    { label: "Product A", color: "#b88b2d" },
-    { label: "Product B", color: "#243c26" },
-    { label: "Product C", color: "#f0e68c" },
-    { label: "Product D", color: "#90ee90" },
-    { label: "Product E", color: "#ffd700" },
-  ];
+  // Dynamic legend
+  const legendItems = labels.map((label, i) => ({
+    label,
+    color: chartColors[i],
+  }));
 
   return (
     <div
       className="chart-wrapper"
       style={{ display: "flex", flexDirection: "column", width: "95%", height: "100%" }}
     >
-      {/* ✅ Header with only chart title */}
+      {/* Header */}
       <div
         className="chart-header"
         style={{
@@ -83,7 +92,6 @@ const TopProduct = () => {
           marginBottom: "10px",
           width: "100%",
           padding: "10px",
-          
         }}
       >
         <h2
@@ -99,44 +107,34 @@ const TopProduct = () => {
         </h2>
       </div>
 
-      {/* ✅ Chart Canvas */}
+      {/* Chart */}
       <div
         className="chart-container"
-        style={{
-          height: "380px",
-          width: "100%",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-        }}
+        style={{ height: "380px", display: "flex", justifyContent: "center", alignItems: "center" }}
       >
         <canvas ref={chartRef}></canvas>
       </div>
 
-      {/* ✅ Custom legend at the bottom, horizontally centered */}
+      {/* Legend */}
       <div
         className="custom-legend"
         style={{
           display: "flex",
           justifyContent: "center",
           alignItems: "center",
+          flexWrap: "wrap",
           gap: "16px",
           marginTop: "15px",
-          flexWrap: "wrap", // ensures legend doesn't overflow on small screens
         }}
       >
         {legendItems.map((item) => (
-          <div
-            key={item.label}
-            style={{ display: "flex", alignItems: "center", gap: "6px" }}
-          >
+          <div key={item.label} style={{ display: "flex", alignItems: "center", gap: "6px" }}>
             <span
               style={{
                 width: "12px",
                 height: "12px",
                 borderRadius: "50%",
                 backgroundColor: item.color,
-                display: "inline-block",
               }}
             ></span>
             <span

@@ -116,6 +116,7 @@ connection.connect((err) => {
         subTotal DECIMAL(10,2) NOT NULL,
         taxAmount DECIMAL(10,2) NOT NULL,
         totalAmount DECIMAL(10,2) NOT NULL,
+        totalPayment DECIMAL(10,2) NOT NULL,
         changes DECIMAL(10,2) NOT NULL,
         saleDate DATETIME DEFAULT CURRENT_TIMESTAMP
       )`;

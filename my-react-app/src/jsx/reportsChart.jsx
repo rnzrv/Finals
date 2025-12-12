@@ -1,34 +1,28 @@
 import React from "react";
-import {Chart as ChartJs, scales} from "chart.js/auto";
 import { Bar } from "react-chartjs-2";
 import ChartDataLabels from 'chartjs-plugin-datalabels';
 import "../css/reportsChart.css";
 import "../css/fonts.css";
 
-
-const ReportsChart = () => {
-    const data = {
-        labels: ['January', 'February', 'March', 'April', 'May', 'June'],
+const ReportsChart = ({ data }) => {
+    // Prepare the chart data using the prop
+    const chartData = {
+        labels: data?.labels || [],
         datasets: [
             {
                 label: 'Sales',
-                data: [120, 1900, 3000, 5500, 2300, 3400],
+                data: data?.datasets?.[0]?.data || [],
                 backgroundColor: "#b88b2d",
                 borderRadius: 8,
                 maxBarThickness: 70,
-           
             },
-
             {
                 label: 'Expenses',
-                data: [800, 1500, 2000, 3000, 1800, 2500],
+                data: data?.datasets?.[1]?.data || [],
                 backgroundColor: "#243c26",
                 borderRadius: 8,
                 maxBarThickness: 70,
-               
             }
-             
-            
         ],
     };
 
@@ -53,14 +47,11 @@ const ReportsChart = () => {
             x: {
                 categoryPercentage: 0.9,
                 barPercentage: 0.9,
-                
-                
             }
         },
     };
 
-    return <Bar data={data} options={options} plugins={[ChartDataLabels]} />;
+    return <Bar data={chartData} options={options} plugins={[ChartDataLabels]} />;
 };
-
 
 export default ReportsChart;

@@ -14,9 +14,14 @@ function PointOfSales() {
   const [cart, setCart] = useState([]);
   const [search, setSearch] = useState('');
 
+  // Payment & change
+  const [totalPayment, setTotalPayment] = useState(''); // keep as string
+  const [change, setChange] = useState(0);
+
   // get customers
   const [customers, setCustomers] = useState([]);
   const [selectedCustomer, setSelectedCustomer] = useState('');
+
   useEffect(() => {
     try {
       const token = sessionStorage.getItem('accessToken');
@@ -116,6 +121,12 @@ function PointOfSales() {
   const tax = subtotal * 0.1;
   const total = subtotal + tax;
 
+  // Calculate change dynamically
+  useEffect(() => {
+    const payment = parseFloat(totalPayment) || 0; // convert empty string to 0
+    setChange(payment - total);
+  }, [totalPayment, total]);
+
   // COMPLETE SALE
   const handleCompleteSale = async (paymentMethod = 'Cash') => {
     if (cart.length === 0) {
@@ -123,14 +134,20 @@ function PointOfSales() {
       return;
     }
 
-    
+    const payment = parseFloat(totalPayment) || 0;
+    if (payment < total) {
+      alert('Payment is not enough!');
+      return;
+    }
+
     const saleData = {
       customerName: selectedCustomer || '',
       paymentMethod,
       subTotal: subtotal,
       taxAmount: tax,
       totalAmount: total,
-      changes: 0,
+      totalPayment: payment,
+      changes: change,
       items: cart.map(item => ({
         code: item.code,
         itemName: item.itemName,
@@ -152,6 +169,7 @@ function PointOfSales() {
 
       alert(`Sale completed! Reference: ${res.data.reference}`);
       setCart([]);
+      setTotalPayment('');
       getPOSData();
     } catch (err) {
       console.error('Error completing sale:', err);
@@ -166,29 +184,37 @@ function PointOfSales() {
         <header><h2>POINT OF SALES</h2></header>
         <div className="point-of-sales-main-content">
           <div className="POS-left">
+            {/* Customer selection */}
             <div className="POS-left-top">
               <h1>Customer</h1>
               <div className="POS-search-bar">
-                <input type="text" placeholder="Search customers..." value={selectedCustomer} onChange={e => setSelectedCustomer(e.target.value)} />
-
-               <select value={selectedCustomer} onChange={e => setSelectedCustomer(e.target.value)}>
-
+                <input
+                  type="text"
+                  placeholder="Search customers..."
+                  value={selectedCustomer}
+                  onChange={e => setSelectedCustomer(e.target.value)}
+                />
+                <select
+                  value={selectedCustomer}
+                  onChange={e => setSelectedCustomer(e.target.value)}
+                >
                   <option value="">Select Customer</option>
                   {customers
-                      .filter(customer => 
-                        customer.customerName.toLowerCase().includes(selectedCustomer.toLowerCase())
-                      )
-                      .map(customer => (
-                        <option key={customer.id} value={customer.customerName}>
-                          {customer.customerName}
-                        </option>
-                      ))}
+                    .filter(customer =>
+                      customer.customerName.toLowerCase().includes(selectedCustomer.toLowerCase())
+                    )
+                    .map(customer => (
+                      <option key={customer.id} value={customer.customerName}>
+                        {customer.customerName}
+                      </option>
+                    ))}
                 </select>
               </div>
             </div>
 
             <div className="br"></div>
 
+            {/* Cart */}
             <div className="POS-product-list">
               {cart.length === 0 ? (
                 <p style={{ padding: '20px', textAlign: 'center', color: '#999', fontFamily: 'DmSans', fontWeight: '500' }}>Cart is empty</p>
@@ -221,6 +247,7 @@ function PointOfSales() {
               )}
             </div>
 
+            {/* Cart summary */}
             <div className="product-list-bottom">
               <div className="buttons">
                 <button onClick={clearCart}><img src={trash} alt="Trash Icon" />Clear Cart</button>
@@ -239,6 +266,22 @@ function PointOfSales() {
                 <h1>Total</h1>
                 <h2>₱{total.toFixed(2)}</h2>
               </div>
+
+              <div className="payment-section">
+                <label>Total Payment:</label>
+                <input
+                  type="number"
+                  min="0"
+                  value={totalPayment}
+                  onChange={e => setTotalPayment(e.target.value)} // keep string
+                />
+              </div>
+
+              <div className="payment-section">
+                <label>Change:</label>
+                <h2>₱{change.toFixed(2)}</h2>
+              </div>
+
               <div className="complete-sale">
                 <button disabled={cart.length === 0} onClick={() => handleCompleteSale('Cash')}>Complete Sale</button>
               </div>
@@ -250,6 +293,7 @@ function PointOfSales() {
             </div>
           </div>
 
+          {/* POS right panel */}
           <div className="POS-right">
             <div className="right-content">
               <input
