@@ -16,6 +16,8 @@ import axios from 'axios';
 function Purchases() {
   const [purchases, setPurchases] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
+  const [startDate, setStartDate] = useState('');
+  const [endDate, setEndDate] = useState('');
 
   // pagination
   const [currentPage, setCurrentPage] = useState(1);
@@ -41,35 +43,48 @@ function Purchases() {
     handleGetPurchases();
   }, []);
 
-  // search (safe lowercasing)
+  // search + date filter
   const q = searchQuery.trim().toLowerCase();
-  const filterItems = q
-    ? purchases.filter(item => {
-        const name = String(item?.itemName ?? '').toLowerCase();
-        const brandTxt = String(item?.brand ?? '').toLowerCase();
-        const codeTxt = String(item?.code ?? '').toLowerCase();
-        const cat = String(item?.category ?? '').toLowerCase();
-        const ref = String(item?.reference ?? '').toLowerCase();
-        const supp = String(item?.suppliers ?? '').toLowerCase();
-        const dt = String(item?.Date ?? item?.date ?? '').toLowerCase();
-        const expdt = String(item?.expiryDate ?? '').toLowerCase();
-        return (
+
+  const filterItems = purchases.filter(item => {
+    const name = String(item?.itemName ?? '').toLowerCase();
+    const brandTxt = String(item?.brand ?? '').toLowerCase();
+    const codeTxt = String(item?.code ?? '').toLowerCase();
+    const cat = String(item?.category ?? '').toLowerCase();
+    const ref = String(item?.reference ?? '').toLowerCase();
+    const supp = String(item?.suppliers ?? '').toLowerCase();
+    const dtRaw = item?.Date ?? item?.date ?? '';
+    const expdt = String(item?.expiryDate ?? '').toLowerCase();
+
+    // SEARCH FILTER
+    const matchesSearch = q
+      ? (
           name.includes(q) ||
           brandTxt.includes(q) ||
           codeTxt.includes(q) ||
           cat.includes(q) ||
           ref.includes(q) ||
           supp.includes(q) ||
-          dt.includes(q) ||
-          expdt.includes(q)
-        );
-      })
-    : purchases;
+          expdt.includes(q) ||
+          String(dtRaw).toLowerCase().includes(q)
+        )
+      : true;
 
-  // reset to first page on search change
+    // DATE FILTER
+    let matchesDate = true;
+    if (startDate || endDate) {
+      const itemDate = new Date(dtRaw);
+      if (startDate && itemDate < new Date(startDate)) matchesDate = false;
+      if (endDate && itemDate > new Date(endDate)) matchesDate = false;
+    }
+
+    return matchesSearch && matchesDate;
+  });
+
+  // reset to first page on search or date change
   useEffect(() => {
     setCurrentPage(1);
-  }, [searchQuery]);
+  }, [searchQuery, startDate, endDate]);
 
   // pagination slice
   const totalItems = filterItems.length;
@@ -83,6 +98,46 @@ function Purchases() {
   };
   const handleNextPage = () => {
     if (currentPage < totalPages) setCurrentPage(p => p + 1);
+  };
+
+  // EXPORT FUNCTION - CSV
+  const handleExportCSV = () => {
+    if (filterItems.length === 0) {
+      alert("No purchases to export.");
+      return;
+    }
+
+    const headers = [
+      "Item Name",
+      "Date",
+      "Reference",
+      "Suppliers",
+      "Quantity",
+      "Grand Total",
+      "Expiry Date",
+      "Category"
+    ];
+
+    const rows = filterItems.map(item => [
+      item?.itemName ?? '',
+      item?.Date ?? item?.date ?? '',
+      item?.reference ?? '',
+      item?.suppliers ?? '',
+      item?.quantity ?? 0,
+      Number(item?.grandTotal ?? 0).toFixed(2),
+      item?.expiryDate ?? '',
+      item?.category ?? ''
+    ]);
+
+    const csvContent =
+      [headers, ...rows].map(e => e.map(a => `"${a}"`).join(",")).join("\n");
+
+    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.setAttribute("href", url);
+    link.setAttribute("download", `purchases_export_${new Date().toISOString().slice(0,10)}.csv`);
+    link.click();
   };
 
   return (
@@ -102,14 +157,31 @@ function Purchases() {
           <div className="inventory-utensil">
             <div className="inventory-select-period">
               <h3>Select Period:</h3>
+
               <div className="inventory-date">
                 <img src={date} alt="Date Icon" />
-                <h6>10 April 2024 - 30 June 2024</h6>
+
+                <input
+                  type="date"
+                  value={startDate}
+                  onChange={(e) => setStartDate(e.target.value)}
+                />
+
+              
+
+                <input
+                  type="date"
+                  value={endDate}
+                  onChange={(e) => setEndDate(e.target.value)}
+                />
               </div>
+
+              
             </div>
 
             <AddProduct onProductAdded={handleGetPurchases} />
-            <button className="inventory-export-btn">
+
+            <button className="inventory-export-btn" onClick={handleExportCSV}>
               Export <img src={dropDown} alt="Dropdown Icon" />
             </button>
           </div>
@@ -170,8 +242,8 @@ function Purchases() {
                 </tbody>
               </table>
             </div>
-
           </div>
+
           <div className="pagination">
             <button className="pagination-btn" onClick={handlePreviousPage} disabled={currentPage === 1}>
               Previous

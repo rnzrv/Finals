@@ -9,16 +9,16 @@ function AddServiceAction({ onSuccess }) {
   const [serviceName, setServiceName] = useState("");
   const [description, setDescription] = useState("");
   const [price, setPrice] = useState("");
-  const [logo, setLogo] = useState("");
+  const [logo, setLogo] = useState(null);
   const [inventory, setInventory] = useState([]);
   const [selectedItems, setSelectedItems] = useState([]);
 
   const token = sessionStorage.getItem("accessToken");
 
-  // ✅ Load inventory when modal opens
+  // Load inventory when modal opens
   useEffect(() => {
     if (isOpen) {
-      axios.get("http://localhost:8081/pos/pos", {
+      axios.get("http://localhost:8081/pos/pos?product=true", {
         headers: { Authorization: `Bearer ${token}` }
       }).then(res => {
         setInventory(res.data);
@@ -26,7 +26,7 @@ function AddServiceAction({ onSuccess }) {
     }
   }, [isOpen]);
 
-  // ✅ Toggle inventory item
+  // Toggle inventory item
   const toggleItem = (item) => {
     const exists = selectedItems.find(i => i.code === item.code);
 
@@ -40,13 +40,15 @@ function AddServiceAction({ onSuccess }) {
     }
   };
 
-  const changeQty = (code, qty) => {
-    setSelectedItems(selectedItems.map(item =>
-      item.code === code ? { ...item, qty: Number(qty) } : item
-    ));
+  const changeQty = (code, value) => {
+    setSelectedItems(items =>
+      items.map(item =>
+        item.code === code ? { ...item, qty: value } : item
+      )
+    );
   };
 
-  // ✅ Submit Service
+  // Submit Service (FormData)
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -55,26 +57,38 @@ function AddServiceAction({ onSuccess }) {
       return;
     }
 
-    const payload = {
-      serviceName,
-      description,
-      price,
-      logo,
-      items: selectedItems.map(item => ({
-        code: item.code,
-        itemName: item.itemName,
-        qty: item.qty,
-        price: item.price
-      }))
-    };
+    const formData = new FormData();
+    formData.append("serviceName", serviceName);
+    formData.append("description", description);
+    formData.append("price", price);
+
+    if (logo) {
+      formData.append("logo", logo);
+    }
+
+    formData.append(
+      "items",
+      JSON.stringify(
+        selectedItems.map(item => ({
+          code: item.code,
+          itemName: item.itemName,
+          qty: Number(item.qty) || 1,
+          price: item.price
+        }))
+      )
+    );
 
     try {
-      await axios.post("http://localhost:8081/services/services", payload, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json"
+      await axios.post(
+        "http://localhost:8081/services/services",
+        formData,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "multipart/form-data"
+          }
         }
-      });
+      );
 
       alert("Service added successfully!");
       onSuccess && onSuccess();
@@ -83,7 +97,7 @@ function AddServiceAction({ onSuccess }) {
       setServiceName("");
       setDescription("");
       setPrice("");
-      setLogo("");
+      setLogo(null);
       setSelectedItems([]);
 
     } catch (err) {
@@ -92,7 +106,9 @@ function AddServiceAction({ onSuccess }) {
     }
   };
 
-  // ✅ MODAL JSX (PORTAL)
+  
+
+  // Modal JSX
   const serviceModal = (
     <div className="modal-backdrop">
       <div className="modal-box">
@@ -121,9 +137,9 @@ function AddServiceAction({ onSuccess }) {
           />
 
           <input
-            placeholder="Logo Filename (optional)"
-            value={logo}
-            onChange={e => setLogo(e.target.value)}
+            type="file"
+            accept="image/*"
+            onChange={(e) => setLogo(e.target.files[0])}
           />
 
           <h3>Select Inventory Items</h3>
@@ -132,16 +148,18 @@ function AddServiceAction({ onSuccess }) {
             {inventory.map(item => (
               <div key={item.code} className="inventory-item">
                 <label>
-                  <input
-                    type="checkbox"
-                    checked={selectedItems.some(i => i.code === item.code)}
-                    onChange={() => toggleItem(item)}
-                  />
                   {item.itemName} (Stock: {item.quantity})
                 </label>
 
+                <input
+                  type="checkbox"
+                  checked={selectedItems.some(i => i.code === item.code)}
+                  onChange={() => toggleItem(item)}
+                />
+
                 {selectedItems.some(i => i.code === item.code) && (
                   <input
+                    className="qty"
                     type="number"
                     min="1"
                     value={selectedItems.find(i => i.code === item.code).qty}
@@ -162,11 +180,10 @@ function AddServiceAction({ onSuccess }) {
     </div>
   );
 
-  // ✅ BUTTON + PORTAL RENDER
   return (
     <div>
       <button className="inventory-action-btn" onClick={() => setIsOpen(true)}>
-        <img src={check} alt="Add Service" />
+        Add Service <img src={check} alt="Add Service" />
       </button>
 
       {isOpen && createPortal(serviceModal, document.body)}

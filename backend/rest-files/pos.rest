@@ -7,10 +7,8 @@ Content-Type: application/json
 }
 
 ### Add Sale Record
-GET http://localhost:8081/pos/pos
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyVHlwZSI6ImFkbWluIiwidXNlcm5hbWUiOiJjZW8xMjMiLCJpYXQiOjE3NjQ5NTcyMDksImV4cCI6MTc2NTU2MjAwOX0.NuwYLlZnxuacGCauWNK0ILbMnFCHx55_ZZj-FgXHXGQ
-Content-Type: application/json
-
+GET http://localhost:8081/pos/pos?services=true
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyVHlwZSI6ImNlbyIsInVzZXJuYW1lIjoiY2VvMTIzIiwiaWF0IjoxNzY1NjM2MDM0LCJleHAiOjE3NjYyNDA4MzR9.1HDbXl0Kj8NvVCaDkU54wZtQwHOAPsOLzAMYlH1oN5Y
 ### SAmple
 POST http://localhost:8081/pos/sales
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyVHlwZSI6ImFkbWluIiwidXNlcm5hbWUiOiJjZW8xMjMiLCJpYXQiOjE3NjQ5NTcyMDksImV4cCI6MTc2NTU2MjAwOX0.NuwYLlZnxuacGCauWNK0ILbMnFCHx55_ZZj-FgXHXGQ

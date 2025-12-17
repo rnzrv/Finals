@@ -15,27 +15,58 @@ const q = (sql, params = []) =>
   });
 
 // GET POS data (products + services)
-router.get('/pos', verifyToken, (req, res) => {
-  const productQ = "SELECT itemName, code, quantity, sellingPrice, logo, category FROM inventory WHERE quantity > 0 AND category = 'Product'";
-  db.query(productQ, (err, productData) => {
-    if (err) return res.status(500).json(err);
+// ...existing code...
 
-    const serviceQ = "SELECT serviceId, serviceName as itemName, 'Service' as category, logo, price as sellingPrice FROM services";
-    db.query(serviceQ, (err, serviceData) => {
-      if (err) return res.status(500).json(err);
+// GET POS data (products + services)
+// ...existing code...
+router.get('/pos', verifyToken, async (req, res) => {
+  try {
+    const { product, services } = req.query;
 
-      const servicesWithCode = (serviceData || []).map(s => ({
-        ...s,
-        code: `SERVICE-${s.serviceId}`,
-        quantity: null
-      }));
+    let productData = [];
+    let serviceData = [];
 
-      const allItems = [...(productData || []), ...servicesWithCode];
-      res.status(200).json(allItems);
-    });
-  });
+    if (!services || product === 'true') {
+      const productQ = `
+        SELECT itemName, code, quantity, sellingPrice,
+               logo, category
+        FROM inventory
+        WHERE quantity > 0 AND category = 'Product'
+      `;
+      productData = await q(productQ);
+    }
+
+    if (!product || services === 'true') {
+      const serviceQ = `
+        SELECT serviceId,
+               serviceName AS itemName,
+               'Service' AS category,
+               CASE
+                 WHEN logo IS NULL OR logo = '' THEN NULL
+                 ELSE logo
+               END AS logo,
+               price AS sellingPrice
+        FROM services
+      `;
+      serviceData = await q(serviceQ);
+    }
+
+    const servicesWithCode = (serviceData || []).map(s => ({
+      ...s,
+      code: `SERVICE-${s.serviceId}`,
+      quantity: null
+    }));
+
+    const allItems = [...(productData || []), ...servicesWithCode];
+    res.status(200).json(allItems);
+  } catch (err) {
+    console.error('POS Error:', err);
+    res.status(500).json({ error: err.message || err });
+  }
 });
+// ...existing code...
 
+// ...existing code...
 router.get('/getPatients/Customers', verifyToken, (req, res) => {
   const q = "SELECT id, name AS customerName FROM patients";
   db.query(q, (err, data) => {

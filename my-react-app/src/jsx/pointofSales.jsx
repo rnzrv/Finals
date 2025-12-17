@@ -13,6 +13,7 @@ function PointOfSales() {
   const [pos, setPOS] = useState([]);
   const [cart, setCart] = useState([]);
   const [search, setSearch] = useState('');
+  const [activeFilter, setActiveFilter] = useState('all');
 
   // Payment & change
   const [totalPayment, setTotalPayment] = useState(''); // keep as string
@@ -41,7 +42,7 @@ function PointOfSales() {
   const getPOSData = async () => {
     try {
       const token = sessionStorage.getItem('accessToken');
-      const res = await axios.get('http://localhost:8081/pos/pos', {
+      const res = await axios.get(`http://localhost:8081/pos/pos?${activeFilter}=true`, {
         withCredentials: true,
         headers: { Authorization: `Bearer ${token}` },
       });
@@ -55,6 +56,10 @@ function PointOfSales() {
   useEffect(() => {
     getPOSData();
   }, []);
+
+ useEffect(() => {
+    getPOSData();
+  }, [activeFilter]);
 
   // FILTER POS by search
   const q = search.trim().toLowerCase();
@@ -177,6 +182,12 @@ function PointOfSales() {
     }
   };
 
+
+  useEffect(() => {
+    getPOSData();
+  }, [activeFilter]);
+
+  
   return (
     <div className='point-of-sales'>
       <Sidebar />
@@ -197,6 +208,8 @@ function PointOfSales() {
                 <select
                   value={selectedCustomer}
                   onChange={e => setSelectedCustomer(e.target.value)}
+                  className='customers-item'
+  
                 >
                   <option value="">Select Customer</option>
                   {customers
@@ -305,12 +318,34 @@ function PointOfSales() {
             </div>
             <div className="right-buttons">
               <div className="left">
-                <button id="all">All</button>
-                <button id="category">Product</button>
-                <button id="category">Services</button>
+                <button
+                id='all'
+  className={`filter-btn ${activeFilter === 'all' ? 'active' : ''}`}
+  onClick={() => setActiveFilter('all')}
+>
+  All
+</button>
+
+<button
+id='category'
+  className={`filter-btn ${activeFilter === 'product' ? 'active' : ''}`}
+  onClick={() => setActiveFilter('product')}
+>
+  Product
+</button>
+
+
+                <button
+                  id='category'
+                  className={`filter-btn ${activeFilter === 'services' ? 'active' : ''}`}
+                  onClick={() => setActiveFilter('services')}
+                >
+                  Services
+                </button>
+
               </div>
               <div className="pos-rightButtons">
-                <button id="sort"><AddService/></button>
+                <AddService/>
               </div>
             </div>
 

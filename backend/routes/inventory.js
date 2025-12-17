@@ -6,6 +6,11 @@ const db = require('../config/db');
 const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
+const { start } = require('repl');
+
+// Add date helper
+
+  // 
 
 // Multer setup
 const storage = multer.diskStorage({
@@ -297,20 +302,67 @@ router.put('/updateInventory/:id', verifyToken, upload.single('logo'), (req, res
 });
 
 // LIST PURCHASES
-router.get('/Purchases/inventory', verifyToken, (req, res) => {
-  const q = 'SELECT itemId, itemName, DATE_FORMAT(created_at, "%Y-%m-%d") as Date, reference, suppliers, quantity, grandTotal, DATE_FORMAT(expiryDate, "%Y-%m-%d") as expiryDate, category FROM purchases';
+// ...existing code...
 
-  db.query(q, (err, data) => {
+// LIST PURCHASES
+router.get('/Purchases/inventory', verifyToken, (req, res) => {
+  const { startDate, endDate } = req.query;
+
+  let q = 'SELECT itemId, itemName, DATE_FORMAT(created_at, "%Y-%m-%d") as Date, reference, suppliers, quantity, grandTotal, DATE_FORMAT(expiryDate, "%Y-%m-%d") as expiryDate, category FROM purchases';
+  const params = [];
+
+  // Build WHERE clause if date range is provided
+  if (startDate || endDate) {
+    const conditions = [];
+    
+    if (startDate) {
+      conditions.push('DATE(created_at) >= ?');
+      params.push(startDate);
+    }
+    
+    if (endDate) {
+      conditions.push('DATE(created_at) <= ?');
+      params.push(endDate);
+    }
+    
+    if (conditions.length > 0) {
+      q += ' WHERE ' + conditions.join(' AND ');
+    }
+  }
+
+  q += ' ORDER BY created_at DESC';
+
+  db.query(q, params, (err, data) => {
     if (err) return res.status(500).json({ error: err.sqlMessage });
     return res.status(200).json(data);
   });
 });
 
+// ...existing code...
 // LIST INVENTORY
 router.get('/getInventory', verifyToken, (req, res) => {
-  const q = 'SELECT itemId, itemName, brand, code, costUnit, sellingPrice, category, quantity, DATE_FORMAT(expiryDate, "%Y-%m-%d") as expiryDate, logo FROM inventory';
+  const { startDate, endDate } = req.query;
+
+  let q = 'SELECT itemId, itemName, brand, code, costUnit, sellingPrice, category, quantity, DATE_FORMAT(expiryDate, "%Y-%m-%d") as expiryDate, logo FROM inventory';
+  const params = [];
+  // Build WHERE clause if date range is provided
+  if (startDate || endDate) {
+    const conditions = [];
+    if (startDate) {
+      conditions.push('DATE(created_at) >= ?');
+      params.push(startDate);
+    }
+    if (endDate) {
+      conditions.push('DATE(created_at) <= ?');
+      params.push(endDate);
+    }
+    if (conditions.length > 0) {
+      q += ' WHERE ' + conditions.join(' AND ');
+    }
+  }
+  q += ' ORDER BY itemName ASC';
   
-  db.query(q, (err, data) => {
+  db.query(q, params, (err, data) => {
     if (err) return res.status(500).json({ error: err.sqlMessage });
     return res.status(200).json(data);
   });

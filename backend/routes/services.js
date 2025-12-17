@@ -3,6 +3,22 @@ const router = express.Router();
 const db = require('../config/db');
 const verifyToken = require('../middleware/middleware');
 
+const multer = require("multer");
+const path = require("path");
+
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, "uploads/services"); // make sure folder exists
+  },
+  filename: (req, file, cb) => {
+    const uniqueName = Date.now() + "-" + file.originalname;
+    cb(null, uniqueName);
+  }
+});
+
+const upload = multer({ storage });
+
+
 
 // ✅ 1. GET ALL SERVICES
 router.get('/services', verifyToken, (req, res) => {
@@ -24,63 +40,80 @@ router.get('/services/inventory', verifyToken, (req, res) => {
 });
 
 
-// ✅ 3. CREATE SERVICE + LINK INVENTORY ITEMS (TRANSACTION SAFE)
-router.post('/services', verifyToken, (req, res) => {
-  const { serviceName, description, price, logo, items } = req.body;
+// ✅ CREATE SERVICE + LINK INVENTORY ITEMS (FORM DATA + TRANSACTION SAFE)
+// ...existing code...
+router.post(
+  "/services",
+  verifyToken,
+  upload.single("logo"),
+  (req, res) => {
+    const { serviceName, description, price } = req.body;
+    let { items } = req.body;
+    const logo = req.file ? `uploads/services/${req.file.filename}` : null;
 
-  if (!serviceName || !price || !items || items.length === 0) {
-    return res.status(400).json({ message: "Missing required fields" });
-  }
+    if (!serviceName || !price || !items) {
+      return res.status(400).json({ message: "Missing required fields" });
+    }
 
-  db.beginTransaction(err => {
-    if (err) return res.status(500).json({ message: "Transaction error", error: err });
+    try {
+      items = JSON.parse(items);
+    } catch (err) {
+      return res.status(400).json({ message: "Invalid items format" });
+    }
 
-    const serviceQ = `
-      INSERT INTO services (serviceName, description, price, logo)
-      VALUES (?, ?, ?, ?)
-    `;
+    if (!Array.isArray(items) || items.length === 0) {
+      return res.status(400).json({ message: "Items cannot be empty" });
+    }
 
-    db.query(serviceQ, [serviceName, description, price, logo], (err, serviceData) => {
-      if (err) return db.rollback(() => res.status(500).json({ message: "Failed to insert service", error: err }));
+    db.beginTransaction(err => {
+      if (err) return res.status(500).json({ message: "Transaction error", error: err });
 
-      const serviceId = serviceData.insertId;
-
-      // Prepare values for bulk insert
-      const values = items.map(item => [
-        serviceId,
-        item.code,
-        item.itemName,
-        item.qty,
-        item.price
-      ]);
-
-      if (values.length === 0) {
-        return db.commit(err => {
-          if (err) return db.rollback(() => res.status(500).json({ message: "Commit failed", error: err }));
-          return res.status(201).json({ message: "Service created successfully", serviceId });
-        });
-      }
-
-      const itemsQ = `
-        INSERT INTO service_items (serviceId, itemCode, itemName, qty, price)
-        VALUES ?
+      const serviceQ = `
+        INSERT INTO services (serviceName, description, price, logo)
+        VALUES (?, ?, ?, ?)
       `;
+      db.query(serviceQ, [serviceName, description, price, logo], (err, serviceData) => {
+        if (err) {
+          return db.rollback(() =>
+            res.status(500).json({ message: "Failed to insert service", error: err })
+          );
+        }
 
-      db.query(itemsQ, [values], (err) => {
-        if (err) return db.rollback(() => res.status(500).json({ message: "Failed to insert service items", error: err }));
+        const serviceId = serviceData.insertId;
+        const values = items.map(item => [
+          serviceId,
+          item.code,
+          item.itemName,
+          item.qty,
+          item.price
+        ]);
 
-        db.commit(err => {
-          if (err) return db.rollback(() => res.status(500).json({ message: "Commit failed", error: err }));
+        const itemsQ = `
+          INSERT INTO service_items (serviceId, itemCode, itemName, qty, price)
+          VALUES ?
+        `;
+        db.query(itemsQ, [values], err => {
+          if (err) {
+            return db.rollback(() =>
+              res.status(500).json({ message: "Failed to insert service items", error: err })
+            );
+          }
 
-          res.status(201).json({
-            message: "Service created successfully",
-            serviceId
+          db.commit(err => {
+            if (err) {
+              return db.rollback(() =>
+                res.status(500).json({ message: "Commit failed", error: err })
+              );
+            }
+            res.status(201).json({ message: "Service created successfully", serviceId });
           });
         });
       });
     });
-  });
-});
+  }
+);
+// ...existing code...
+
 
 
 

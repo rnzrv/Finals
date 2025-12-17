@@ -16,11 +16,17 @@ import axios from 'axios';
 function Inventory() {
 
   const [inventory, setInventory] = useState([]);
+  const [startDate, setStartDate] = useState('');
+  const [endDate, setEndDate] = useState('');
 
   const getInventoryData = async () => {
     try {
       const token = sessionStorage.getItem('accessToken');
       const res = await axios.get('http://localhost:8081/inventory/getInventory', {
+        params: {
+          startDate: startDate || undefined,
+          endDate: endDate || undefined
+        },
         withCredentials: true,
         headers: { Authorization: `Bearer ${token}` },
       });
@@ -30,43 +36,38 @@ function Inventory() {
     }
   }
 
-
-  
   useEffect(() => {
     getInventoryData();
   }, []);
 
-     
+  useEffect(() => {
+    getInventoryData();
+  }, [startDate, endDate]); 
 
   // for handling search
   const [searchQuery, setSearchQuery] = useState('');
- const filterItems = searchQuery
-  ? inventory.filter(item => {
-      const expiry = item.expiryDate ? item.expiryDate.slice(0, 10) : '';
-      return (
-        item.itemName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        item.brand.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        item.code.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        item.category.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        expiry.includes(searchQuery) // user should type YYYY-MM-DD
-      );
-    })
-  : inventory;
+  const filterItems = searchQuery
+    ? inventory.filter(item => {
+        const expiry = item.expiryDate ? item.expiryDate.slice(0, 10) : '';
+        return (
+          item.itemName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          item.brand.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          item.code.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          item.category.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          expiry.includes(searchQuery)
+        );
+      })
+    : inventory;
 
-
-
-  const maxItemsPerPage = 10; // Maximum items to display per page
+  const maxItemsPerPage = 10;
   const [currentPage, setCurrentPage] = useState(1);
 
-
-
-  const totalItems = filterItems.length; // Example total items, replace with actual data length
-  const totalPages = Math.ceil(totalItems/maxItemsPerPage);
+  const totalItems = filterItems.length;
+  const totalPages = Math.ceil(totalItems / maxItemsPerPage);
   const startIndex = (currentPage - 1) * maxItemsPerPage;
   const endIndex = startIndex + maxItemsPerPage;
 
-
-  const currentItems = filterItems.slice(startIndex, endIndex); // Replace with actual data slice: data.slice(startIndex, endIndex);
+  const currentItems = filterItems.slice(startIndex, endIndex);
 
   const handlePreviousPage = () => {
     if (currentPage > 1) {
@@ -79,6 +80,33 @@ function Inventory() {
       setCurrentPage(currentPage + 1);
     }
   }
+
+  // Export function
+  const exportInventoryCSV = () => {
+    const rows = [
+      ["Item", "Brand", "Code", "Cost Unit", "Selling Price", "Category", "Quantity", "Expiry Date"],
+      ...filterItems.map(item => [
+        item.itemName,
+        item.brand,
+        item.code,
+        item.costUnit,
+        item.sellingPrice,
+        item.category,
+        item.quantity,
+        item.expiryDate || "N/A"
+      ])
+    ];
+
+    const csv = rows
+      .map((r) => r.map((c) => `"${String(c).replace(/"/g, '""')}"`).join(","))
+      .join("\n");
+
+    const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+    const link = document.createElement("a");
+    link.href = URL.createObjectURL(blob);
+    link.download = `inventory-${new Date().toISOString().split('T')[0]}.csv`;
+    link.click();
+  };
 
   return (
     <div className="inventory">
@@ -99,13 +127,25 @@ function Inventory() {
               <h3>Select Period:</h3>
               <div className="inventory-date">
                 <img src={date} alt="Date Icon" />
-                <h6>10 April 2024 - 30 June 2024</h6>
+                <div className="inventory-date-inputs">
+                  <input
+                    type="date"
+                    value={startDate}
+                    onChange={(e) => setStartDate(e.target.value)}
+                  />
+                  <span> - </span>
+                  <input
+                    type="date"
+                    value={endDate}
+                    onChange={(e) => setEndDate(e.target.value)}
+                  />
+                </div>
               </div>
             </div>
 
             <div className="inventory-export-product">
               <AddProduct />
-              <button className="inventory-export-btn">
+              <button className="inventory-export-btn" onClick={exportInventoryCSV}>
                 Export <img src={dropDown} alt="Dropdown Icon" />
               </button>
             </div>
@@ -116,14 +156,12 @@ function Inventory() {
               <h3>Inventory Overview</h3>
 
               <div className="inventory-search">
-
                 <img src={search} alt="Search Icon" />
                 <input type="text" placeholder="Search..." 
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
                 />
               </div>
-              
             </div>
 
             <div className="inventory-table-container">
@@ -143,31 +181,28 @@ function Inventory() {
                 </thead>
                 <tbody>
                   {currentItems.map(item => ( 
-                  <tr key={item.id}>
-                    <td className="inventory-item-name">{item.itemName}</td>
-                    <td className="inventory-item-text">{item.brand}</td>
-                    <td className="inventory-item-text">{item.code}</td>
-                    <td className="inventory-item-text">₱{item.costUnit}</td>
-                    <td className="inventory-item-text">₱{item.sellingPrice}</td>
-                    <td><span className="inventory-category-badge">{item.category}</span></td>
-                    <td className="inventory-item-text">{item.quantity}</td>
-                    <td className="inventory-item-text">{item.expiryDate}</td>
-                    <td>
-                      <div className="inventory-actions-cell">
-                        
-                        <InventoryEditAction item={item} onUpdate={getInventoryData} />
-                        
-                        <InventoryDeleteAction item={item} onDelete={getInventoryData} />
-                      </div>
-                    </td>
-                  </tr>
+                    <tr key={item.id}>
+                      <td className="inventory-item-name">{item.itemName}</td>
+                      <td className="inventory-item-text">{item.brand}</td>
+                      <td className="inventory-item-text">{item.code}</td>
+                      <td className="inventory-item-text">₱{item.costUnit}</td>
+                      <td className="inventory-item-text">₱{item.sellingPrice}</td>
+                      <td><span className="inventory-category-badge">{item.category}</span></td>
+                      <td className="inventory-item-text">{item.quantity}</td>
+                      <td className="inventory-item-text">{item.expiryDate}</td>
+                      <td>
+                        <div className="inventory-actions-cell">
+                          <InventoryEditAction item={item} onUpdate={getInventoryData} />
+                          <InventoryDeleteAction item={item} onDelete={getInventoryData} />
+                        </div>
+                      </td>
+                    </tr>
                   ))}
-
                 </tbody>
               </table>
             </div>
-            
           </div>
+          
           <div className="pagination">
             <button className="pagination-btn" onClick={handlePreviousPage} disabled={currentPage === 1}>Previous</button>
             <span className="pagination-info">Page {currentPage} of {totalPages}</span>
@@ -180,17 +215,3 @@ function Inventory() {
 }
 
 export default Inventory;
-
-
-//  <h3>Select Period:</h3>
-//               <input
-//                 type="date"
-//                 value={startDate}
-//                 onChange={(e) => setStartDate(e.target.value)}
-//               />
-//               <span> - </span>
-//               <input
-//                 type="date"
-//                 value={endDate}
-//                 onChange={(e) => setEndDate(e.target.value)}
-//               />

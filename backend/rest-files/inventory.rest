@@ -108,3 +108,19 @@ Content-Type: image/jpeg
 
 @./body_lotion.jpg
 --WebKitFormBoundary123--
+
+
+#### asd
+GET http://localhost:8081/inventory/Purchases/inventory?startDate=2025-01-01&endDate=2026-12-31
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyVHlwZSI6ImNlbyIsInVzZXJuYW1lIjoiY2VvMTIzIiwiaWF0IjoxNzY1NjIwODk4LCJleHAiOjE3NjYyMjU2OTh9.dGxKF9IxRkEf9AKeYR97HkxjpZ3hnzWdleRghjNP7m8
+Content-Type: application/json
+
+###
+GET http://localhost:8081/inventory/getInventory?startDate=2025-01-01&endDate=2026-12-31
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyVHlwZSI6ImNlbyIsInVzZXJuYW1lIjoiY2VvMTIzIiwiaWF0IjoxNzY1NjIwODk4LCJleHAiOjE3NjYyMjU2OTh9.dGxKF9IxRkEf9AKeYR97HkxjpZ3hnzWdleRghjNP7m8
+Content-Type: application/json
+
+
+
+###
+GET http://localhost:8081/inventory/getInventory/lowStock
