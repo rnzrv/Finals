@@ -24,7 +24,8 @@ const posRoutes = require('./routes/pos');
 const services = require('./routes/services');
 const summaryRoutes = require('./routes/summary');
 const dashboardRoutes = require('./routes/dashboard');
-
+const logoutRoutes = require('./routes/logout');
+const salesRoutes = require('./routes/sales');
 
 // Use routes
 app.use('/users', userRoutes);
@@ -36,6 +37,9 @@ app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 app.use('/services', services);
 app.use('/summary', summaryRoutes);
 app.use('/dashboard', dashboardRoutes);
+app.use('/logout', logoutRoutes);
+app.use('/sales', salesRoutes);
+
 // Test route
 
 app.get('/', (req, res) => {

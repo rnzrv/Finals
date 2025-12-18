@@ -9,7 +9,9 @@ import Reports from "./reports";
 import PointofSales from "./pointofSales";
 import ProtectedRoute from "./protectedRoute";
 import Settings from "./settings";
-
+import LogoutPage from "./LogoutPage";
+import RoleProtectedRoute from "./roleProtectedRoute.jsx";
+import SalesHistory from "./salesHistory.jsx";
 function App() {
   return (
     <Router>
@@ -21,50 +23,58 @@ function App() {
         <Route
           path="/dashhboard"
           element={
-            <ProtectedRoute>
+            <RoleProtectedRoute allowedRoles={["ceo", "MANAGER", "STAFF"]}>
               <Dashhboard />
-            </ProtectedRoute>
+            </RoleProtectedRoute>
           }
         />
         <Route
           path="/inventory"
           element={
-            <ProtectedRoute>
+            <RoleProtectedRoute allowedRoles={["ceo", "MANAGER", "STAFF"]}>
               <Inventory />
-            </ProtectedRoute>
+            </RoleProtectedRoute>
           }
         />
         <Route
           path="/purchases"
           element={
-            <ProtectedRoute>
+            <RoleProtectedRoute allowedRoles={["ceo", "MANAGER"]}>
               <Purchases />
-            </ProtectedRoute>
+            </RoleProtectedRoute>
           }
         />
 
         <Route
           path="/sales"
           element={
-            <ProtectedRoute>
+            <RoleProtectedRoute allowedRoles={["ceo", "MANAGER", "STAFF"]}>
               <PointofSales />
-            </ProtectedRoute>
+            </RoleProtectedRoute>
+          }
+        />
+        <Route 
+          path="/salesHistory"
+          element={
+            <RoleProtectedRoute allowedRoles={["ceo", "MANAGER", "STAFF"]}>
+              <SalesHistory />
+            </RoleProtectedRoute>
           }
         />
         <Route
           path="/appointments"
           element={
-            <ProtectedRoute>
+            <RoleProtectedRoute allowedRoles={["ceo", "MANAGER", "STAFF"]}>
               <Appointments />
-            </ProtectedRoute>
+            </RoleProtectedRoute>
           }
         />
         <Route
           path="/patients"
           element={
-            <ProtectedRoute>
+            <RoleProtectedRoute allowedRoles={["ceo", "MANAGER", "STAFF"]}>
               <Patients />
-            </ProtectedRoute>
+            </RoleProtectedRoute>
           }
         />
         <Route
@@ -84,6 +94,8 @@ function App() {
             </ProtectedRoute>
           }
         />
+
+        
       </Routes>
     </Router>
   );

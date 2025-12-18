@@ -29,6 +29,7 @@ function Login() {
 
       // Store access token in memory (not localStorage)
       sessionStorage.setItem("accessToken", response.data.accessToken);
+      sessionStorage.setItem("role", response.data.role);
 
       alert("Login successful!");
       navigate("/dashhboard"); // ✅ redirect after success

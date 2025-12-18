@@ -32,13 +32,13 @@ router.post('/user/login', async (req, res) => {
 
       // Create tokens
       const accessToken = jwt.sign(
-        { id: user.id, userType: user.userType, username: user.username },
+        { id: user.id, username: user.username, role: user.userType }, // include role
         process.env.ACCESS_TOKEN_SECRET,
         { expiresIn: '7d' }
       );
 
       const refreshToken = jwt.sign(
-        { id: user.id, userType: user.userType, username: user.username },
+        { id: user.id, username: user.username, role: user.userType },
         process.env.REFRESH_TOKEN_SECRET,
         { expiresIn: '7d' }
       );
@@ -55,11 +55,12 @@ router.post('/user/login', async (req, res) => {
         httpOnly: true,
         secure: process.env.NODE_ENV === 'production',
         sameSite: 'Strict',
-        
       });
 
-      res.json({ message: '✅ Login successful', accessToken });
-    } catch {
+      // Send access token and role in response
+      res.json({ message: '✅ Login successful', accessToken, role: user.userType });
+    } catch (error) {
+      console.error(error);
       res.status(500).json({ error: 'Server error' });
     }
   });

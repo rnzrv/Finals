@@ -1,0 +1,338 @@
+@import url(./fonts.css);
+@import url(./color.css);
+
+body {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Inter', sans-serif;
+}
+
+/* MAIN CONTAINER */
+.salesHistory {
+  display: flex;
+  height: 100%;
+  width: 100%;
+}
+
+/* CONTENT AREA */
+.salesHistory-content {
+  margin-left: 240px;
+  height: 100vh;
+  width: calc(100% - 235px);
+  background-color: #f9f9f9;
+  box-sizing: border-box;
+  transition: all 0.3s ease;
+  overflow-y: auto;
+}
+
+/* HEADER */
+.salesHistory-content header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: var(--header-bg-color--);
+  padding: 10px 40px;
+  border-bottom: 1px solid #f0eeee;
+  height: 50px;
+  color: var(--primary-color--);
+  font-weight: 600;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+}
+
+/* ADMIN INFO */
+.salesHistory-account {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.salesHistory-account img {
+  height: 35px;
+  width: 35px;
+  border-radius: 50%;
+}
+
+.salesHistory-account p {
+  margin: 0;
+  font-weight: 500;
+  color: var(--primary-color--);
+  font-size: 16px;
+}
+
+/* MAIN CONTENT */
+.salesHistory-main-content {
+  display: flex;
+  flex-direction: column;
+  margin: 10px 40px;
+  height: 100%;
+}
+
+/* FILTERS + BUTTONS */
+.salesHistory-utensil {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+}
+
+.salesHistory-select-period {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.salesHistory-select-period h3 {
+  font-family: "DM Sans", sans-serif;
+  font-weight: 500;
+}
+
+.salesHistory-date {
+  display: flex;
+  align-items: center;
+  background-color: #fff;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+  height: 40px;
+  border-radius: 10px;
+  padding: 5px 10px;
+}
+
+.salesHistory-date img {
+  margin-right: 6px;
+}
+
+.salesHistory-date-inputs {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.salesHistory-date-inputs input {
+  border: none;
+  outline: none;
+  padding: 5px;
+  font-size: 14px;
+}
+
+/* BUTTONS */
+.salesHistory-export-product {
+  display: flex;
+  gap: 15px;
+}
+
+.salesHistory-export-btn {
+  height: 40px;
+  padding: 0 20px;
+  border-radius: 5px;
+  font-family: "DM Sans", "Poppins";
+  font-weight: 500;
+  cursor: pointer;
+  background-color: var(--primary-color--);
+  color: #fff;
+  border: none;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+.salesHistory-export-btn:hover {
+  background-color: #fff;
+  color: var(--primary-color--);
+  border: 2px solid var(--primary-color--);
+}
+
+/* DATA SECTION */
+.salesHistory-data {
+  margin-top: 20px;
+  background-color: #fff;
+  border-radius: 12px;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+  padding-bottom: 20px;
+  height: 100%;
+  overflow: hidden;
+}
+
+/* HEADER INSIDE TABLE SECTION */
+.salesHistory-data-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px;
+  font-family: 'DM Sans', 'Poppins';
+  font-size: 20px;
+}
+
+.salesHistory-search {
+  display: flex;
+  align-items: center;
+  background-color: #fff;
+  border: 1px solid var(--primary-color--);
+  border-radius: 25px;
+  padding: 6px 12px;
+  width: 230px;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+}
+
+.salesHistory-search img {
+  width: 18px;
+  height: 18px;
+  margin-right: 8px;
+  opacity: 0.7;
+}
+
+.salesHistory-search input {
+  border: none;
+  outline: none;
+  font-size: 14px;
+  width: 100%;
+  background: transparent;
+}
+
+/* TABLE DESIGN */
+.salesHistory-table-container {
+  background-color: white;
+  border-radius: 12px;
+  overflow: hidden;
+  margin: 0 20px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
+
+.salesHistory-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+  font-family: 'DM Sans', 'Poppins';
+  font-size: 14px;
+}
+
+.salesHistory-table thead tr {
+  background-color: var(--primary-color--);
+  color: white;
+}
+
+.salesHistory-table th {
+  padding: 14px 16px;
+  font-weight: 600;
+  text-transform: uppercase;
+  font-size: 13px;
+  letter-spacing: 0.5px;
+}
+
+.salesHistory-table td {
+  padding: 14px 16px;
+  border-bottom: 1px solid #eee;
+  color: #333;
+}
+
+.salesHistory-table tbody tr:hover {
+  background-color: #f5f7fb;
+  transition: background-color 0.2s ease;
+}
+
+.salesHistory-reference {
+  font-weight: 600;
+  color: var(--primary-color--);
+}
+
+.salesHistory-item-text {
+  color: #666;
+}
+
+.salesHistory-amount {
+  font-weight: 600;
+  color: #27ae60;
+}
+
+/* ACTION BUTTONS */
+.salesHistory-actions-cell {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.salesHistory-action-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  border-radius: 6px;
+  padding: 6px;
+  transition: background 0.2s ease, transform 0.1s ease;
+}
+
+.salesHistory-action-btn:hover {
+  background-color: #f0f0f0;
+  transform: scale(1.05);
+}
+
+.salesHistory-action-btn img {
+  width: 18px;
+  height: 18px;
+}
+
+/* LOADING & ERROR */
+.salesHistory-loading,
+.salesHistory-error,
+.salesHistory-no-data {
+  text-align: center;
+  padding: 30px;
+  font-size: 16px;
+}
+
+.salesHistory-loading {
+  color: #3498db;
+}
+
+.salesHistory-error {
+  color: #e74c3c;
+  background-color: #fadbd8;
+  margin: 20px;
+  border-radius: 8px;
+}
+
+.salesHistory-no-data {
+  color: #95a5a6;
+}
+
+/* Pagination */
+.pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 20px;
+  gap: 10px;
+}
+
+.pagination-btn {
+  padding: 8px 12px;
+  background-color: var(--secondary-color--);
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font: 14px 'DmSans', sans-serif;
+}
+
+.pagination-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.pagination-info {
+  font: 14px 'DmSans', sans-serif;
+  color: var(--primary-color--);
+}
+
+@media (max-width: 768px) {
+  .salesHistory-content {
+    margin-left: 0;
+    width: 100%;
+  }
+
+  .salesHistory-table {
+    font-size: 12px;
+  }
+
+  .salesHistory-table th,
+  .salesHistory-table td {
+    padding: 8px;
+  }
+}
