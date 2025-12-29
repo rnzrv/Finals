@@ -4,6 +4,7 @@ import "../css/dashboard.css";
 import user from "../icons/user.svg";
 import SalesChart from "./salesChart.jsx"; // ✅ match correct capitalization
 import TopProduct from "./topProduct.jsx";
+import notificationIcon from "../icons/notification.svg";
 
 function Dashboard() {
   return (
@@ -18,6 +19,8 @@ function Dashboard() {
           <div className="dashboard-account">
             <img src={user} alt="Admin Icon" />
             <p>Admin</p>
+          
+            <button className="dashboard-logout-button">Notification</button>
           </div>
         </header>
 

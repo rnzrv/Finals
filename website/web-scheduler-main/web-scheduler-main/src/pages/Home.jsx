@@ -4,6 +4,8 @@ import { SERVICES } from '../context/AppContext';
 import clinicHero from '../images/clinic-hero.png';
 import spaTreatment from '../images/spa-treatment.png';
 import './Home.css';
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
 
 function Home() {
     // Use the spa treatment image for all service cards
@@ -11,6 +13,19 @@ function Home() {
         ...service,
         image: spaTreatment,
     }));
+
+    const [fetchedServices, setFetchedServices] = useState([]);
+
+     useEffect(() => {
+        axios.get('http://localhost:8081/website/services/getServices')
+            .then(response => {
+                console.log(response.data); // DEBUG
+                setFetchedServices(response.data); // ✅ FIX
+            })
+            .catch(error => {
+                console.error('Error fetching services:', error);
+            });
+    }, []);
 
     return (
         <div className="home-page">
@@ -50,12 +65,13 @@ function Home() {
                 </div>
 
                 <div className="services-grid">
-                    {servicesWithImages.map(service => (
+                    {fetchedServices.map(service => (
                         <ServiceCard
                             key={service.id}
-                            title={service.name}
+                            title={service.serviceName}
                             description={service.description}
-                            image={service.image}
+                            image={service.logo ? `http://localhost:8081/${service.logo}` : spaTreatment}
+                            price={service.price}
                         />
                     ))}
                 </div>

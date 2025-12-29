@@ -1,0 +1,31 @@
+POST http://localhost:8081/login/signup
+Content-Type: application/json
+
+{
+    "firstName": "John",
+    "middleName": "A.",
+    "lastName": "Doe",
+    "contactNumber": "1234567890",
+    "gender": "Male",
+    "birthday": "1990-01-01",
+    "email": "john.doe@example.com",
+    "password": "securePassword123"
+}
+
+### try
+
+POST http://localhost:8081/website/services/website-appointment
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MTEsImVtYWlsIjoidG9wc29uY2ViMTkzMEBnbWFpbC5jb20iLCJpYXQiOjE3NjY0NzA3MDAsImV4cCI6MTc2NjU1NzEwMH0.ofIIFGnD0akjsk0om6IQP0wiPjEbNgIS1OF6eaqThDI
+
+{
+    "serviceAvailed": "General Consultation",
+    "preferredDate": "2025-12-29",
+    "preferredTime": "09:00 AM"
+}
+
+
+###    
+GET http://localhost:8081/website/services/website-appointment
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MTEsImVtYWlsIjoidG9wc29uY2ViMTkzMEBnbWFpbC5jb20iLCJpYXQiOjE3NjY0NzA3MDAsImV4cCI6MTc2NjU1NzEwMH0.ofIIFGnD0akjsk0om6IQP0wiPjEbNgIS1OF6eaqThDI

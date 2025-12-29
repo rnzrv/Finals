@@ -74,7 +74,7 @@ router.get('/getDataMonthly', verifyToken, async(req, res) => {
         FROM patients p
         JOIN appointments a ON p.id = a.patient_id
         WHERE DATE(a.date) = CURDATE()
-        ORDER BY a.date ASC
+        ORDER BY a.date ASC LIMIT 5
         `)
 
     const recentSales = await q(`SELECT 

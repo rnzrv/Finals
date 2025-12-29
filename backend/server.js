@@ -43,6 +43,10 @@ const summaryRoutes = require('./routes/summary');
 const dashboardRoutes = require('./routes/dashboard');
 const logoutRoutes = require('./routes/logout');
 const salesRoutes = require('./routes/sales');
+const loginRoutes = require('./routes/website/login');
+const serviceRoutes = require('./routes/website/services');
+const webAppointmentRoutes = require('./routes/website/webAppointment');
+const notificationRoutes = require('./routes/notification');
 
 // Use routes
 app.use('/users', userRoutes);
@@ -56,7 +60,10 @@ app.use('/summary', summaryRoutes);
 app.use('/dashboard', dashboardRoutes);
 app.use('/logout', logoutRoutes);
 app.use('/sales', salesRoutes);
-
+app.use('/notifications', notificationRoutes);
+app.use('/login', loginRoutes);
+app.use('/website/services', serviceRoutes);
+app.use('/web/appointments', webAppointmentRoutes);
 // Test route
 
 app.get('/', (req, res) => {

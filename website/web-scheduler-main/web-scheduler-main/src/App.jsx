@@ -2,6 +2,7 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { AppProvider } from './context/AppContext';
 import Header from './components/Header';
 import Footer from './components/Footer';
+import CartSidebar from './components/CartSidebar';
 import ProtectedRoute from './components/ProtectedRoute';
 import Home from './pages/Home';
 import Appointment from './pages/Appointment';
@@ -31,6 +32,7 @@ function App() {
             </Routes>
           </main>
           <Footer />
+          <CartSidebar />
         </div>
       </Router>
     </AppProvider>

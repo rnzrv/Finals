@@ -7,6 +7,9 @@ import TopProduct from "./topProduct.jsx";
 import AppointmentCard from "./dashboardAppointment.jsx";
 import RecentCard from "./dashboardRecent.jsx";
 import axios from "axios";
+import notificationIcon from "../icons/notification.svg";
+import Notification from './modals/notification/notification';
+
 
 function Dashhboard() {
   const [data, setData] = useState({
@@ -49,6 +52,7 @@ function Dashhboard() {
         <header>
           <h2>DASHBOARD</h2>
           <div className="dashboard-account">
+            <Notification />
             <img src={user} alt="Admin Icon" />
             <p>Admin</p>
           </div>
@@ -83,10 +87,10 @@ function Dashhboard() {
           <div className="dashboard-barGraph-pieGraph">
             <div className="dashboard-Graph dashboard-barGraph">
               <SalesChart
-  labels={data.salesTrends.labels}
-  sales={data.salesTrends.sales}
-  purchases={data.salesTrends.expenses}
-/>
+                labels={data.salesTrends.labels}
+                sales={data.salesTrends.sales}
+                purchases={data.salesTrends.expenses}
+              />
 
             </div>
 

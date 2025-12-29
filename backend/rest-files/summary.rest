@@ -11,3 +11,30 @@ Content-Type: application/json
 GET http://localhost:8081/appointments/getAppointments/appointmentPage
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyVHlwZSI6ImFkbWluIiwidXNlcm5hbWUiOiJjZW8xMjMiLCJpYXQiOjE3NjQ5NTcyMDksImV4cCI6MTc2NTU2MjAwOX0.NuwYLlZnxuacGCauWNK0ILbMnFCHx55_ZZj-FgXHXGQ
 Content-Type: application/json
+
+
+###
+GET http://localhost:8081/appointments/getAppointments/appointmentPage?startDate=2025-10-01&endDate=2025-10-31
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyVHlwZSI6ImFkbWluIiwidXNlcm5hbWUiOiJjZW8xMjMiLCJpYXQiOjE3NjQ5NTcyMDksImV4cCI6MTc2NTU2MjAwOX0.NuwYLlZnxuacGCauWNK0ILbMnFCHx55_ZZj-FgXHXGQ
+Content-Type: application/json
+
+###
+GET http://localhost:8081/web/appointments/getPendingRequests
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImNlbzEyMyIsInJvbGUiOiJjZW8iLCJpYXQiOjE3NjY1NjI3NDgsImV4cCI6MTc2NzE2NzU0OH0.rdohD77qo3xZ3tY3EYGWAdYnI9TtbV-i40AYJDdcF4k
+Content-Type: application/json
+
+###    
+PUT http://localhost:8081/web/appointments/updateRequestStatus/9
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImNlbzEyMyIsInJvbGUiOiJjZW8iLCJpYXQiOjE3NjY1NjI3NDgsImV4cCI6MTc2NzE2NzU0OH0.rdohD77qo3xZ3tY3EYGWAdYnI9TtbV-i40AYJDdcF4k
+Content-Type: application/json
+
+###
+
+GET http://localhost:8081/website/services/getScheduledAppointments
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MywiZW1haWwiOiJyb256cmVtb3JvemFAZ21haWwuY29tIiwiaWF0IjoxNzY2OTM1MTI1LCJleHAiOjE3NjcwMjE1MjV9.gN4I3P5bJ6J-DpN9VEIJtT2fo56mcLIR3-69z7ntgN4
+Content-Type: application/json
+
+###      
+GET http://localhost:8081/website/services/getServices
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MywiZW1haWwiOiJyb256cmVtb3JvemFAZ21haWwuY29tIiwiaWF0IjoxNzY2ODA4Mzg0LCJleHAiOjE3NjY4OTQ3ODR9.y49NnGfLLSzSnG5hKSvDL0nsrs-vMivFqRXjva-hBm0
+Content-Type: application/json

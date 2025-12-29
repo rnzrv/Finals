@@ -60,9 +60,14 @@ router.post('/setAppointment', verifyToken, (req, res) => {
 router.get('/history/:id', (req, res) => {
   const patientId = req.params.id;
   const q = `
-    SELECT p.name, a.date, a.time, a.service_type
+    SELECT 
+      p.name, 
+      a.date, 
+      a.time, 
+      COALESCE(s.serviceName, a.service_type) AS service_name
     FROM appointments a
     JOIN patients p ON a.patient_id = p.id
+    LEFT JOIN services s ON a.service_type = s.serviceId
     WHERE a.patient_id = ?
     ORDER BY a.date DESC
   `;

@@ -11,6 +11,19 @@
     border-bottom: 1px solid rgba(164, 131, 13, 0.1);
 }
 
+/* Auth pages: simplify header and hide nav */
+.header.auth .nav {
+    display: none;
+}
+
+.header.auth .mobile-menu-btn {
+    display: none;
+}
+
+.header.auth .header-container {
+    justify-content: space-between;
+}
+
 .header-container {
     display: flex;
     align-items: center;

@@ -1,10 +1,11 @@
 import { Link, useNavigate, useLocation } from 'react-router-dom';
-import { SERVICES } from '../context/AppContext';
+import { useApp } from '../context/AppContext';
 import './Footer.css';
 
 function Footer() {
     const navigate = useNavigate();
     const location = useLocation();
+    const { fetchedServices } = useApp(); 
 
     // Scroll to section or navigate home first
     const scrollToSection = (sectionId) => {
@@ -24,6 +25,10 @@ function Footer() {
         }
     };
 
+
+    
+
+
     return (
         <footer className="footer">
             <div className="footer-container">
@@ -40,9 +45,9 @@ function Footer() {
                 <div className="footer-column">
                     <h3 className="footer-heading">Services</h3>
                     <ul className="footer-links">
-                        {SERVICES.map(service => (
+                        {fetchedServices.map(service => (
                             <li key={service.id}>
-                                <button onClick={() => scrollToSection('services')}>{service.name}</button>
+                                <button onClick={() => scrollToSection('services')}>{service.serviceName}</button>
                             </li>
                         ))}
                     </ul>

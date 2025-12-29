@@ -8,7 +8,13 @@ const path = require("path");
 
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    cb(null, "uploads/services"); // make sure folder exists
+    if (file.fieldname === "logo") {
+      cb(null, "uploads/services"); // logo folder
+    } else if (file.fieldname === "consentForm") {
+      cb(null, "uploads/consent"); // consent form folder
+    } else {
+      cb(null, "uploads/others"); // fallback folder
+    }
   },
   filename: (req, file, cb) => {
     const uniqueName = Date.now() + "-" + file.originalname;
@@ -45,11 +51,13 @@ router.get('/services/inventory', verifyToken, (req, res) => {
 router.post(
   "/services",
   verifyToken,
-  upload.single("logo"),
+  upload.fields([
+    { name: "logo", maxCount: 1 },
+    { name: "consentForm", maxCount: 1 }
+  ]),
   (req, res) => {
     const { serviceName, description, price } = req.body;
     let { items } = req.body;
-    const logo = req.file ? `uploads/services/${req.file.filename}` : null;
 
     if (!serviceName || !price || !items) {
       return res.status(400).json({ message: "Missing required fields" });
@@ -65,14 +73,17 @@ router.post(
       return res.status(400).json({ message: "Items cannot be empty" });
     }
 
+    const logo = req.files.logo ? `uploads/services/${req.files.logo[0].filename}` : null;
+    const consentForm = req.files.consentForm ? `uploads/consent/${req.files.consentForm[0].filename}` : null;
+
     db.beginTransaction(err => {
       if (err) return res.status(500).json({ message: "Transaction error", error: err });
 
       const serviceQ = `
-        INSERT INTO services (serviceName, description, price, logo)
-        VALUES (?, ?, ?, ?)
+        INSERT INTO services (serviceName, description, price, logo, consentForm)
+        VALUES (?, ?, ?, ?, ?)
       `;
-      db.query(serviceQ, [serviceName, description, price, logo], (err, serviceData) => {
+      db.query(serviceQ, [serviceName, description, price, logo, consentForm], (err, serviceData) => {
         if (err) {
           return db.rollback(() =>
             res.status(500).json({ message: "Failed to insert service", error: err })
@@ -112,7 +123,6 @@ router.post(
     });
   }
 );
-// ...existing code...
 
 
 

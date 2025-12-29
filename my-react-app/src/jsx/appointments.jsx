@@ -4,7 +4,7 @@ import "../css/appointment.css"; // ✅ new CSS file for styling
 import search from "../icons/search.svg"
 import React, {useState, useEffect} from "react";
 import axios from "axios";
-
+import RequestAppointment from "./modals/appointment/requestappointment";
 function Appointments() {
 
   const Months = [
@@ -166,6 +166,8 @@ function Appointments() {
             <div className="search-bar">
               <input type="text" placeholder="Search by Appointment" />
               <span className="search-icon"><img src={search} alt="" /></span>
+             
+              <RequestAppointment />
             </div>
 
           </div>

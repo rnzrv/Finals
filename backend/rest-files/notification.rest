@@ -1,0 +1,53 @@
+### Notification API Tests
+@baseUrl = http://localhost:8081
+@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImNlbzEyMyIsInJvbGUiOiJjZW8iLCJpYXQiOjE3NjY5OTA4OTcsImV4cCI6MTc2NzU5NTY5N30.COOk9LYdsSgQ7dOjeldbnDfTs5HLokMjInIuN-WqvMo
+
+
+### Get All Notifications
+GET {{baseUrl}}/notifications/getAllNotifications
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+###
+
+### Get Low Inventory Notifications
+GET {{baseUrl}}/notifications/lowInventory
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+###
+
+### Get Appointment Notifications
+GET {{baseUrl}}/notifications/appointments
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+###
+
+### Get Critical Inventory (quantity <= 5)
+GET {{baseUrl}}/notifications/criticalInventory
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+###
+
+### Get Appointment Statistics
+GET {{baseUrl}}/notifications/appointmentStats
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+###
+
+### Get Inventory Statistics
+GET {{baseUrl}}/notifications/inventoryStats
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+###
+
+### Get Summary Dashboard
+GET {{baseUrl}}/notifications/summary
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+###

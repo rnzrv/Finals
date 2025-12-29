@@ -88,6 +88,7 @@ function Header() {
 
     // Check if we're on the main landing page
     const isLandingPage = location.pathname === '/';
+    const isAuthPage = location.pathname === '/login' || location.pathname === '/signup';
 
     // Account dropdown content (reused for desktop and mobile)
     const AccountDropdown = ({ isMobile = false }) => (
@@ -127,7 +128,7 @@ function Header() {
     );
 
     return (
-        <header className={`header ${isMobileMenuOpen ? 'menu-open' : ''}`}>
+        <header className={`header ${isAuthPage ? 'auth' : ''} ${isMobileMenuOpen ? 'menu-open' : ''}`}>
             <div className="header-container">
                 {/* Logo */}
                 <Link to="/" className="logo" onClick={() => scrollToSection('home')}>
@@ -144,32 +145,34 @@ function Header() {
                     <span className={`hamburger ${isMobileMenuOpen ? 'open' : ''}`}></span>
                 </button>
 
-                {/* Navigation - centered on desktop */}
-                <nav className={`nav ${isMobileMenuOpen ? 'mobile-open' : ''}`}>
-                    <button
-                        onClick={() => scrollToSection('home')}
-                        className={`nav-link ${isLandingPage && activeSection === 'home' ? 'active' : ''}`}
-                    >
-                        Home
-                    </button>
-                    <button
-                        onClick={() => scrollToSection('about')}
-                        className={`nav-link ${isLandingPage && activeSection === 'about' ? 'active' : ''}`}
-                    >
-                        About us
-                    </button>
-                    <button
-                        onClick={() => scrollToSection('services')}
-                        className={`nav-link ${isLandingPage && activeSection === 'services' ? 'active' : ''}`}
-                    >
-                        Services
-                    </button>
+                {/* Navigation - centered on desktop (hidden on auth pages) */}
+                {!isAuthPage && (
+                    <nav className={`nav ${isMobileMenuOpen ? 'mobile-open' : ''}`}>
+                        <button
+                            onClick={() => scrollToSection('home')}
+                            className={`nav-link ${isLandingPage && activeSection === 'home' ? 'active' : ''}`}
+                        >
+                            Home
+                        </button>
+                        <button
+                            onClick={() => scrollToSection('about')}
+                            className={`nav-link ${isLandingPage && activeSection === 'about' ? 'active' : ''}`}
+                        >
+                            About us
+                        </button>
+                        <button
+                            onClick={() => scrollToSection('services')}
+                            className={`nav-link ${isLandingPage && activeSection === 'services' ? 'active' : ''}`}
+                        >
+                            Services
+                        </button>
 
-                    {/* Account Section - only visible in mobile drawer */}
-                    <div className="account-section mobile-only">
-                        <AccountDropdown isMobile={true} />
-                    </div>
-                </nav>
+                        {/* Account Section - only visible in mobile drawer */}
+                        <div className="account-section mobile-only">
+                            <AccountDropdown isMobile={true} />
+                        </div>
+                    </nav>
+                )}
 
                 {/* Desktop Account Section - separate from nav */}
                 <div className="account-section desktop-only" ref={dropdownRef}>

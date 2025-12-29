@@ -18,3 +18,27 @@ Content-Type: application/json
 GET http://localhost:8081/sales/getSales?startDate=2025-12-02&endDate=2025-12-31
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImNlbzEyMyIsInJvbGUiOiJjZW8iLCJpYXQiOjE3NjYwMjUwNTEsImV4cCI6MTc2NjYyOTg1MX0.NYecm5a0ojHjT541jEBkswUhJPQDspKCWkzL267G6Ew
 Content-Type: application/json
+
+
+###
+POST http://localhost:8081/login/google-login
+Content-Type: application/json
+
+
+{
+  "token": ["-1",null,[[["ANDROID_BACKUP",0],["BATTERY_STATS",0],["SMART_SETUP",0],["TRON",0]],-3334737594024971225],[],{"175237375":[10000]}],
+  "firstName": "Ronz",
+  "middleName": "A",
+  "lastName": "Remoroza",
+  "contactNumber": "09123456789",
+  "gender": "male",
+  "birthday": "2005-08-14",
+  "email": "ronz@example.com",
+  "password": "123456"
+}
+
+
+###    
+
+GET http://localhost:8081/website/services/getServices
+Content-Type: application/json

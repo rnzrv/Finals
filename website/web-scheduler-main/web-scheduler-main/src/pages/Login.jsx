@@ -2,11 +2,13 @@ import { useState, useEffect } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useApp } from '../context/AppContext';
 import './Login.css';
+import { GoogleLogin } from '@react-oauth/google';
+import axios from 'axios';
 
 function Login() {
     const navigate = useNavigate();
     const location = useLocation();
-    const { login, loginMessage, setLoginMessage } = useApp();
+    const { login, loginWithGoogle, loginMessage, setLoginMessage } = useApp();
 
     const [formData, setFormData] = useState({
         email: '',
@@ -17,37 +19,28 @@ function Login() {
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [authMessage, setAuthMessage] = useState('');
 
-    // Show login message from redirect (e.g., trying to access protected route)
+    // Show login message from redirect
     useEffect(() => {
         if (loginMessage) {
             setAuthMessage(loginMessage);
-            setLoginMessage(''); // Clear the message after showing
+            setLoginMessage('');
         }
     }, [loginMessage, setLoginMessage]);
 
     const handleChange = (e) => {
         const { name, value } = e.target;
         setFormData(prev => ({ ...prev, [name]: value }));
-        // Clear error when user starts typing
-        if (errors[name]) {
-            setErrors(prev => ({ ...prev, [name]: '' }));
-        }
+        if (errors[name]) setErrors(prev => ({ ...prev, [name]: '' }));
     };
 
     const validateForm = () => {
         const newErrors = {};
 
-        if (!formData.email) {
-            newErrors.email = 'Email is required';
-        } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
-            newErrors.email = 'Please enter a valid email';
-        }
+        if (!formData.email) newErrors.email = 'Email is required';
+        else if (!/\S+@\S+\.\S+/.test(formData.email)) newErrors.email = 'Please enter a valid email';
 
-        if (!formData.password) {
-            newErrors.password = 'Password is required';
-        } else if (formData.password.length < 6) {
-            newErrors.password = 'Password must be at least 6 characters';
-        }
+        if (!formData.password) newErrors.password = 'Password is required';
+        else if (formData.password.length < 6) newErrors.password = 'Password must be at least 6 characters';
 
         setErrors(newErrors);
         return Object.keys(newErrors).length === 0;
@@ -55,25 +48,38 @@ function Login() {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-
         if (!validateForm()) return;
 
         setIsSubmitting(true);
-
-        // Simulate API call
-        await new Promise(resolve => setTimeout(resolve, 1000));
-
-        const result = login(formData.email, formData.password);
+        const result = await login(formData.email, formData.password);
 
         if (result.success) {
-            // Redirect to the page they tried to visit or home
             const from = location.state?.from?.pathname || '/';
             navigate(from, { replace: true });
         } else {
-            setErrors({ general: 'Invalid credentials' });
+            setErrors({ general: result.error || 'Invalid credentials' });
         }
-
         setIsSubmitting(false);
+    };
+
+    const handleGoogleLogin = async (credentialResponse) => {
+        try {
+            const response = await axios.post(
+                'http://localhost:8081/login/google-login',
+                { token: credentialResponse.credential }
+            );
+
+            // Update context with user data and token
+            loginWithGoogle(response.data);
+
+            // Redirect after login
+            const from = location.state?.from?.pathname || '/';
+            navigate(from, { replace: true });
+
+        } catch (err) {
+            console.error('Google login failed:', err.response?.data || err.message);
+            alert('Google login failed!');
+        }
     };
 
     return (
@@ -83,7 +89,6 @@ function Login() {
                     <h1 className="login-title">Login your Account</h1>
 
                     <form onSubmit={handleSubmit} className="login-form">
-                        {/* Auth required message */}
                         {authMessage && (
                             <div className="auth-message">
                                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -131,17 +136,7 @@ function Login() {
                                     onClick={() => setShowPassword(!showPassword)}
                                     aria-label={showPassword ? 'Hide password' : 'Show password'}
                                 >
-                                    {showPassword ? (
-                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                                            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
-                                            <circle cx="12" cy="12" r="3" />
-                                        </svg>
-                                    ) : (
-                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                                            <path d="M17.94 17.94A10.07 10.07 0 0112 20c-7 0-11-8-11-8a18.45 18.45 0 015.06-5.94M9.9 4.24A9.12 9.12 0 0112 4c7 0 11 8 11 8a18.5 18.5 0 01-2.16 3.19m-6.72-1.07a3 3 0 11-4.24-4.24" />
-                                            <line x1="1" y1="1" x2="23" y2="23" />
-                                        </svg>
-                                    )}
+                                    {showPassword ? 'Hide' : 'Show'}
                                 </button>
                             </div>
                             {errors.password && <span className="error-text">{errors.password}</span>}
@@ -155,6 +150,14 @@ function Login() {
                         >
                             {isSubmitting ? 'Logging in...' : 'Login'}
                         </button>
+
+                        {/* Google Login */}
+                        <div style={{ marginTop: '20px', textAlign: 'center' }}>
+                            <GoogleLogin
+                                onSuccess={handleGoogleLogin}
+                                onError={() => console.log('Google login failed')}
+                            />
+                        </div>
                     </form>
 
                     <p className="login-footer">

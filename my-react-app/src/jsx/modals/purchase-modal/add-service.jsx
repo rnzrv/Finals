@@ -10,12 +10,12 @@ function AddServiceAction({ onSuccess }) {
   const [description, setDescription] = useState("");
   const [price, setPrice] = useState("");
   const [logo, setLogo] = useState(null);
+  const [consentForm, setConsentForm] = useState(null); // ✅ Add consent form state
   const [inventory, setInventory] = useState([]);
   const [selectedItems, setSelectedItems] = useState([]);
 
   const token = sessionStorage.getItem("accessToken");
 
-  // Load inventory when modal opens
   useEffect(() => {
     if (isOpen) {
       axios.get("http://localhost:8081/pos/pos?product=true", {
@@ -26,29 +26,21 @@ function AddServiceAction({ onSuccess }) {
     }
   }, [isOpen]);
 
-  // Toggle inventory item
   const toggleItem = (item) => {
     const exists = selectedItems.find(i => i.code === item.code);
-
     if (exists) {
       setSelectedItems(selectedItems.filter(i => i.code !== item.code));
     } else {
-      setSelectedItems([
-        ...selectedItems,
-        { ...item, qty: 1, price: item.sellingPrice }
-      ]);
+      setSelectedItems([...selectedItems, { ...item, qty: 1, price: item.sellingPrice }]);
     }
   };
 
   const changeQty = (code, value) => {
     setSelectedItems(items =>
-      items.map(item =>
-        item.code === code ? { ...item, qty: value } : item
-      )
+      items.map(item => item.code === code ? { ...item, qty: value } : item)
     );
   };
 
-  // Submit Service (FormData)
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -62,9 +54,8 @@ function AddServiceAction({ onSuccess }) {
     formData.append("description", description);
     formData.append("price", price);
 
-    if (logo) {
-      formData.append("logo", logo);
-    }
+    if (logo) formData.append("logo", logo);
+    if (consentForm) formData.append("consentForm", consentForm); // ✅ Append consent form
 
     formData.append(
       "items",
@@ -98,37 +89,29 @@ function AddServiceAction({ onSuccess }) {
       setDescription("");
       setPrice("");
       setLogo(null);
+      setConsentForm(null); // ✅ Reset consent form
       setSelectedItems([]);
-
     } catch (err) {
       console.error(err);
       alert("Failed to add service");
     }
   };
 
-  
-
-  // Modal JSX
   const serviceModal = (
     <div className="modal-backdrop">
       <div className="modal-box">
-
         <h2>Add New Service</h2>
-
         <form onSubmit={handleSubmit}>
-
           <input
             placeholder="Service Name"
             value={serviceName}
             onChange={e => setServiceName(e.target.value)}
           />
-
           <input
             placeholder="Service Description"
             value={description}
             onChange={e => setDescription(e.target.value)}
           />
-
           <input
             placeholder="Service Price"
             type="number"
@@ -136,27 +119,30 @@ function AddServiceAction({ onSuccess }) {
             onChange={e => setPrice(e.target.value)}
           />
 
+          LOGO
           <input
             type="file"
             accept="image/*"
             onChange={(e) => setLogo(e.target.files[0])}
           />
 
-          <h3>Select Inventory Items</h3>
+          Consent Form
+          <input
+            type="file"
+            accept="application/pdf"
+            onChange={(e) => setConsentForm(e.target.files[0])} // ✅ Handle change
+          />
 
+          <h3>Select Inventory Items</h3>
           <div className="inventory-list">
             {inventory.map(item => (
               <div key={item.code} className="inventory-item">
-                <label>
-                  {item.itemName} (Stock: {item.quantity})
-                </label>
-
+                <label>{item.itemName} (Stock: {item.quantity})</label>
                 <input
                   type="checkbox"
                   checked={selectedItems.some(i => i.code === item.code)}
                   onChange={() => toggleItem(item)}
                 />
-
                 {selectedItems.some(i => i.code === item.code) && (
                   <input
                     className="qty"
@@ -174,7 +160,6 @@ function AddServiceAction({ onSuccess }) {
             <button type="submit">Save Service</button>
             <button type="button" onClick={() => setIsOpen(false)}>Cancel</button>
           </div>
-
         </form>
       </div>
     </div>
@@ -185,7 +170,6 @@ function AddServiceAction({ onSuccess }) {
       <button className="inventory-action-btn" onClick={() => setIsOpen(true)}>
         Add Service <img src={check} alt="Add Service" />
       </button>
-
       {isOpen && createPortal(serviceModal, document.body)}
     </div>
   );

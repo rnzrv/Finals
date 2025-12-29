@@ -1,4 +1,5 @@
-import { createContext, useContext, useState, useCallback } from 'react';
+import { createContext, useContext, useState, useCallback, useEffect} from 'react';
+import axios from 'axios';
 
 // Create the context
 const AppContext = createContext(null);
@@ -13,6 +14,8 @@ export const SERVICES = [
     { id: 'whitening', name: 'Whitening', description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.' },
 ];
 
+
+
 // Time slots available for appointments
 export const TIME_SLOTS = [
     '9:00 AM', '10:00 AM', '11:00 AM',
@@ -23,6 +26,22 @@ export const TIME_SLOTS = [
 
 // Context Provider component
 export function AppProvider({ children }) {
+
+
+    const [fetchedServices, setFetchedServices] = useState([]);
+
+     useEffect(() => {
+        axios.get('http://localhost:8081/website/services/getServices')
+            .then(response => {
+                console.log(response.data); // DEBUG
+                setFetchedServices(response.data); // ✅ FIX
+            })
+            .catch(error => {
+                console.error('Error fetching services:', error);
+            });
+    }, []);
+
+
     // User authentication state
     const [user, setUser] = useState(null);
     const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -33,21 +52,42 @@ export function AppProvider({ children }) {
     // Appointments storage
     const [appointments, setAppointments] = useState([]);
 
-    // Login function (simulated)
-    const login = useCallback((email, password) => {
-        // Simulate login - in real app, this would call an API
-        if (email && password) {
+    // Login function (real API)
+    const login = useCallback(async (email, password) => {
+        try {
+            const response = await axios.post('http://localhost:8081/login/login', { email, password });
+            const data = response.data;
+            if (data?.token) {
+                localStorage.setItem('token', data.token);
+            }
             const userData = {
-                id: Date.now(),
-                email,
-                firstName: 'Guest',
-                lastName: 'User',
+                id: data.id,
+                email: data.email,
+                firstName: data.firstName,
+                lastName: data.lastName,
             };
             setUser(userData);
             setIsAuthenticated(true);
             return { success: true, user: userData };
+        } catch (err) {
+            return { success: false, error: err.response?.data?.message || 'Login failed' };
         }
-        return { success: false, error: 'Invalid credentials' };
+    }, []);
+
+    // Login with Google (set state from backend response)
+    const loginWithGoogle = useCallback((data) => {
+        if (data?.token) {
+            localStorage.setItem('token', data.token);
+        }
+        const userData = {
+            id: data.id,
+            email: data.email,
+            firstName: data.firstName,
+            lastName: data.lastName,
+        };
+        setUser(userData);
+        setIsAuthenticated(true);
+        return { success: true, user: userData };
     }, []);
 
     // Register function (simulated)
@@ -98,6 +138,7 @@ export function AppProvider({ children }) {
         user,
         isAuthenticated,
         login,
+        loginWithGoogle,
         register,
         logout,
 
@@ -109,7 +150,7 @@ export function AppProvider({ children }) {
         appointments,
         bookAppointment,
         cancelAppointment,
-
+        fetchedServices,
         // Static data
         services: SERVICES,
         timeSlots: TIME_SLOTS,

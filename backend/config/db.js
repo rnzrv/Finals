@@ -33,18 +33,23 @@ connection.connect((err) => {
       // Step 3: Create tables if not exist
       const createPatientsTable = `
         CREATE TABLE IF NOT EXISTS patients (
-          id INT AUTO_INCREMENT PRIMARY KEY,
-          name VARCHAR(100) NOT NULL,
-          email VARCHAR(100) NOT NULL UNIQUE,
-          contact_number VARCHAR(20),
-          age INT,
-          gender ENUM('Male', 'Female', 'Other'),
-          medical_notes TEXT,
-          last_visit DATE,
-          status ENUM('active', 'inactive', 'scheduled') NOT NULL DEFAULT 'active',
-          created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-          updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
-        )`;
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        user_id INT UNIQUE, -- links to website_users
+        name VARCHAR(100) NOT NULL,
+        email VARCHAR(100) NOT NULL UNIQUE,
+        contact_number VARCHAR(20),
+        age INT,
+        gender ENUM('Male', 'Female', 'Other'),
+        medical_notes TEXT,
+        last_visit DATE,
+        status ENUM('active', 'inactive', 'scheduled') NOT NULL DEFAULT 'active',
+        created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+        updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+        CONSTRAINT fk_user
+          FOREIGN KEY (user_id) REFERENCES website_users(id)
+          ON DELETE CASCADE
+      )`;
+
 
       const createAppointmentsTable = `
         CREATE TABLE IF NOT EXISTS appointments (
@@ -53,7 +58,7 @@ connection.connect((err) => {
           doctor VARCHAR(100) NOT NULL,
           date DATE NOT NULL,
           time TIME NOT NULL,
-          service_type ENUM('Spa', 'Facial Services', 'Massage Therapy', 'Other') NOT NULL,
+          service_type VARCHAR(100) NOT NULL,
           status ENUM('Pending', 'Completed', 'Cancelled') NOT NULL DEFAULT 'Pending',
           notes TEXT,
           created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
@@ -138,6 +143,7 @@ connection.connect((err) => {
           serviceName VARCHAR(100) NOT NULL,
           category VARCHAR(100) NOT NULL,
           logo VARCHAR(255) NULL,
+          consentForm VARCHAR(255) NULL,
           description TEXT,
           price DECIMAL(10,2) NOT NULL,
           created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
@@ -166,6 +172,35 @@ connection.connect((err) => {
         FOREIGN KEY (saleId) REFERENCES sales(saleId) ON DELETE CASCADE,
         FOREIGN KEY (serviceId) REFERENCES services(serviceId) ON DELETE CASCADE
       )`;
+
+        const createWebsiteUsersTable = `
+        CREATE TABLE IF NOT EXISTS website_users (
+          id INT AUTO_INCREMENT PRIMARY KEY,
+          google_id VARCHAR(255) UNIQUE,
+          firstName VARCHAR(100) NOT NULL,
+          middleName VARCHAR(100),
+          lastName VARCHAR(100) NOT NULL,
+          email VARCHAR(100) NOT NULL UNIQUE,
+          gender ENUM('Male','Female','Other'),
+          password VARCHAR(255),
+          created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+          updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+        )`;
+
+        const createRequestsTable = `
+        CREATE TABLE IF NOT EXISTS requests (
+          id INT AUTO_INCREMENT PRIMARY KEY,
+          patient_id INT NOT NULL,
+          service_requested INT NOT NULL,
+          preferred_date DATE NOT NULL,
+          preferred_time TIME NOT NULL,
+          status ENUM('Pending', 'Scheduled', 'Declined') NOT NULL DEFAULT 'Pending',
+          created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+          updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+          FOREIGN KEY (patient_id) REFERENCES patients(id) ON DELETE CASCADE,
+          FOREIGN KEY (service_requested) REFERENCES services(serviceId) ON DELETE CASCADE
+        )`;
+
 
 
 
@@ -218,6 +253,17 @@ connection.connect((err) => {
         if(err) throw err;
         console.log('✅ sale_services table ready.');
       });
+
+      connection.query(createWebsiteUsersTable, (err) => {
+        if(err) throw err;
+        console.log('✅ website_users table ready.');
+      }
+      );
+      connection.query(createRequestsTable, (err) => {
+        if(err) throw err;
+        console.log('✅ requests table ready.');
+      }
+      );
     });
   });
 });

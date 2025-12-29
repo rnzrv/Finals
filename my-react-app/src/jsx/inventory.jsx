@@ -12,6 +12,7 @@ import React, { useState, useEffect } from 'react';
 import InventoryDeleteAction from './modals/inventory-modal/inventory-action-delete.jsx';
 import InventoryEditAction from './modals/inventory-modal/inventory-action-edit.jsx';
 import axios from 'axios';
+import Notification from './modals/notification/notification.jsx';
 
 function Inventory() {
 
@@ -116,7 +117,9 @@ function Inventory() {
         <header>
           <h2>INVENTORY</h2>
           <div className="inventory-account">
+            <Notification />
             <img src={user} alt="Admin Icon" />
+            
             <p>Admin</p>
           </div>
         </header>

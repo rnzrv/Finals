@@ -89,7 +89,7 @@ function ModalPatientHistory({ patient }) {
                       }
                     )}
                   </td>
-                  <td>{item.service_type}</td>
+                  <td>{item.service_name || item.service_type}</td>
                 </tr>
               ))
             ) : (

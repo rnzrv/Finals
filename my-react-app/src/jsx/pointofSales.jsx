@@ -8,6 +8,7 @@ import logs from "../icons/logo.svg";
 import arrowup from "../icons/arrow-up.svg";
 import axios from 'axios';
 import AddService from "./modals/purchase-modal/add-service.jsx";
+import Notification from './modals/notification/notification.jsx';
 
 function PointOfSales() {
   const [pos, setPOS] = useState([]);
@@ -192,7 +193,9 @@ function PointOfSales() {
     <div className='point-of-sales'>
       <Sidebar />
       <div className="point-of-sales-content">
-        <header><h2>POINT OF SALES</h2></header>
+        <header><h2>POINT OF SALES</h2>
+        <Notification />
+        </header>
         <div className="point-of-sales-main-content">
           <div className="POS-left">
             {/* Customer selection */}
@@ -320,19 +323,19 @@ function PointOfSales() {
               <div className="left">
                 <button
                 id='all'
-  className={`filter-btn ${activeFilter === 'all' ? 'active' : ''}`}
-  onClick={() => setActiveFilter('all')}
->
-  All
-</button>
+                  className={`filter-btn ${activeFilter === 'all' ? 'active' : ''}`}
+                  onClick={() => setActiveFilter('all')}
+                >
+                  All
+                </button>
 
-<button
-id='category'
-  className={`filter-btn ${activeFilter === 'product' ? 'active' : ''}`}
-  onClick={() => setActiveFilter('product')}
->
-  Product
-</button>
+                <button
+                id='category'
+                  className={`filter-btn ${activeFilter === 'product' ? 'active' : ''}`}
+                  onClick={() => setActiveFilter('product')}
+                >
+                  Product
+                </button>
 
 
                 <button

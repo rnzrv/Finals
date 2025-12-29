@@ -1,39 +1,46 @@
 import ServiceCard from '../components/ServiceCard';
-import { SERVICES } from '../context/AppContext';
-import spaTreatment from '../assets/spa-treatment.png';
 import './Services.css';
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
 
 function Services() {
-    // Use the spa treatment image for all service cards
-    const servicesWithImages = SERVICES.map(service => ({
-        ...service,
-        image: spaTreatment,
-    }));
+    const [fetchedServices, setFetchedServices] = useState([]);
+
+    useEffect(() => {
+        axios.get('http://localhost:8081/website/services/getServices')
+            .then(response => {
+                console.log(response.data); // DEBUG
+                setFetchedServices(response.data); // ✅ FIX
+            })
+            .catch(error => {
+                console.error('Error fetching services:', error);
+            });
+    }, []);
 
     return (
         <div className="services-page">
             <section className="services-section">
-                {/* Header */}
+
                 <div className="services-header">
                     <h1 className="services-title">Our Services</h1>
-                    <p className="services-description">
-                        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque porttitor velit
-                        neque, at eleifend metus vestibulum Phasellus tempor tortor eu mi lacinia, sed
-                        placerat eros porta. Fusce vel magna eu justo blandit imperdiet a eget
-                    </p>
                 </div>
 
-                {/* Services Grid */}
                 <div className="services-grid">
-                    {servicesWithImages.map(service => (
+                    {fetchedServices.length === 0 && (
+                        <p>No services found</p>
+                    )}
+
+                    {fetchedServices.map(service => (
                         <ServiceCard
-                            key={service.id}
-                            title={service.name}
+                            key={service.serviceId}
+                            title={service.serviceName}
                             description={service.description}
-                            image={service.image}
+                            image={`http://localhost:8081/${service.logo}`}
+                            price={service.price}
                         />
                     ))}
                 </div>
+
             </section>
         </div>
     );

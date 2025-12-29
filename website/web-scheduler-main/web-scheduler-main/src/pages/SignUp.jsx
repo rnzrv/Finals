@@ -1,11 +1,11 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { useApp } from '../context/AppContext';
 import './SignUp.css';
+import { GoogleLogin } from '@react-oauth/google';
+import axios from 'axios';
 
 function SignUp() {
     const navigate = useNavigate();
-    const { register } = useApp();
 
     const [formData, setFormData] = useState({
         firstName: '',
@@ -24,48 +24,22 @@ function SignUp() {
     const handleChange = (e) => {
         const { name, value } = e.target;
         setFormData(prev => ({ ...prev, [name]: value }));
-        // Clear error when user starts typing
-        if (errors[name]) {
-            setErrors(prev => ({ ...prev, [name]: '' }));
-        }
+        if (errors[name]) setErrors(prev => ({ ...prev, [name]: '' }));
     };
 
     const validateForm = () => {
         const newErrors = {};
 
-        if (!formData.firstName.trim()) {
-            newErrors.firstName = 'First name is required';
-        }
-
-        if (!formData.lastName.trim()) {
-            newErrors.lastName = 'Last name is required';
-        }
-
-        if (!formData.gender) {
-            newErrors.gender = 'Gender is required';
-        }
-
-        if (!formData.email) {
-            newErrors.email = 'Email is required';
-        } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
-            newErrors.email = 'Please enter a valid email';
-        }
-
-        if (!formData.contactNumber) {
-            newErrors.contactNumber = 'Contact number is required';
-        } else if (!/^\d{10,11}$/.test(formData.contactNumber.replace(/\D/g, ''))) {
-            newErrors.contactNumber = 'Please enter a valid contact number';
-        }
-
-        if (!formData.birthday) {
-            newErrors.birthday = 'Birthday is required';
-        }
-
-        if (!formData.password) {
-            newErrors.password = 'Password is required';
-        } else if (formData.password.length < 6) {
-            newErrors.password = 'Password must be at least 6 characters';
-        }
+        if (!formData.firstName.trim()) newErrors.firstName = 'First name is required';
+        if (!formData.lastName.trim()) newErrors.lastName = 'Last name is required';
+        if (!formData.gender) newErrors.gender = 'Gender is required';
+        if (!formData.email) newErrors.email = 'Email is required';
+        else if (!/\S+@\S+\.\S+/.test(formData.email)) newErrors.email = 'Please enter a valid email';
+        if (!formData.contactNumber) newErrors.contactNumber = 'Contact number is required';
+        else if (!/^\d{10,11}$/.test(formData.contactNumber.replace(/\D/g, ''))) newErrors.contactNumber = 'Please enter a valid contact number';
+        if (!formData.birthday) newErrors.birthday = 'Birthday is required';
+        if (!formData.password) newErrors.password = 'Password is required';
+        else if (formData.password.length < 6) newErrors.password = 'Password must be at least 6 characters';
 
         setErrors(newErrors);
         return Object.keys(newErrors).length === 0;
@@ -78,30 +52,44 @@ function SignUp() {
 
         setIsSubmitting(true);
 
-        // Simulate API call
-        await new Promise(resolve => setTimeout(resolve, 1000));
-
-        const result = register(formData);
-
-        if (result.success) {
-            navigate('/');
+        try {
+            const res = await axios.post('http://localhost:8081/login/signup', formData);
+            alert(res.data.message);
+            navigate('/login'); // Redirect to login page after signup
+        } catch (err) {
+            alert(err.response?.data.message || 'Signup failed');
         }
 
         setIsSubmitting(false);
+    };
+
+    const handleGoogleSignup = async (credentialResponse) => {
+        try {
+            const res = await axios.post('http://localhost:8081/login/google-login', {
+                token: credentialResponse.credential,
+            });
+
+            console.log('Google signup/login response:', res.data);
+            localStorage.setItem('token', res.data.token);
+            alert(`Welcome, ${res.data.firstName}!`);
+            navigate('/'); // Redirect after Google login/signup
+        } catch (err) {
+            console.error('Google signup failed:', err.response?.data || err.message);
+            alert('Google signup/login failed!');
+            console.log(credentialResponse);
+        }
     };
 
     return (
         <div className="signup-page">
             <div className="signup-container">
                 <div className="signup-card">
-                    <h1 className="signup-title">Sign in your Account</h1>
+                    <h1 className="signup-title">Sign up your Account</h1>
                     <p className="signup-subtitle">Unlock Your Skin's True Potential</p>
 
                     <form onSubmit={handleSubmit} className="signup-form">
                         <div className="form-grid">
-                            {/* Left Column */}
                             <div className="form-column">
-                                {/* First Name */}
                                 <div className="form-group">
                                     <label className="form-label">First Name</label>
                                     <input
@@ -115,7 +103,6 @@ function SignUp() {
                                     {errors.firstName && <span className="error-text">{errors.firstName}</span>}
                                 </div>
 
-                                {/* Last Name */}
                                 <div className="form-group">
                                     <label className="form-label">Last Name</label>
                                     <input
@@ -129,7 +116,6 @@ function SignUp() {
                                     {errors.lastName && <span className="error-text">{errors.lastName}</span>}
                                 </div>
 
-                                {/* Gender */}
                                 <div className="form-group">
                                     <label className="form-label">Gender</label>
                                     <select
@@ -146,7 +132,6 @@ function SignUp() {
                                     {errors.gender && <span className="error-text">{errors.gender}</span>}
                                 </div>
 
-                                {/* Email */}
                                 <div className="form-group">
                                     <label className="form-label">Email Address</label>
                                     <input
@@ -161,9 +146,7 @@ function SignUp() {
                                 </div>
                             </div>
 
-                            {/* Right Column */}
                             <div className="form-column">
-                                {/* Middle Name */}
                                 <div className="form-group">
                                     <label className="form-label">Middle Name</label>
                                     <input
@@ -176,7 +159,6 @@ function SignUp() {
                                     />
                                 </div>
 
-                                {/* Contact Number */}
                                 <div className="form-group">
                                     <label className="form-label">Contact Number</label>
                                     <input
@@ -190,23 +172,18 @@ function SignUp() {
                                     {errors.contactNumber && <span className="error-text">{errors.contactNumber}</span>}
                                 </div>
 
-                                {/* Birthday */}
                                 <div className="form-group">
                                     <label className="form-label">Birthday</label>
-                                    <div className="date-input-wrapper">
-                                        <input
-                                            type="date"
-                                            name="birthday"
-                                            value={formData.birthday}
-                                            onChange={handleChange}
-                                            placeholder="DD/MM/YYYY"
-                                            className={`form-input ${errors.birthday ? 'error' : ''}`}
-                                        />
-                                    </div>
+                                    <input
+                                        type="date"
+                                        name="birthday"
+                                        value={formData.birthday}
+                                        onChange={handleChange}
+                                        className={`form-input ${errors.birthday ? 'error' : ''}`}
+                                    />
                                     {errors.birthday && <span className="error-text">{errors.birthday}</span>}
                                 </div>
 
-                                {/* Password */}
                                 <div className="form-group">
                                     <label className="form-label">Password</label>
                                     <div className="password-wrapper">
@@ -224,17 +201,7 @@ function SignUp() {
                                             onClick={() => setShowPassword(!showPassword)}
                                             aria-label={showPassword ? 'Hide password' : 'Show password'}
                                         >
-                                            {showPassword ? (
-                                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                                                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
-                                                    <circle cx="12" cy="12" r="3" />
-                                                </svg>
-                                            ) : (
-                                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                                                    <path d="M17.94 17.94A10.07 10.07 0 0112 20c-7 0-11-8-11-8a18.45 18.45 0 015.06-5.94M9.9 4.24A9.12 9.12 0 0112 4c7 0 11 8 11 8a18.5 18.5 0 01-2.16 3.19m-6.72-1.07a3 3 0 11-4.24-4.24" />
-                                                    <line x1="1" y1="1" x2="23" y2="23" />
-                                                </svg>
-                                            )}
+                                            {showPassword ? 'Hide' : 'Show'}
                                         </button>
                                     </div>
                                     {errors.password && <span className="error-text">{errors.password}</span>}
@@ -242,14 +209,20 @@ function SignUp() {
                             </div>
                         </div>
 
-                        {/* Submit Button */}
                         <button
                             type="submit"
                             className="btn btn-primary submit-btn"
                             disabled={isSubmitting}
                         >
-                            {isSubmitting ? 'Signing up...' : 'Sign in'}
+                            {isSubmitting ? 'Signing up...' : 'Sign up'}
                         </button>
+
+                        <div style={{ marginTop: '20px', textAlign: 'center' }}>
+                            <GoogleLogin
+                                onSuccess={handleGoogleSignup}
+                                onError={() => console.log('Google signup/login failed')}
+                            />
+                        </div>
                     </form>
 
                     <p className="signup-footer">
