@@ -8,13 +8,18 @@ import spaTreatment from '../images/spa-treatment.png';
 function CartSidebar() {
     const [isOpen, setIsOpen] = useState(false);
     const [cartItems, setCartItems] = useState([]);
-    const [activeStatus, setActiveStatus] = useState('Scheduled');
+    const [activeStatus, setActiveStatus] = useState('Pending');
+    const [fetchError, setFetchError] = useState('');
 
     const navigate = useNavigate();
 
     const getScheduledAppointments = async () => {
         try {
             const token = localStorage.getItem('token');
+            if (!token) {
+                setFetchError('You need to log in to view appointments.');
+                return;
+            }
             const res = await axios.get(
                 'http://localhost:8081/website/services/getScheduledAppointments',
                 {
@@ -22,8 +27,11 @@ function CartSidebar() {
                 }
             );
             setCartItems(res.data || []);
+            setFetchError('');
         } catch (error) {
             console.error('Failed to fetch scheduled appointments', error);
+            const msg = error.response?.data?.message || 'Failed to fetch scheduled appointments';
+            setFetchError(msg);
         }
     };
 
@@ -57,9 +65,12 @@ function CartSidebar() {
         }
     };
 
-    const filteredItems = cartItems.filter(item => item.status === activeStatus);
+    const filteredItems = cartItems.filter(item => {
+        const status = (item.status || 'Pending').toLowerCase();
+        return status === activeStatus.toLowerCase();
+    });
 
-    const getTotalItems = () => filteredItems.length;
+    const getTotalItems = () => cartItems.length;
 
     const getTotalPrice = () =>
         filteredItems

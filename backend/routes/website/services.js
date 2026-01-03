@@ -37,8 +37,8 @@ router.post('/website-appointment', webVerifyToken, (req, res) => {
 
     const insertRequest = (patientId) => {
       const q = `
-        INSERT INTO requests (patient_id, service_requested, preferred_date, preferred_time)
-        VALUES (?, ?, ?, ?)
+        INSERT INTO requests (patient_id, service_requested, preferred_date, preferred_time, status)
+        VALUES (?, ?, ?, ?, 'Pending')
       `;
       db.query(q, [patientId, serviceAvailed, preferredDate, preferredTime], (err) => {
         if (err) return res.status(500).json(err);
@@ -50,22 +50,45 @@ router.post('/website-appointment', webVerifyToken, (req, res) => {
       // Patient exists
       insertRequest(patients[0].id);
     } else {
-      // Patient doesn't exist → create one
+      // Patient doesn't exist for this user → reuse or create by email
       db.query("SELECT * FROM website_users WHERE id = ?", [userId], (err, users) => {
         if (err || users.length === 0) return res.status(404).json({ message: "User not found" });
 
         const user = users[0];
         const patientName = `${user.firstName} ${user.lastName}`;
+        const userEmail = user.email;
+        const userGender = user.gender || null;
 
-        db.query(
-          "INSERT INTO patients (name, email, gender, user_id) VALUES (?, ?, ?, ?)",
-          [patientName, user.email, user.gender, user.id],
-          (err, result) => {
-            if (err) return res.status(500).json(err);
+        // First try to reuse an existing patient by email
+        db.query("SELECT id FROM patients WHERE email = ? LIMIT 1", [userEmail], (err, emailPatient) => {
+          if (err) return res.status(500).json(err);
 
-            insertRequest(result.insertId); // now insert into requests
+          if (emailPatient.length > 0) {
+            const existingPatientId = emailPatient[0].id;
+
+            // If the patient is not yet linked to this website user, link it
+            db.query(
+              "UPDATE patients SET user_id = ? WHERE id = ? AND (user_id IS NULL OR user_id <> ?)",
+              [user.id, existingPatientId, user.id],
+              () => {
+                // Even if update fails silently, continue to insert the request
+                return insertRequest(existingPatientId);
+              }
+            );
+            return; // prevent double send
           }
-        );
+
+          // Otherwise create a new patient
+          db.query(
+            "INSERT INTO patients (name, email, gender, user_id) VALUES (?, ?, ?, ?)",
+            [patientName, userEmail, userGender, user.id],
+            (err, result) => {
+              if (err) return res.status(500).json(err);
+
+              insertRequest(result.insertId); // now insert into requests
+            }
+          );
+        });
       });
     }
   });

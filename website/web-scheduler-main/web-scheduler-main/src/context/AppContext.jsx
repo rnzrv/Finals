@@ -30,6 +30,22 @@ export function AppProvider({ children }) {
 
     const [fetchedServices, setFetchedServices] = useState([]);
 
+    // Hydrate auth state from storage on load
+    useEffect(() => {
+        const storedToken = localStorage.getItem('token');
+        const storedUser = localStorage.getItem('user');
+        if (storedToken) {
+            setIsAuthenticated(true);
+            if (storedUser) {
+                try {
+                    setUser(JSON.parse(storedUser));
+                } catch {
+                    // ignore parse errors
+                }
+            }
+        }
+    }, []);
+
      useEffect(() => {
         axios.get('http://localhost:8081/website/services/getServices')
             .then(response => {
@@ -66,6 +82,7 @@ export function AppProvider({ children }) {
                 firstName: data.firstName,
                 lastName: data.lastName,
             };
+            localStorage.setItem('user', JSON.stringify(userData));
             setUser(userData);
             setIsAuthenticated(true);
             return { success: true, user: userData };
@@ -85,6 +102,7 @@ export function AppProvider({ children }) {
             firstName: data.firstName,
             lastName: data.lastName,
         };
+        localStorage.setItem('user', JSON.stringify(userData));
         setUser(userData);
         setIsAuthenticated(true);
         return { success: true, user: userData };
@@ -97,6 +115,7 @@ export function AppProvider({ children }) {
             id: Date.now(),
             ...userData,
         };
+        localStorage.setItem('user', JSON.stringify(newUser));
         setUser(newUser);
         setIsAuthenticated(true);
         return { success: true, user: newUser };
@@ -106,6 +125,8 @@ export function AppProvider({ children }) {
     const logout = useCallback(() => {
         setUser(null);
         setIsAuthenticated(false);
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
     }, []);
 
     // Book an appointment

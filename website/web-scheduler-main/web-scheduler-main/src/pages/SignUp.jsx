@@ -20,6 +20,8 @@ function SignUp() {
     const [showPassword, setShowPassword] = useState(false);
     const [errors, setErrors] = useState({});
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const [apiError, setApiError] = useState('');
+    const [toast, setToast] = useState(null); // { message, type }
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -51,13 +53,16 @@ function SignUp() {
         if (!validateForm()) return;
 
         setIsSubmitting(true);
+        setApiError('');
 
         try {
             const res = await axios.post('http://localhost:8081/login/signup', formData);
-            alert(res.data.message);
+            setToast({ message: res.data.message || 'Signup successful', type: 'success' });
             navigate('/login'); // Redirect to login page after signup
         } catch (err) {
-            alert(err.response?.data.message || 'Signup failed');
+            const msg = err.response?.data?.message || 'Signup failed';
+            setApiError(msg);
+            setToast({ message: msg, type: 'error' });
         }
 
         setIsSubmitting(false);
@@ -217,6 +222,10 @@ function SignUp() {
                             {isSubmitting ? 'Signing up...' : 'Sign up'}
                         </button>
 
+                        {apiError && (
+                            <p className="signup-api-error">{apiError}</p>
+                        )}
+
                         <div style={{ marginTop: '20px', textAlign: 'center' }}>
                             <GoogleLogin
                                 onSuccess={handleGoogleSignup}
@@ -230,6 +239,12 @@ function SignUp() {
                     </p>
                 </div>
             </div>
+
+            {toast && (
+                <div className={`signup-toast ${toast.type}`}>
+                    {toast.message}
+                </div>
+            )}
         </div>
     );
 }

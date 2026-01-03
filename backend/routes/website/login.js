@@ -118,35 +118,43 @@ router.post('/signup', async (req, res) => {
     const name = `${firstName} ${middleName} ${lastName}`;
     const age = new Date().getFullYear() - new Date(birthday).getFullYear();
 
-    const validateFunction = () => {
-        if (age < 0 || isNaN(age)) {
-            return res.status(400).json({ message: 'Invalid birthday' });
-        }
+    const validationError = (() => {
+        if (!birthday || age < 0 || isNaN(age)) return 'Invalid birthday';
 
-        if (!['Male', 'Female', 'Other'].includes(gender)) {
-            return res.status(400).json({ message: 'Invalid gender' });
-        }
+        const normalizedGender = (gender || '').toLowerCase();
+        if (!['male', 'female', 'other'].includes(normalizedGender)) return 'Invalid gender';
 
-        if (!/^[\w.-]+@[a-zA-Z\d.-]+\.[a-zA-Z]{2,}$/.test(email)) {
-            return res.status(400).json({ message: 'Invalid email format' });
-        }
+        if (!email || !/^[\w.-]+@[a-zA-Z\d.-]+\.[a-zA-Z]{2,}$/.test(email)) return 'Invalid email format';
 
-        if (password.length < 6) {
-            return res.status(400).json({ message: 'Password must be at least 6 characters' })
-        }
+        if (!password || password.length < 6) return 'Password must be at least 6 characters';
 
-        
+        if (!firstName || !lastName) return 'First and last name are required';
+
+        return null;
+    })();
+
+    if (validationError) {
+        return res.status(400).json({ message: validationError });
     }
-    const quer = `INSERT INTO website_users (firstName, middleName, lastName, email, gender, password) VALUES (?, ?, ?, ?, ?, ?)`;
-    
-    db.query(quer, [firstName, middleName, lastName, email, gender, hashedPassword], (err, result) => {
+
+    // Check if email already exists before inserting
+    db.query('SELECT id FROM website_users WHERE email = ? LIMIT 1', [email], (err, rows) => {
         if (err) return res.status(500).json({ message: err.message });
-        
-        // Only insert into patients after first insert succeeds
-        const q = 'INSERT INTO patients (name, email, contact_number, age, gender) VALUES (?, ?, ?, ?, ?)';
-        db.query(q, [name, email, contactNumber, age, gender], (err, result) => {
+        if (rows.length > 0) {
+            return res.status(409).json({ message: 'Email already registered' });
+        }
+
+        const quer = `INSERT INTO website_users (firstName, middleName, lastName, email, gender, password) VALUES (?, ?, ?, ?, ?, ?)`;
+
+        db.query(quer, [firstName, middleName, lastName, email, gender, hashedPassword], (err, result) => {
             if (err) return res.status(500).json({ message: err.message });
-            res.status(201).json({ message: 'User registered successfully' });
+            
+            // Only insert into patients after first insert succeeds
+            const q = 'INSERT INTO patients (name, email, contact_number, age, gender) VALUES (?, ?, ?, ?, ?)';
+            db.query(q, [name, email, contactNumber, age, gender], (err, result) => {
+                if (err) return res.status(500).json({ message: err.message });
+                res.status(201).json({ message: 'User registered successfully' });
+            });
         });
     });
 });

@@ -9,7 +9,7 @@ import Reports from "./reports";
 import PointofSales from "./pointofSales";
 import ProtectedRoute from "./protectedRoute";
 import Settings from "./settings";
-import LogoutPage from "./LogoutPage";
+import LogoutPage from "./logoutPage.jsx";
 import RoleProtectedRoute from "./roleProtectedRoute.jsx";
 import SalesHistory from "./salesHistory.jsx";
 function App() {
