@@ -5,6 +5,8 @@ import search from "../icons/search.svg"
 import React, {useState, useEffect} from "react";
 import axios from "axios";
 import RequestAppointment from "./modals/appointment/requestappointment";
+import Notification from './modals/notification/notification';
+import LogoutModal from "./modals/logout/logout";
 function Appointments() {
 
   const Months = [
@@ -16,9 +18,10 @@ function Appointments() {
 
   const [selectedMonth, setSelectedMonth] = useState(Months[new Date().getMonth()]);
   const [selectedWeek, setSelectedWeek] = useState(Math.ceil(new Date().getDate() / 7));
-
+  const [showLogoutModal, setShowLogoutModal] = useState(false);
   const currentYear = new Date().getFullYear();
   const [daysInMonth, setDaysInMonth] = useState([]);
+  const role = sessionStorage.getItem("role") || localStorage.getItem("role");
 
   const Week = [1, 2, 3, 4, 5];
 
@@ -91,6 +94,20 @@ function Appointments() {
     fetchAppointments();
   }, []);
 
+  const handleCloseClick = async (appointmentId) => {
+    try {
+      const token = sessionStorage.getItem("accessToken");
+      await axios.delete(`http://localhost:8081/appointments/cancelAppointment/${appointmentId}`, {
+        withCredentials: true,
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      setAppointments((prev) => prev.filter((a) => a.id !== appointmentId));
+      console.log('Appointment cancelled:', appointmentId);
+    } catch (error) {
+      console.error('Error cancelling appointment:', error);
+    }
+  };
+
   const getAppointment = (time, day) => {
     // day format: "05 Fri", we need to extract day number and match with date
     const dayNum = parseInt(day.split(' ')[0]);
@@ -122,9 +139,16 @@ function Appointments() {
       <div className="inventory-content">
         <header>
           <h2>APPOINTMENT</h2>
-          <div className="dashboard-account">
-            <img src={user} alt="Admin Icon" />
-            <p>Admin</p>
+          <div className="inventory-account">
+            <Notification /> 
+
+            <button onClick={() => setShowLogoutModal(true)}
+            
+              className="inventory-user-btn">
+            <img src={user} alt="Admin Icon"/>
+            
+            <p>{role}</p>
+            </button>
           </div>
         </header>
 
@@ -153,7 +177,7 @@ function Appointments() {
 
                 </div>
                 
-                <div className="week">Week</div>
+                <div className="week">Week
                 {/* Choose week number ( 1 - 4 or 5?) */}
                     <select name="week" id="week" value={selectedWeek} onChange={(e) => setSelectedWeek(Number(e.target.value))}>
                       
@@ -161,11 +185,10 @@ function Appointments() {
                         <option key={index} value={weekNumber}>{weekNumber}</option>
                       ))}
                     </select>
+                  </div>
                 
             </div>
             <div className="search-bar">
-              <input type="text" placeholder="Search by Appointment" />
-              <span className="search-icon"><img src={search} alt="" /></span>
              
               <RequestAppointment />
             </div>
@@ -198,7 +221,7 @@ function Appointments() {
                             color: appointment.status === 'Scheduled' ? '#333' : '#fff',
                           }}
                         >
-                          <div>{appointment.doctorName}</div>
+                          <div className="close-button"><button onClick={() => handleCloseClick(appointment.id)}>X</button></div>
                           <div className="session">{appointment.sessionType}</div>
                           <div className="patient">{appointment.patientName}</div>
                         </div>
@@ -208,6 +231,17 @@ function Appointments() {
                 })}
               </div>
             ))}
+
+            {showLogoutModal && (
+                <LogoutModal
+                  open={showLogoutModal}
+                  onCancel={() => setShowLogoutModal(false)}
+                  onConfirm={() => {
+                    sessionStorage.clear();
+                    window.location.href = "/";
+                  }}
+                />
+              )}
           </div>
         </div>
       </div>

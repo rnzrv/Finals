@@ -3,6 +3,7 @@ import { createPortal } from 'react-dom';
 import axios from 'axios';
 import check from '../../../icons/checkbook.svg';
 import '../../../css/modal/inventory/edit.css';
+import x from '../../../icons/x.svg';
 
 function toDateInput(value) {
   if (!value) return '';
@@ -22,6 +23,7 @@ function InventoryEditAction({ item, onUpdate }) {
   const [isOpen, setIsOpen] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
+  const [logoFile, setLogoFile] = useState(null);
 
   const [formData, setFormData] = useState({
     itemName: item.itemName || '',
@@ -75,6 +77,26 @@ function InventoryEditAction({ item, onUpdate }) {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
+  const handleFileChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      // Validate file type
+      if (!file.type.match(/^image\/(png|jpe?g|gif|webp)$/)) {
+        setErrorMessage('Only image files (png, jpg, jpeg, gif, webp) are allowed');
+        e.target.value = '';
+        return;
+      }
+      // Validate file size (5MB)
+      if (file.size > 5 * 1024 * 1024) {
+        setErrorMessage('File size must be less than 5MB');
+        e.target.value = '';
+        return;
+      }
+      setLogoFile(file);
+      setErrorMessage('');
+    }
+  };
+
   const editProductHandle = async (e) => {
     e.preventDefault();
     if (!validate()) return;
@@ -82,22 +104,30 @@ function InventoryEditAction({ item, onUpdate }) {
     setSubmitting(true);
     try {
       const token = sessionStorage.getItem('accessToken');
-      const payload = {
-        itemName: formData.itemName.trim(),
-        brand: formData.brand.trim(),
-        code: formData.code.trim(),
-        costUnit: Number(formData.costUnit),
-        sellingPrice: Number(formData.sellingPrice),
-        category: formData.category.trim(),
-        quantity: Number(formData.quantity),
-        expiryDate: formData.expiryDate || null,
-        logo: formData.logo || null,
-      };
+
+      const fd = new FormData();
+      fd.append('itemName', formData.itemName.trim());
+      fd.append('brand', formData.brand.trim());
+      fd.append('code', formData.code.trim());
+      fd.append('costUnit', Number(formData.costUnit));
+      fd.append('sellingPrice', Number(formData.sellingPrice));
+      fd.append('category', formData.category.trim());
+      fd.append('quantity', Number(formData.quantity));
+      fd.append('expiryDate', formData.expiryDate || '');
+
+      if (logoFile) {
+        fd.append('logo', logoFile);
+      }
 
       await axios.put(
         `http://localhost:8081/inventory/updateInventory/${item.itemId}`,
-        payload,
-        { headers: { Authorization: `Bearer ${token}` } }
+        fd,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'multipart/form-data',
+          },
+        }
       );
 
       onUpdate && onUpdate();
@@ -110,113 +140,143 @@ function InventoryEditAction({ item, onUpdate }) {
     }
   };
 
+
   const inventoryEditModal = (
     <div className="inventory-edit-action-modal-overlay">
       <div className="inventory-edit-action-modal">
         <div className="inventory-edit-modal-header">
           <h2 className="inventory-edit-action-modal-header">Edit Inventory Item</h2>
+           <button className="inventory-edit-close" onClick={() => setIsOpen(false)}>
+              <img src={x} alt="Close" />
+        </button>
         </div>
 
         <div className="inventory-edit-action-modal-body">
           {errorMessage && <div className="inv-edit-error">{errorMessage}</div>}
 
           <form className="inventory-action-form" onSubmit={editProductHandle}>
-            <div className="inventory-edit-action-left">
-              <label>
-                Item Name:
-                <input
-                  type="text"
-                  name="itemName"
-                  value={formData.itemName}
-                  onChange={handleChange}
-                  required
-                />
-              </label>
+            <div className="inv-act-edit-whole">
+              <div className="inv-act-edit-top">
+                <div className="inventory-edit-action-left">
+                      <label>
+                        Item Name:
+                        <input
+                          type="text"
+                          name="itemName"
+                          value={formData.itemName}
+                          onChange={handleChange}
+                          required
+                        />
+                      </label>
 
-              <label>
-                Brand:
-                <input
-                  type="text"
-                  name="brand"
-                  value={formData.brand}
-                  onChange={handleChange}
-                  required
-                />
-              </label>
-            </div>
+                      <label>
+                        Brand:
+                        <input
+                          type="text"
+                          name="brand"
+                          value={formData.brand}
+                          onChange={handleChange}
+                          required
+                        />
+                      </label>
+                    
 
-            <div className="inventory-edit-action-middle">
-              <label>
-                Code:
-                <input
-                  type="text"
-                  name="code"
-                  value={formData.code}
-                  onChange={handleChange}
-                  required
-                />
-              </label>
+                      <label>
+                        Code:
+                        <input
+                          type="text"
+                          name="code"
+                          value={formData.code}
+                          onChange={handleChange}
+                          required
+                        />
+                      </label>
 
-              <label>
-                Cost Unit:
-                <input
-                  type="number"
-                  name="costUnit"
-                  value={formData.costUnit}
-                  onChange={handleChange}
-                  min="0"
-                  step="0.01"
-                  required
-                />
-              </label>
+                      <label>
+                        Cost Unit:
+                        <input
+                          type="number"
+                          name="costUnit"
+                          value={formData.costUnit}
+                          onChange={handleChange}
+                          min="0"
+                          step="0.01"
+                          required
+                        />
+                      </label>
+                    </div>
 
-              <label>
-                Selling Price:
-                <input
-                  type="number"
-                  name="sellingPrice"
-                  value={formData.sellingPrice}
-                  onChange={handleChange}
-                  min="0"
-                  step="0.01"
-                  required
-                />
-              </label>
+                    <div className="inventory-edit-action-right">
+                      <label>
+                        Selling Price:
+                        <input
+                          type="number"
+                          name="sellingPrice"
+                          value={formData.sellingPrice}
+                          onChange={handleChange}
+                          min="0"
+                          step="0.01"
+                          required
+                        />
+                      </label>
 
-              <label>
-                Category:
-                <input
-                  type="text"
-                  name="category"
-                  value={formData.category}
-                  onChange={handleChange}
-                  required
-                />
-              </label>
+                      <label>
+                        Category:
+                        <input
+                          type="text"
+                          name="category"
+                          value={formData.category}
+                          onChange={handleChange}
+                          required
+                        />
+                      </label>
 
-              <label>
-                Quantity:
-                <input
-                  type="number"
-                  name="quantity"
-                  value={formData.quantity}
-                  onChange={handleChange}
-                  min="0"
-                  step="1"
-                  required
-                />
-              </label>
+                      <label>
+                        Quantity:
+                        <input
+                          type="number"
+                          name="quantity"
+                          value={formData.quantity}
+                          onChange={handleChange}
+                          min="0"
+                          step="1"
+                          required
+                        />
+                      </label>
 
-              <label>
-                Expiry Date:
-                <input
-                  type="date"
-                  name="expiryDate"
-                  value={formData.expiryDate}
-                  onChange={handleChange}
-                />
-              </label>
-            </div>
+                      <label>
+                        Expiry Date:
+                        <input
+                          type="date"
+                          name="expiryDate"
+                          value={formData.expiryDate}
+                          onChange={handleChange}
+                        />
+                      </label>
+
+                    </div>
+                </div>
+                <div className="inventory-edit-action-bottom">
+                  <label>
+                            Logo (Image File)
+                            <input
+                              type="file"
+                              name="logoFile"
+                              accept="image/png,image/jpeg,image/jpg,image/gif,image/webp"
+                              onChange={handleFileChange}
+                            />
+                            {formData.logo && !logoFile && (
+                              <small style={{ display: 'block', marginTop: '4px', color: '#666' }}>
+                                Current: {formData.logo.split('/').pop()}
+                              </small>
+                            )}
+                            {logoFile && (
+                              <small style={{ display: 'block', marginTop: '4px', color: '#4CAF50' }}>
+                                New file selected: {logoFile.name}
+                              </small>
+                            )}
+                  </label>
+                </div>
 
             <div className="inventory-edit-actions">
               <button type="button" onClick={() => setIsOpen(false)} disabled={submitting}>
@@ -226,12 +286,11 @@ function InventoryEditAction({ item, onUpdate }) {
                 {submitting ? 'Saving...' : 'Save'}
               </button>
             </div>
+          </div>
           </form>
         </div>
 
-        <button className="inventory-edit-close" onClick={() => setIsOpen(false)}>
-          Close
-        </button>
+       
       </div>
     </div>
   );

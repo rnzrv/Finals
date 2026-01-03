@@ -12,6 +12,9 @@ import EditPatients from "./modals/modal-EditPatients.jsx";
 import DeletePatient from "./modals/modal-deletepatient.jsx";
 import ModalSchedulePatient from "./modals/modal-schedulePatient.jsx";
 import ModalPatientHistory from "./modals/modal-patientHistory.jsx";
+import Notification from './modals/notification/notification';
+import LogoutModal from './modals/logout/logout.jsx';
+
 
 function Patients() {
   const [patients, setPatients] = useState([]);
@@ -19,6 +22,7 @@ function Patients() {
   const [appointments, setAppointments] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [latestVisitData, setLastVisitData] = useState({});
+  const [inactiveCount, setInactiveCount] = useState(0);
   const [stats, setStats] = useState({
     total_patients: 0,
     scheduled_today: 0,
@@ -113,6 +117,27 @@ function Patients() {
     fetchStats();
   }, [patients, appointments]);
 
+  // ✅ Compute inactive patients based on last visit (90+ days) or no visit
+  useEffect(() => {
+    if (!patients || patients.length === 0) {
+      setInactiveCount(0);
+      return;
+    }
+
+    const THRESHOLD_DAYS = 90;
+    const now = new Date();
+
+    const count = patients.reduce((acc, patient) => {
+      const lastVisit = latestVisitData[patient.id]?.last_visit;
+      if (!lastVisit) return acc + 1; // no visit recorded => inactive
+
+      const diffDays = (now - new Date(lastVisit)) / (1000 * 60 * 60 * 24);
+      return diffDays > THRESHOLD_DAYS ? acc + 1 : acc;
+    }, 0);
+
+    setInactiveCount(count);
+  }, [patients, latestVisitData]);
+
   // ✅ Search
   const handleSearch = (e) => {
     const query = e.target.value.toLowerCase();
@@ -140,15 +165,32 @@ function Patients() {
   const currentPatients = filteredPatients.slice(indexOfFirstPatient, indexOfLastPatient);
   const totalPages = Math.ceil(filteredPatients.length / patientsPerPage);
 
+  const isInactiveByDate = (lastVisit) => {
+    if (!lastVisit) return true;
+    const THRESHOLD_DAYS = 30;
+    const diffDays = (new Date() - new Date(lastVisit)) / (1000 * 60 * 60 * 24);
+    return diffDays > THRESHOLD_DAYS;
+  };
+
+  const role = sessionStorage.getItem("role") || localStorage.getItem("role");
+  const [showLogoutModal, setShowLogoutModal] = useState(false);
+
   return (
     <div className="patients">
       <Sidebar />
       <div className="dashboard-content">
         <header>
           <h2>PATIENTS</h2>
-          <div className="dashboard-account">
-            <img src={user} alt="Admin Icon" />
-            <p>Admin</p>
+          <div className="inventory-account">
+            <Notification /> 
+
+            <button onClick={() => setShowLogoutModal(true)}
+            
+              className="inventory-user-btn">
+            <img src={user} alt="Admin Icon"/>
+            
+            <p>{role}</p>
+            </button>
           </div>
         </header>
 
@@ -166,6 +208,10 @@ function Patients() {
             <div className="card-patients">
               <p>New This Week</p>
               <h3>{stats.new_this_week}</h3>
+            </div>
+            <div className="card-patients">
+              <p>Inactive</p>
+              <h3>{inactiveCount}</h3>
             </div>
           </div>
 
@@ -193,7 +239,15 @@ function Patients() {
                   </div>
                   <div className="patients-info-header-right">
                     <h1>{patient.name}</h1>
-                    <h3>Status</h3>
+                    {(() => {
+                      const lastVisit = latestVisitData[patient.id]?.last_visit;
+                      const inactive = isInactiveByDate(lastVisit);
+                      return (
+                        <span className={`status-pill ${inactive ? "status-inactive" : "status-active"}`}>
+                          {inactive ? "Inactive" : "Active"}
+                        </span>
+                      );
+                    })()}
                   </div>
                 </div>
 
@@ -210,8 +264,7 @@ function Patients() {
                     <div className="data patients-last-visit">
                       <img src={calendar} alt="" />
                       <p>
-                        Last visit:{" "}
-                        {latestVisitData[patient.id]?.last_visit
+                        Last visit: {latestVisitData[patient.id]?.last_visit
                           ? new Date(latestVisitData[patient.id].last_visit).toLocaleDateString()
                           : "N/A"}
                       </p>
@@ -247,6 +300,16 @@ function Patients() {
               Next
             </button>
           </div>
+          {showLogoutModal && (
+                <LogoutModal
+                  open={showLogoutModal}
+                  onCancel={() => setShowLogoutModal(false)}
+                  onConfirm={() => {
+                    sessionStorage.clear();
+                    window.location.href = "/";
+                  }}
+                />
+              )}
         </div>
       </div>
     </div>

@@ -57,6 +57,7 @@
   justify-content: space-between;
   align-items: center;
   padding: 20px;
+  
 }
 
 .appointment-header .left{
@@ -161,6 +162,7 @@
   padding: 6px;
   font-size: 12px;
   text-align: center;
+  position: relative;
 }
 
 .appointment-box .session {
@@ -183,3 +185,61 @@
     font-size: 18px;
   }
 }
+
+.appointment-header .month,
+.appointment-header .week {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.appointment-header .left .month select,
+.appointment-header .left .week select {
+  padding: 5px;
+  border-radius: 5px;
+  border: 1px solid var(--primary-color--);
+  outline: none;
+}
+
+.appointment-box .close-button{
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  margin: 0;
+  width: 28px;
+  height: 28px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.close-button{
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.close-button button{
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background-color: transparent;
+  border: none;
+  color: rgba(206, 3, 3, 0.95);
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.15);
+  cursor: pointer;
+}
+
+.close-button button:hover{
+  background-color: rgba(206, 3, 3, 0.1);
+}
+

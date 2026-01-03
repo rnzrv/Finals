@@ -71,7 +71,7 @@ function DeletePatient({ patient, onPatientDeleted }) {
             <div className="delete-modal">
                 <h2>Delete Patient</h2>
                 <p className={`message ${messageType}`}>{Message}</p>
-                <p>Are you sure you want to delete this patient?</p>
+                <p className='deleteP' >Are you sure you want to delete this patient?</p>
                 <div className="delete-modal-actions">
                     <button onClick={handleDelete}>Yes, Delete</button>
                     <button onClick={() => setIsOpen(false)}>Cancel</button>
@@ -84,8 +84,8 @@ function DeletePatient({ patient, onPatientDeleted }) {
 
   return (
     <>
-        <button className="patients-card-button" onClick={()=>setIsOpen(true)}>
-            Delete Patient
+        <button className="patients-card-button delete" onClick={()=>setIsOpen(true)}>
+            Delete
         </button>
 
         {isMounted && createPortal(modalContent, document.body)}

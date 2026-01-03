@@ -161,9 +161,9 @@ function EditPatients({ patient, onPatientUpdated }) {
     }
   };
 
-  // Modal open with validation
+  // Modal open (allow opening even if some fields are empty; they can be edited)
   const handleOpenModal = () => {
-    if (!patient || !patient.id || !patient.name || !patient.email || !patient.contact_number) {
+    if (!patient || !patient.id) {
       setMessage("Invalid patient data");
       setMessageType("error");
       return;
@@ -290,7 +290,7 @@ function EditPatients({ patient, onPatientUpdated }) {
 
   return (
     <>
-      <button ref={openButtonRef} className="patients-card-button" onClick={handleOpenModal}>
+      <button ref={openButtonRef} className="patients-card-button edit" onClick={handleOpenModal}>
         Edit
       </button>
 

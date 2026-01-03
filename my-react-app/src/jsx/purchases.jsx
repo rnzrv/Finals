@@ -12,16 +12,19 @@ import PurchaseEditModal from "./modals/purchase-modal/edit.jsx";
 import React, {useState, useEffect} from 'react';
 import AddProduct from './modals/inventory-modal/modal-addProduct.jsx';
 import axios from 'axios';
-
+import Notification from './modals/notification/notification';
+import LogoutModal from './modals/logout/logout.jsx';
 function Purchases() {
   const [purchases, setPurchases] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
+  const role = sessionStorage.getItem("role") || localStorage.getItem("role");
+  const [showLogoutModal, setShowLogoutModal] = useState(false);
 
   // pagination
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 10;
+  const itemsPerPage = 14;
 
   const handleGetPurchases = async () => {
     try {
@@ -148,8 +151,15 @@ function Purchases() {
         <header>
           <h2>PURCHASES</h2>
           <div className="inventory-account">
-            <img src={user} alt="Admin Icon" />
-            <p>Admin</p>
+            <Notification /> 
+
+            <button onClick={() => setShowLogoutModal(true)}
+            
+              className="inventory-user-btn">
+            <img src={user} alt="Admin Icon"/>
+            
+            <p>{role}</p>
+            </button>
           </div>
         </header>
 
@@ -166,9 +176,9 @@ function Purchases() {
                   value={startDate}
                   onChange={(e) => setStartDate(e.target.value)}
                 />
-
-              
-
+                <span>
+                  -
+                </span>
                 <input
                   type="date"
                   value={endDate}
@@ -178,12 +188,13 @@ function Purchases() {
 
               
             </div>
+            <div className="period-export">
+              <AddProduct onProductAdded={handleGetPurchases} />
 
-            <AddProduct onProductAdded={handleGetPurchases} />
-
-            <button className="inventory-export-btn" onClick={handleExportCSV}>
-              Export <img src={dropDown} alt="Dropdown Icon" />
-            </button>
+              <button className="inventory-export-btn" onClick={handleExportCSV}>
+                Export <img src={dropDown} alt="Dropdown Icon" />
+              </button>
+            </div>
           </div>
 
           <div className="inventory-data">
@@ -211,8 +222,6 @@ function Purchases() {
                     <th>Quantity</th>
                     <th>Grand Total</th>
                     <th>Expiry Date</th>
-                    <th>Category</th>
-                    <th>Action</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -225,13 +234,7 @@ function Purchases() {
                       <td className="inventory-item-text">{item?.quantity ?? 0}</td>
                       <td className="inventory-item-text">₱{Number(item?.grandTotal ?? 0).toFixed(2)}</td>
                       <td className="inventory-item-text">{item?.expiryDate ?? ''}</td>
-                      <td className="inventory-item-text">{item?.category ?? ''}</td>
-                      <td>
-                        <div className="inventory-actions-cell">
-                          <PurchaseEditModal item={item} />
-                          <PurchaseDeleteModal item={item} />
-                        </div>
-                      </td>
+                      
                     </tr>
                   ))}
                   {currentItems.length === 0 && (
@@ -253,6 +256,17 @@ function Purchases() {
               Next
             </button>
           </div>
+
+          {showLogoutModal && (
+                <LogoutModal
+                  open={showLogoutModal}
+                  onCancel={() => setShowLogoutModal(false)}
+                  onConfirm={() => {
+                    sessionStorage.clear();
+                    window.location.href = "/";
+                  }}
+                />
+              )}
         </div>
       </div>
     </div>

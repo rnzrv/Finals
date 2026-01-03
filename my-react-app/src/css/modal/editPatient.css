@@ -1,111 +1,177 @@
-/* Overlay for EditPatients modal */
+@import url(../color.css);
+@import url(../fonts.css);
+
 .edit-modal-overlay {
   position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0, 0, 0, 0.5);
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  backdrop-filter: blur(4px);
   display: flex;
   justify-content: center;
   align-items: center;
-  z-index: 10000; /* Higher than AddPatients' z-index: 9999 */
+  z-index: 10000;
   opacity: 0;
-  transition: opacity 0.3s ease;
-  isolation: isolate; /* Prevent parent transforms (e.g., patients-info:hover) */
+  transition: opacity 0.25s ease;
+  padding: 20px;
+  isolation: isolate;
 }
 
-/* Show modal when open */
 .edit-modal-overlay.open {
   opacity: 1;
 }
 
-/* Modal content styling */
 .edit-modal-content {
-  background: white;
-  padding: 20px;
-  border-radius: 8px;
-  width: 400px;
-  max-width: 90%;
-  max-height: 80vh;
+  background: linear-gradient(180deg, #ffffff 0%, #f7fbff 100%);
+  padding: 24px;
+  border-radius: 14px;
+  width: min(520px, 92vw);
+  max-height: 82vh;
   overflow-y: auto;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 14px 40px rgba(0, 0, 0, 0.18);
+  border: 1px solid #e6ecf8;
   font-family: 'DmSans', 'Poppins', sans-serif;
-  transform: none !important; /* Block inherited transforms */
 }
 
-/* Modal header */
 .edit-modal-content h2 {
-  margin-bottom: 20px;
-  font-size: 1.5rem;
-  text-align: center;
-  color: var(--primary-color--);
+  margin: 0 0 14px;
+  font-size: 22px;
+  color: #2f2f2f;
+  text-align: left;
 }
 
-/* Form group styling */
-.form-group {
-  margin-bottom: 15px;
+.edit-modal-content form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
 }
 
-/* Form labels */
-.form-group label {
-  display: block;
-  margin-bottom: 5px;
-  font-weight: 500;
-  color: #5C5C5C;
+.edit-modal-content form label {
+  font-weight: 600;
+  font-size: 13px;
+  color: #4a4a4a;
 }
 
-/* Form inputs */
-.form-group input {
+.edit-modal-content form input,
+.edit-modal-content form select,
+.edit-modal-content form textarea {
   width: 100%;
-  padding: 8px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
+  padding: 10px 12px;
+  border: 1px solid #d9d9d9;
+  border-radius: 10px;
   box-sizing: border-box;
   font-family: 'DmSans', 'Poppins', sans-serif;
+  font-size: 14px;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
-/* Button container */
+.edit-modal-content form input:focus,
+.edit-modal-content form select:focus,
+.edit-modal-content form textarea:focus {
+  outline: none;
+  border-color: var(--primary-color--);
+  box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.18);
+}
+
+.form-group {
+  margin-bottom: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.form-group label {
+  font-weight: 600;
+  font-size: 13px;
+  color: #4a4a4a;
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid #d9d9d9;
+  border-radius: 10px;
+  box-sizing: border-box;
+  font-family: 'DmSans', 'Poppins', sans-serif;
+  font-size: 14px;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+  outline: none;
+  border-color: var(--primary-color--);
+  box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.18);
+}
+
 .edit-modal-buttons {
   display: flex;
   justify-content: flex-end;
   gap: 10px;
-  margin-top: 20px;
+  margin-top: 6px;
 }
 
-/* General button styling */
 .edit-modal-buttons button {
-  padding: 8px 16px;
+  padding: 10px 16px;
   border: none;
-  border-radius: 5px;
+  border-radius: 10px;
   cursor: pointer;
   font-family: 'DmSans', 'Poppins', sans-serif;
-  font-size: 1rem;
-  transition: all 0.3s ease;
+  font-size: 14px;
+  font-weight: 600;
+  transition: all 0.2s ease;
 }
 
-/* Cancel button */
 .edit-modal-buttons button[type="button"] {
-  background-color: #ccc;
-  color: #333;
+  background-color: #f7f7f7;
+  color: #3d3d3d;
+  border: 1px solid #dcdcdc;
 }
 
-/* Save button */
 .edit-modal-buttons button.green {
   background-color: var(--primary-color--);
-  color: white;
+  color: #ffffff;
+  border: 1px solid var(--primary-color--);
 }
 
 .edit-modal-buttons button.green:hover {
-  background-color: white;
-  color: var(--primary-color--);
-  border: 2px solid var(--primary-color--);
+  background-color: #093a08;
+  color: #ffffff;
+  border: 1px solid #093a08;
 }
 
 .message {
   text-align: center;
-  color: white;
-  margin-bottom: 10px;
+  margin: 0 0 12px;
   font-weight: 600;
-  background-color: green;
+  padding: 10px 12px;
+  border-radius: 10px;
+  font-size: 13px;
+}
+
+.message.success {
+  background: #e8f5e9;
+  color: #2e7d32;
+  border: 1px solid #c8e6c9;
+}
+
+.message.error {
+  background: #ffebee;
+  color: #c62828;
+  border: 1px solid #ffcdd2;
+}
+
+.patients-card-button.edit {
+  background-color: var(--primary-color--);
+  color: #ffffff;
+  border: 1px solid var(--primary-color--);
+  font-family: 'Inter', sans-serif;
+}
+
+.patients-card-button.edit:hover {
+  background-color: #093a08;
+  color: #ffffff;
+  border: 1px solid #093a08; 
 }

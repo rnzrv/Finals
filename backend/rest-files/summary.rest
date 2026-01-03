@@ -38,3 +38,14 @@ Content-Type: application/json
 GET http://localhost:8081/website/services/getServices
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MywiZW1haWwiOiJyb256cmVtb3JvemFAZ21haWwuY29tIiwiaWF0IjoxNzY2ODA4Mzg0LCJleHAiOjE3NjY4OTQ3ODR9.y49NnGfLLSzSnG5hKSvDL0nsrs-vMivFqRXjva-hBm0
 Content-Type: application/json
+
+###  
+GET http://localhost:8081/users/user/logo
+Content-Type: application/json
+
+###    
+GET http://localhost:8081/business-profile
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImNlbzEyMyIsInJvbGUiOiJjZW8iLCJpYXQiOjE3Njc0MjA5NTEsImV4cCI6MTc2ODAyNTc1MX0.woptdrxrA2lRm4_jN2D0vrN18N-gYCjHroY9jfUvC_Q
+Content-Type: application/json
+
+

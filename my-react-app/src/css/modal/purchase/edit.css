@@ -83,3 +83,11 @@
 .inventory-edit-action-right input:focus {
     border-color: var(--primary-color--);
 }
+
+.inventory-action-btn.inventory-action-edit{
+    background-color: #fff;
+}
+
+.inventory-action-btn.inventory-action-edit:hover{
+    background-color: #fff;
+}

@@ -7,6 +7,8 @@ function ModalPatientHistory({ patient }) {
   const [isOpen, setIsOpen] = useState(false);
   const [isMounted, setIsMounted] = useState(false);
   const [history, setHistory] = useState([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const PAGE_SIZE = 5;
 
   const openButtonRef = useRef(null);
 
@@ -36,10 +38,22 @@ function ModalPatientHistory({ patient }) {
     if (isOpen && patient?.id) {
       axios
         .get(`http://localhost:8081/appointments/history/${patient.id}`)
-        .then((res) => setHistory(res.data))
+        .then((res) => {
+          setHistory(res.data || []);
+          setCurrentPage(1);
+        })
         .catch((err) => console.error("Error fetching history:", err));
     }
   }, [isOpen, patient]);
+
+  // Reset page when history changes from outside or modal reopens
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [history.length]);
+
+  const totalPages = Math.max(1, Math.ceil((history?.length || 0) / PAGE_SIZE));
+  const startIndex = (currentPage - 1) * PAGE_SIZE;
+  const pagedHistory = history.slice(startIndex, startIndex + PAGE_SIZE);
 
   // Modal JSX
   const modalContent = (
@@ -69,8 +83,8 @@ function ModalPatientHistory({ patient }) {
             </tr>
           </thead>
           <tbody>
-            {history.length > 0 ? (
-              history.map((item, index) => (
+            {pagedHistory.length > 0 ? (
+              pagedHistory.map((item, index) => (
                 <tr key={index}>
                   <td>
                     {new Date(item.date).toLocaleDateString("en-US", {
@@ -101,6 +115,26 @@ function ModalPatientHistory({ patient }) {
             )}
           </tbody>
         </table>
+
+        {history.length > PAGE_SIZE && (
+          <div className="history-pagination">
+            <button
+              onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+              disabled={currentPage === 1}
+            >
+              Prev
+            </button>
+            <span>
+              Page {currentPage} of {totalPages}
+            </span>
+            <button
+              onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+              disabled={currentPage === totalPages}
+            >
+              Next
+            </button>
+          </div>
+        )}
       </div>
     </div>
   );
@@ -111,7 +145,7 @@ function ModalPatientHistory({ patient }) {
       <button
         ref={openButtonRef}
         onClick={openModal}
-        className="view-history-btn"
+        className="view-history-btn history"
       >
         View History
       </button>

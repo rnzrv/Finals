@@ -61,3 +61,11 @@
     background-color: var(--primary-color--);
     color: #fff;
 }
+
+.inventory-action-btn.inventory-action-delete{
+    background-color: #fff;
+}
+
+.inventory-action-btn.inventory-action-delete:hover{
+    background-color: #fff;
+}

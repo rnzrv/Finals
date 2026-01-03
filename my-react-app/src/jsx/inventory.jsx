@@ -13,12 +13,18 @@ import InventoryDeleteAction from './modals/inventory-modal/inventory-action-del
 import InventoryEditAction from './modals/inventory-modal/inventory-action-edit.jsx';
 import axios from 'axios';
 import Notification from './modals/notification/notification.jsx';
+import { useNavigate } from 'react-router-dom';
+import LogoutModal from './modals/logout/logout.jsx';
 
 function Inventory() {
 
   const [inventory, setInventory] = useState([]);
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
+  const [showLogoutModal, setShowLogoutModal] = useState(false);
+  const role = sessionStorage.getItem("role") || localStorage.getItem("role");
+  const test = showLogoutModal ? console.log("Logout Modal Opened") : null;
+  
 
   const getInventoryData = async () => {
     try {
@@ -60,7 +66,7 @@ function Inventory() {
       })
     : inventory;
 
-  const maxItemsPerPage = 10;
+  const maxItemsPerPage = 9;
   const [currentPage, setCurrentPage] = useState(1);
 
   const totalItems = filterItems.length;
@@ -92,7 +98,6 @@ function Inventory() {
         item.code,
         item.costUnit,
         item.sellingPrice,
-        item.category,
         item.quantity,
         item.expiryDate || "N/A"
       ])
@@ -117,10 +122,15 @@ function Inventory() {
         <header>
           <h2>INVENTORY</h2>
           <div className="inventory-account">
-            <Notification />
-            <img src={user} alt="Admin Icon" />
+            <Notification /> 
+
+            <button onClick={() => setShowLogoutModal(true)}
             
-            <p>Admin</p>
+              className="inventory-user-btn">
+            <img src={user} alt="Admin Icon"/>
+            
+            <p>{role}</p>
+            </button>
           </div>
         </header>
 
@@ -147,10 +157,13 @@ function Inventory() {
             </div>
 
             <div className="inventory-export-product">
-              <AddProduct />
-              <button className="inventory-export-btn" onClick={exportInventoryCSV}>
-                Export <img src={dropDown} alt="Dropdown Icon" />
-              </button>
+
+
+            
+              {/* <AddProduct /> */}
+                <button className="inventory-export-btn" onClick={exportInventoryCSV}>
+                  Export <img src={dropDown} alt="Dropdown Icon" />
+                </button>
             </div>
           </div>
 
@@ -176,7 +189,6 @@ function Inventory() {
                     <th>Code</th>
                     <th>Cost Unit</th>
                     <th>Selling Price</th>
-                    <th>Category</th>
                     <th>Quantity</th>
                     <th>Expiry Date</th>
                     <th>Action</th>
@@ -184,13 +196,12 @@ function Inventory() {
                 </thead>
                 <tbody>
                   {currentItems.map(item => ( 
-                    <tr key={item.id}>
+                    <tr key={item.itemId}>
                       <td className="inventory-item-name">{item.itemName}</td>
                       <td className="inventory-item-text">{item.brand}</td>
                       <td className="inventory-item-text">{item.code}</td>
                       <td className="inventory-item-text">₱{item.costUnit}</td>
                       <td className="inventory-item-text">₱{item.sellingPrice}</td>
-                      <td><span className="inventory-category-badge">{item.category}</span></td>
                       <td className="inventory-item-text">{item.quantity}</td>
                       <td className="inventory-item-text">{item.expiryDate}</td>
                       <td>
@@ -213,6 +224,18 @@ function Inventory() {
           </div>
         </div>
       </div>
+
+      {showLogoutModal && (
+  <LogoutModal
+    open={showLogoutModal}
+    onCancel={() => setShowLogoutModal(false)}
+    onConfirm={() => {
+      sessionStorage.clear();
+      window.location.href = "/login";
+    }}
+  />
+)}
+
     </div>
   );
 }

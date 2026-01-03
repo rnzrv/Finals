@@ -1,37 +1,128 @@
-.delete-modal-overlay.open {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(0, 0, 0, 0.5);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-    transition: opacity 0.3s ease, visibility 0.3s ease;
-}
-
-.delete-modal{
-    background-color: #fff;
+.delete-modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.45);
+    backdrop-filter: blur(3px);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.25s ease, visibility 0.25s ease;
+    z-index: 11000;
     padding: 20px;
-    border-radius: 8px;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-    width: 400px;
-    max-width: 90%;
 }
 
-.message.null{
-    display: none;
+.delete-modal-overlay.closed {
+    opacity: 0;
+    visibility: hidden;
 }
 
-.message.success{
-    background-color: green;
-    color: white;
+.delete-modal-overlay.open {
+    opacity: 1;
+    visibility: visible;
+}
+
+.delete-modal {
+    background: linear-gradient(180deg, #ffffff 0%, #f7fbff 100%);
+    padding: 24px;
+    border-radius: 14px;
+    box-shadow: 0 14px 40px rgba(0, 0, 0, 0.18);
+    width: min(420px, 92vw);
+    border: 1px solid #e6ecf8;
+    text-align: center;
+}
+
+.delete-modal h2 {
+    margin: 0 0 12px;
+    font-size: 20px;
+    color: #2f2f2f;
+}
+
+.delete-modal p {
+    margin: 6px 0 16px;
+    color: #4a4a4a;
+    font-size: 14px;
+}
+
+.message {
+    padding: 10px 12px;
+    border-radius: 10px;
+    font-size: 13px;
+    font-weight: 600;
+    margin-bottom: 10px;
+}
+
+.message.null { display: none; }
+
+.message.success {
+    background: #e8f5e9;
+    color: #2e7d32;
+    border: 1px solid #c8e6c9;
+}
+
+.message.error {
+    background: #ffebee;
+    color: #c62828;
+    border: 1px solid #ffcdd2;
+}
+
+.delete-modal-actions {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
     margin-top: 10px;
 }
 
-.message.error{
-    background-color: red;
-    color: white;
+.delete-modal-actions button {
+    padding: 10px 16px;
+    border-radius: 10px;
+    border: 1px solid transparent;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 14px;
+    transition: all 0.2s ease;
+}
+
+.delete-modal-actions button:first-of-type {
+    background: var(--primary-color--);
+    color: #ffffff;
+    border-color: var(--primary-color--);
+}
+
+.delete-modal-actions button:first-of-type:hover {
+    background: #093a08;
+    color: #ffffff;
+    border-color: #093a08;
+}
+
+.delete-modal-actions button:last-of-type {
+    background: #f7f7f7;
+    color: #3d3d3d;
+    border: 1px solid #dcdcdc;
+}
+
+.delete-modal-actions button:last-of-type:hover {
+    background: #ffffff;
+    border-color: #bdbdbd;
+}
+
+.patients-card-button.delete {
+    background-color: #c62828;
+    color: #ffffff;
+    border: 1px solid #b71c1c;
+    font-family: 'Inter', sans-serif;
+}
+
+.patients-card-button.delete:hover {
+    background-color: #b71c1c;
+    color: #ffffff;
+    border: 1px solid #b71c1c;
+}
+
+.deleteP{
+    color: #4a4a4a;
+    font-size: 14px;
     margin-top: 10px;
+    font-weight: 500;
 }

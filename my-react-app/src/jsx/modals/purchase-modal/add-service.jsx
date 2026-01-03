@@ -102,36 +102,47 @@ function AddServiceAction({ onSuccess }) {
       <div className="modal-box">
         <h2>Add New Service</h2>
         <form onSubmit={handleSubmit}>
+
+      <div className="add-service-top-bottom">
+        <div className="add-service-top">
+          
+          <div className="add-service-item">Service Name:</div>
           <input
             placeholder="Service Name"
             value={serviceName}
             onChange={e => setServiceName(e.target.value)}
           />
+          <div className="add-service-item">Service Description:</div>
           <input
             placeholder="Service Description"
             value={description}
             onChange={e => setDescription(e.target.value)}
           />
+          <div className="add-service-item">Service Price:</div>
           <input
             placeholder="Service Price"
             type="number"
             value={price}
             onChange={e => setPrice(e.target.value)}
           />
+        </div>
 
-          LOGO
+        <div className="add-service-bottom">
+          <div className="add-service-item">LOGO</div>
           <input
             type="file"
             accept="image/*"
             onChange={(e) => setLogo(e.target.files[0])}
           />
 
-          Consent Form
+          <div className="add-service-item">Consent Form</div>
           <input
             type="file"
             accept="application/pdf"
             onChange={(e) => setConsentForm(e.target.files[0])} // ✅ Handle change
           />
+        </div>
+      </div>
 
           <h3>Select Inventory Items</h3>
           <div className="inventory-list">
@@ -168,7 +179,7 @@ function AddServiceAction({ onSuccess }) {
   return (
     <div>
       <button className="inventory-action-btn" onClick={() => setIsOpen(true)}>
-        Add Service <img src={check} alt="Add Service" />
+        <img src={check} alt="Add Service" />  Add Service
       </button>
       {isOpen && createPortal(serviceModal, document.body)}
     </div>

@@ -100,6 +100,19 @@ router.get('/summary', verifyToken, async (req, res) => {
     );
     const averageTransactionValueRow = await q(`SELECT AVG(totalAmount) AS avgTransaction FROM sales s ${where}`, params);
 
+    // Payment methods breakdown
+    const paymentMethodsRow = await q(
+      `SELECT 
+        paymentMethod,
+        COUNT(*) AS transactions,
+        COALESCE(SUM(totalAmount), 0) AS revenue,
+        COALESCE(AVG(totalAmount), 0) AS avgTransaction
+       FROM sales s
+       ${where}
+       GROUP BY paymentMethod`,
+      params
+    );
+
     // Sales trends
     const salesTrendsRaw = await q(
       `SELECT DATE_FORMAT(s.saleDate, ?) AS label, SUM(s.totalAmount) AS sales, SUM(si.qty * inv.costUnit) AS expenses
@@ -152,6 +165,26 @@ router.get('/summary', verifyToken, async (req, res) => {
         newCustomers: newCustomers[0]?.count || 0,
         retentionRate: retentionRateRow[0]?.retentionRate || 0,
         avgTransaction: averageTransactionValueRow[0]?.avgTransaction || 0,
+      },
+      paymentMethods: {
+        cash: {
+          transactions: paymentMethodsRow.find(p => p.paymentMethod === 'Cash')?.transactions || 0,
+          revenue: paymentMethodsRow.find(p => p.paymentMethod === 'Cash')?.revenue || 0,
+          avgTransaction: paymentMethodsRow.find(p => p.paymentMethod === 'Cash')?.avgTransaction || 0,
+          percentOfTotal: totalRevenue > 0 ? ((paymentMethodsRow.find(p => p.paymentMethod === 'Cash')?.revenue || 0) / totalRevenue) * 100 : 0,
+        },
+        gcash: {
+          transactions: paymentMethodsRow.find(p => p.paymentMethod === 'GCash')?.transactions || 0,
+          revenue: paymentMethodsRow.find(p => p.paymentMethod === 'GCash')?.revenue || 0,
+          avgTransaction: paymentMethodsRow.find(p => p.paymentMethod === 'GCash')?.avgTransaction || 0,
+          percentOfTotal: totalRevenue > 0 ? ((paymentMethodsRow.find(p => p.paymentMethod === 'GCash')?.revenue || 0) / totalRevenue) * 100 : 0,
+        },
+        card: {
+          transactions: paymentMethodsRow.find(p => p.paymentMethod === 'Card')?.transactions || 0,
+          revenue: paymentMethodsRow.find(p => p.paymentMethod === 'Card')?.revenue || 0,
+          avgTransaction: paymentMethodsRow.find(p => p.paymentMethod === 'Card')?.avgTransaction || 0,
+          percentOfTotal: totalRevenue > 0 ? ((paymentMethodsRow.find(p => p.paymentMethod === 'Card')?.revenue || 0) / totalRevenue) * 100 : 0,
+        },
       },
       topServices: revenueByService.map((s) => ({
         name: s.serviceName,

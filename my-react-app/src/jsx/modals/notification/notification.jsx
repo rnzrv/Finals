@@ -1,6 +1,9 @@
 import React, { useState, useEffect, useRef } from 'react';
 import '../../../css/modal/notification.css';
-
+import Inv from '../../../icons/inv-notif.svg';
+import refresh from '../../../icons/refresh.svg';
+import check from '../../../icons/check.svg';
+import Appoint from '../../../icons/appoint.svg';
 const Notification = () => {
   const [notifications, setNotifications] = useState([]);
   const [lowInventory, setLowInventory] = useState([]);
@@ -10,7 +13,7 @@ const Notification = () => {
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef(null);
 
-  const token = localStorage.getItem('token') || sessionStorage.getItem('accessToken');
+  const token = sessionStorage.getItem('accessToken') || localStorage.getItem('token');
   const API_URL = 'http://localhost:8081';
 
   // Fetch low inventory items (quantity <= 10)
@@ -36,7 +39,7 @@ const Notification = () => {
             quantity: item.quantity,
             itemName: item.itemName,
             brand: item.brand,
-            icon: '📦',
+            icon: Inv,
             timestamp: new Date(),
           }))
         );
@@ -65,12 +68,12 @@ const Notification = () => {
             id: index,
             type: 'appointment',
             title: `Appointment: ${appointment.patientName}`,
-            message: `${appointment.sessionType} with Dr. ${appointment.doctor}`,
+            message: `${appointment.serviceName}`,
             date: appointment.date,
             time: appointment.time,
             patientName: appointment.patientName,
             doctorName: appointment.doctor,
-            icon: '📅',
+            icon: Appoint,
             timestamp: new Date(appointment.date),
           }))
         );
@@ -163,7 +166,7 @@ const totalCount = getNotificationCount('all');
                 disabled={loading}
                 title="Refresh notifications"
               >
-                🔄
+                <img src={refresh} alt="Refresh" />
               </button>
             </div>
 
@@ -195,7 +198,7 @@ const totalCount = getNotificationCount('all');
                 </div>
               ) : notifications.length === 0 ? (
                 <div className="notification-empty">
-                  <p>✅ No notifications at this time</p>
+                 <img src={check} alt="No notifications" /> <p>  No notifications at this time</p>
                 </div>
               ) : (
                 <div className="notification-list">
@@ -204,7 +207,13 @@ const totalCount = getNotificationCount('all');
                       key={`${notification.type}-${notification.id}-${index}`}
                       className={`notification-item notification-${notification.type}`}
                     >
-                      <div className="notification-icon">{notification.icon}</div>
+                      <div className="notification-icon">
+                        {(notification.type === 'inventory' || notification.type === 'appointment') ? (
+                          <img src={notification.icon} alt={`${notification.type} alert`} />
+                        ) : (
+                          notification.icon
+                        )}
+                      </div>
                       <div className="notification-details">
                         <h4 className="notification-title">{notification.title}</h4>
                         <p className="notification-message">{notification.message}</p>

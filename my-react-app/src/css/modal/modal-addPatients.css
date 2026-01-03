@@ -1,108 +1,165 @@
-/* Existing styles (assumed) */
+@import url(../color.css);
+@import url(../fonts.css);
+
+:root {
+  --modal-shadow: 0 14px 40px rgba(0, 0, 0, 0.18);
+  --modal-radius: 16px;
+}
+
 .modal-overlay {
   position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0, 0, 0, 0.5);
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  backdrop-filter: blur(4px);
   display: flex;
-  justify-content: center;
   align-items: center;
+  justify-content: center;
   z-index: 9999;
+  padding: 20px;
 }
 
 .modal-container {
-  background: white;
-  padding: 20px;
-  border-radius: 8px;
-  max-width: 500px;
-  width: 100%;
+  width: min(540px, 92vw);
+  background: #ffffff;
+  border-radius: var(--modal-radius);
+  box-shadow: var(--modal-shadow);
+  padding: 24px 24px 20px;
+  border: 1px solid #ececec;
+  animation: modal-fade 0.25s ease;
+}
+
+.modal-container h2 {
+  margin: 0 0 12px;
+  font-size: 22px;
+  color: #2f2f2f;
+  text-align: left;
+  letter-spacing: 0.2px;
 }
 
 .modal-form {
   display: flex;
   flex-direction: column;
-  gap: 15px;
+  gap: 12px;
 }
 
 .modal-form label {
-  font-weight: bold;
+  font-weight: 600;
+  font-size: 13px;
+  color: #4a4a4a;
 }
 
-.modal-form input {
-  padding: 8px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
+.modal-form input,
+.modal-form select {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid #d9d9d9;
+  border-radius: 10px;
+  font-size: 14px;
+  font-family: 'DmSans', 'Poppins', sans-serif;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.modal-form input:focus,
+.modal-form select:focus {
+  outline: none;
+  border-color: var(--primary-color--);
+  box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.18);
 }
 
 .modal-buttons {
   display: flex;
-  gap: 10px;
   justify-content: flex-end;
+  gap: 10px;
+  margin-top: 4px;
 }
 
-.save-btn {
-  background: #28a745;
-  color: white;
-  padding: 8px 16px;
+.save-btn,
+.cancel-btn,
+.add-patient-btn {
   border: none;
-  border-radius: 4px;
+  border-radius: 10px;
+  font-weight: 600;
+  font-size: 14px;
   cursor: pointer;
-}
-
-.save-btn:disabled {
-  background: #6c757d;
-  cursor: not-allowed;
-}
-
-.cancel-btn {
-  background: #dc3545;
-  color: white;
-  padding: 8px 16px;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: 'DmSans', 'Poppins', sans-serif;
 }
 
 .add-patient-btn {
-  background: #007bff;
-  color: white;
-  padding: 10px;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
+  background: var(--primary-color--);
+  color: #ffffff;
+  padding: 10px 16px;
+  border: 1px solid var(--primary-color--);
+  width: 350px;
 }
 
-/* New styles for messages */
+.add-patient-btn:hover {
+  background: #093a08;
+  color: #ffffff;
+  border: 1px solid #093a08;
+}
+
+.save-btn {
+  background: var(--primary-color--);
+  color: #fff;
+  padding: 10px 16px;
+  min-width: 110px;
+  border: 1px solid var(--primary-color--);
+}
+
+.save-btn:hover {
+  background: #093a08;
+  color: #ffffff;
+  border: 1px solid #093a08;
+}
+
+.save-btn:disabled {
+  background: #cfd3d9;
+  color: #7b7b7b;
+  cursor: not-allowed;
+  border: none;
+}
+
+.cancel-btn {
+  background: #f7f7f7;
+  color: #3d3d3d;
+  padding: 10px 14px;
+  border: 1px solid #dcdcdc;
+}
+
+.cancel-btn:hover {
+  background: #ffffff;
+  border-color: var(--primary-color--);
+  color: var(--primary-color--);
+}
+
 .message {
-  padding: 10px;
-  border-radius: 4px;
-  font-size: 14px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 600;
   text-align: center;
-  animation: fadeIn 0.3s ease-in;
+  animation: fadeIn 0.2s ease;
 }
 
 .message.success {
-  background: #d4edda;
-  color: #155724;
-  border: 1px solid #c3e6cb;
+  background: #e8f5e9;
+  color: #2e7d32;
+  border: 1px solid #c8e6c9;
 }
 
 .message.error {
-  background: #f8d7da;
-  color: #721c24;
-  border: 1px solid #f5c6cb;
+  background: #ffebee;
+  color: #c62828;
+  border: 1px solid #ffcdd2;
 }
 
-/* Fade-in animation for smooth appearance */
+@keyframes modal-fade {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
 @keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(-10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+  from { opacity: 0; }
+  to { opacity: 1; }
 }

@@ -24,20 +24,21 @@ router.get('/getAllNotifications', verifyToken, (req, res) => {
     // Get upcoming appointments
     const appointmentQuery = `
       SELECT 
-  a.id,
-  a.patient_id,
-  a.doctor,
-  DATE_FORMAT(a.date, '%Y-%m-%d') AS date,
-  DATE_FORMAT(a.time, '%H:%i') AS time,
-  a.service_type AS sessionType,
+  r.id,
+  r.patient_id,
+  DATE_FORMAT(r.preferred_date, '%Y-%m-%d') AS date,
+  DATE_FORMAT(r.preferred_time, '%h:%i %p') AS time,
+  s.serviceName AS serviceName,
   p.name AS patientName,
+  r.status,
   'appointment' AS notificationType,
-  a.created_at AS timestamp
-FROM appointments a
-LEFT JOIN patients p ON a.patient_id = p.id
-WHERE a.date >= CURDATE()
-ORDER BY a.date ASC, a.time ASC
-LIMIT 10
+  r.created_at AS timestamp
+FROM requests r
+LEFT JOIN patients p ON r.patient_id = p.id
+LEFT JOIN services s ON r.service_requested = s.serviceId
+WHERE r.status = 'Pending'
+ORDER BY r.created_at DESC
+
     `;
 
     // Execute both queries
@@ -116,21 +117,22 @@ router.get('/lowInventory', verifyToken, (req, res) => {
 router.get('/appointments', verifyToken, (req, res) => {
   const query = `
     SELECT 
-      a.id,
-      a.patient_id,
-      a.doctor,
-      DATE_FORMAT(a.date, '%Y-%m-%d') AS date,
-      DATE_FORMAT(a.time, '%H:%i') AS time,
-      a.service_type AS sessionType,
-      p.name AS patientName,
-      a.status,
-      'appointment' AS notificationType,
-      a.created_at AS timestamp
-    FROM appointments a
-    LEFT JOIN patients p ON a.patient_id = p.id
-    WHERE DATE(a.date) >= CURDATE()
-    ORDER BY a.date ASC, a.time ASC
-    LIMIT 10
+  r.id,
+  r.patient_id,
+  DATE_FORMAT(r.preferred_date, '%Y-%m-%d') AS date,
+  DATE_FORMAT(r.preferred_time, '%h:%i %p') AS time,
+  s.serviceName AS serviceName,
+  p.name AS patientName,
+  r.status,
+  'appointment' AS notificationType,
+  r.created_at AS timestamp
+FROM requests r
+LEFT JOIN patients p ON r.patient_id = p.id
+LEFT JOIN services s ON r.service_requested = s.serviceId
+WHERE r.status = 'Pending'
+ORDER BY r.created_at DESC
+LIMIT 10
+
   `;
 
   db.query(query, (err, data) => {
@@ -185,8 +187,8 @@ router.get('/appointmentStats', verifyToken, (req, res) => {
     SELECT 
       status,
       COUNT(*) AS count
-    FROM appointments
-    WHERE DATE(date) >= CURDATE()
+    FROM requests
+    WHERE DATE(preferred_date) >= CURDATE()
     GROUP BY status
   `;
 
@@ -253,11 +255,11 @@ router.get('/summary', verifyToken, (req, res) => {
         if (!err && data[0]) summary.lowStockItems = data[0].count;
 
         // Upcoming appointments
-        db.query('SELECT COUNT(*) as count FROM appointments WHERE DATE(date) >= CURDATE()', (err, data) => {
+        db.query('SELECT COUNT(*) as count FROM requests WHERE DATE(preferred_date) >= CURDATE()', (err, data) => {
           if (!err && data[0]) summary.upcomingAppointments = data[0].count;
 
           // Today's appointments
-          db.query('SELECT COUNT(*) as count FROM appointments WHERE DATE(date) = CURDATE()', (err, data) => {
+          db.query('SELECT COUNT(*) as count FROM requests WHERE DATE(preferred_date) = CURDATE()', (err, data) => {
             if (!err && data[0]) summary.todayAppointments = data[0].count;
 
             summary.totalNotifications = summary.criticalItems + summary.lowStockItems + summary.upcomingAppointments;

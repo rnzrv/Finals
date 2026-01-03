@@ -60,13 +60,13 @@ Content-Type: application/json
 
 ### Set Appointment
 POST http://localhost:8081/appointments/setAppointment
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyVHlwZSI6ImFkbWluIiwidXNlcm5hbWUiOiJjZW8xMjMiLCJpYXQiOjE3NjI2OTY1MTUsImV4cCI6MTc2MzMwMTMxNX0.C3gFZqsQfYCo6iTqu6AWxnq4FA-Del6V_J_ilgVK4FE
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImNlbzEyMyIsInJvbGUiOiJjZW8iLCJpYXQiOjE3NjcxNzM1MTksImV4cCI6MTc2Nzc3ODMxOX0.Z2hzhQZvjZP-Ar4u-7aI1ozgROyIF7rYoNFpdVHgvm8
 Content-Type: application/json
 
 {
     "patient_id": 14,
     "doctor": "Dr. Smith",
-    "date": "2025-10-27",
+    "date": "2025-12-31",
     "time": "14:30",
     "service_type": "Consultation",
     "status": "Scheduled",
@@ -79,3 +79,59 @@ GET http://localhost:8081/appointments/getAppointments/appointmentPage
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyVHlwZSI6ImFkbWluIiwidXNlcm5hbWUiOiJjZW8xMjMiLCJpYXQiOjE3NjI2OTY1MTUsImV4cCI6MTc2MzMwMTMxNX0.C3gFZqsQfYCo6iTqu6AWxnq4FA-Del6V_J_ilgVK4FE
 Content-Type: application/json
 
+### Cancel Appointment
+DELETE http://localhost:8081/appointments/cancelAppointment/92
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImNlbzEyMyIsInJvbGUiOiJjZW8iLCJpYXQiOjE3NjcyNDE2MjksImV4cCI6MTc2Nzg0NjQyOX0.-DZlepODtflw34wdWeWMx2X5TpLskRkvlBwRIjGl6jg
+
+### aasjdas
+
+### Add Inventory (First time - create new product)
+POST http://localhost:8081/inventory/addInventory
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImNlbzEyMyIsInJvbGUiOiJjZW8iLCJpYXQiOjE3NjcxMTY0MzUsImV4cCI6MTc2NzcyMTIzNX0.2breItpbSzRlmqBeMC6ttwKvfo2Sh-rQibY2GMhxDrU
+Content-Type: multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW
+
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="itemName"
+
+Test Product
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="brand"
+
+Test Bdawd
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="code"
+
+TEST123
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="costUnit"
+
+15.99
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="sellingPrice"
+
+15.99
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="reference"
+
+REF123
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="suppliers"
+
+Supplier A
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="quantity"
+
+100
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="grandTotal"
+
+999
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="expiryDate"
+
+2025-12-31
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="category"
+
+Product
+------WebKitFormBoundary7MA4YWxkTrZu0gW--

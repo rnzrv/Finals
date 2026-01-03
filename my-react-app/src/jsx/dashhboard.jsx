@@ -9,6 +9,7 @@ import RecentCard from "./dashboardRecent.jsx";
 import axios from "axios";
 import notificationIcon from "../icons/notification.svg";
 import Notification from './modals/notification/notification';
+import LogoutModal from './modals/logout/logout.jsx';
 
 
 function Dashhboard() {
@@ -22,10 +23,13 @@ function Dashhboard() {
     todayAppointments: [],
     recentSales: []
   });
+  const [showLogoutModal, setShowLogoutModal] = useState(false);
 
   useEffect(() => {
     fetchSummary();
   }, []);
+
+  const role = sessionStorage.getItem("role") || localStorage.getItem("role");
 
   const fetchSummary = async () => {
     try {
@@ -51,10 +55,16 @@ function Dashhboard() {
       <div className="dashboard-content">
         <header>
           <h2>DASHBOARD</h2>
-          <div className="dashboard-account">
-            <Notification />
-            <img src={user} alt="Admin Icon" />
-            <p>Admin</p>
+          <div className="inventory-account">
+            <Notification /> 
+
+            <button onClick={() => setShowLogoutModal(true)}
+            
+              className="inventory-user-btn">
+            <img src={user} alt="Admin Icon"/>
+            
+            <p>{role}</p>
+            </button>
           </div>
         </header>
 
@@ -139,10 +149,22 @@ function Dashhboard() {
                 ))}
               </div>
             </div>
+              {showLogoutModal && (
+                <LogoutModal
+                  open={showLogoutModal}
+                  onCancel={() => setShowLogoutModal(false)}
+                  onConfirm={() => {
+                    sessionStorage.clear();
+                    window.location.href = "/";
+                  }}
+                />
+              )}
           </div>
 
         </div>
-      </div>
+          </div>
+
+      
     </div>
   );
 }

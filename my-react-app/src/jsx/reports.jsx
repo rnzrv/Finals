@@ -15,6 +15,8 @@ import groupAdd from "../icons/group-add.svg";
 import retention from "../icons/retention.svg";
 import star from "../icons/star.svg";
 import ReportsChart from "./reportsChart.jsx";
+import Notification from "./modals/notification/notification";
+import LogoutModal from './modals/logout/logout.jsx';
 
 function fmtCurrency(num) {
   if (num == null) return "₱0";
@@ -53,6 +55,11 @@ function Reports() {
       newCustomers: 0,
       retentionRate: 0,
       avgTransaction: 0,
+    },
+    paymentMethods: {
+      cash: { transactions: 0, revenue: 0, avgTransaction: 0, percentOfTotal: 0 },
+      gcash: { transactions: 0, revenue: 0, avgTransaction: 0, percentOfTotal: 0 },
+      card: { transactions: 0, revenue: 0, avgTransaction: 0, percentOfTotal: 0 },
     },
     topServices: [],
     salesTrends: { labels: [], datasets: [] },
@@ -96,6 +103,11 @@ function Reports() {
           newCustomers: 0,
           retentionRate: 0,
           avgTransaction: 0,
+        },
+        paymentMethods: data.paymentMethods ?? {
+          cash: { transactions: 0, revenue: 0, avgTransaction: 0, percentOfTotal: 0 },
+          gcash: { transactions: 0, revenue: 0, avgTransaction: 0, percentOfTotal: 0 },
+          card: { transactions: 0, revenue: 0, avgTransaction: 0, percentOfTotal: 0 },
         },
         topServices: data.topServices ?? [],
         salesTrends: data.salesTrends ?? { labels: [], datasets: [] },
@@ -148,6 +160,8 @@ function Reports() {
     link.click();
   };
 
+  const role = sessionStorage.getItem("role") || localStorage.getItem("role");
+  const [showLogoutModal, setShowLogoutModal] = useState(false);
   return (
     <div className="reports">
       <Sidebar />
@@ -156,19 +170,25 @@ function Reports() {
         <header>
           <h2>REPORTS</h2>
           <div className="dashboard-account">
-            <img src={user} alt="Admin Icon" />
-            <p>Admin</p>
+            <div className="inventory-account">
+            <Notification /> 
+
+            <button onClick={() => setShowLogoutModal(true)}
+            
+              className="inventory-user-btn">
+            <img src={user} alt="Admin Icon"/>
+            
+            <p>{role}</p>
+            </button>
+          </div>
           </div>
         </header>
 
         <div className="reports-container">
           <div className="reports-utilities">
-            <div className="reports-util-left">
-              <img src={calendar} alt="Calendar Icon" />
-              <h1>Period:</h1>
-            </div>
 
             <div className="reports-util-mid">
+              <h1>Select Period:</h1> 
               <button
                 className={periodType === "weekly" ? "active" : ""}
                 onClick={() => {
@@ -461,6 +481,71 @@ function Reports() {
                 </div>
               </div>
 
+              <div className="business-growth-metrics-item7 business-growth-metrics-item">
+                <div className="payment-methods-container">
+                  <div className="payment-methods-title">
+                    <h3>Payment Methods Breakdown</h3>
+                    <p>Revenue distribution by payment type</p>
+                  </div>
+                  
+                  <div className="payment-methods-cards">
+                    <div className="payment-method-card cash-payment">
+                      <div className="payment-method-info">
+                        <h4 className="Cash"> Cash </h4>
+                        <h2>{fmtCurrency(summary.paymentMethods?.cash?.revenue)}</h2>
+                        <p className="payment-percent">{summary.paymentMethods?.cash?.percentOfTotal?.toFixed(1)}% of total revenue</p>
+                      </div>
+                      <div className="payment-method-stats">
+                        <div className="stat-row">
+                          <span className="stat-label">Transactions</span>
+                          <span className="stat-value">{fmtNumber(summary.paymentMethods?.cash?.transactions)}</span>
+                        </div>
+                        <div className="stat-row">
+                          <span className="stat-label">Avg. Amount</span>
+                          <span className="stat-value">{fmtCurrency(summary.paymentMethods?.cash?.avgTransaction)}</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="payment-method-card gcash-payment">
+                      <div className="payment-method-info">
+                        <h4 className="GCash">GCash</h4>
+                        <h2>{fmtCurrency(summary.paymentMethods?.gcash?.revenue)}</h2>
+                        <p className="payment-percent">{summary.paymentMethods?.gcash?.percentOfTotal?.toFixed(1)}% of total revenue</p>
+                      </div>
+                      <div className="payment-method-stats">
+                        <div className="stat-row">
+                          <span className="stat-label">Transactions</span>
+                          <span className="stat-value">{fmtNumber(summary.paymentMethods?.gcash?.transactions)}</span>
+                        </div>
+                        <div className="stat-row">
+                          <span className="stat-label">Avg. Amount</span>
+                          <span className="stat-value">{fmtCurrency(summary.paymentMethods?.gcash?.avgTransaction)}</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="payment-method-card card-payment">
+                      <div className="payment-method-info">
+                        <h4 className="Card">Card</h4>
+                        <h2>{fmtCurrency(summary.paymentMethods?.card?.revenue)}</h2>
+                        <p className="payment-percent">{summary.paymentMethods?.card?.percentOfTotal?.toFixed(1)}% of total revenue</p>
+                      </div>
+                      <div className="payment-method-stats">
+                        <div className="stat-row">
+                          <span className="stat-label">Transactions</span>
+                          <span className="stat-value">{fmtNumber(summary.paymentMethods?.card?.transactions)}</span>
+                        </div>
+                        <div className="stat-row">
+                          <span className="stat-label">Avg. Amount</span>
+                          <span className="stat-value">{fmtCurrency(summary.paymentMethods?.card?.avgTransaction)}</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
               <div className="business-growth-metrics-item6 reports-sales-purchase-trends business-growth-metric-item">
                 <div className="business-growth-metrics-item6-title">
                   <h3>Sales and Purchase Trends</h3>
@@ -487,6 +572,16 @@ function Reports() {
             {loading && <p>Loading report...</p>}
             {error && <p style={{ color: "red" }}>Error: {error}</p>}
           </div>
+          {showLogoutModal && (
+                <LogoutModal
+                  open={showLogoutModal}
+                  onCancel={() => setShowLogoutModal(false)}
+                  onConfirm={() => {
+                    sessionStorage.clear();
+                    window.location.href = "/";
+                  }}
+                />
+              )}
         </div>
       </div>
     </div>

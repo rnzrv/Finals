@@ -201,67 +201,84 @@ connection.connect((err) => {
           FOREIGN KEY (service_requested) REFERENCES services(serviceId) ON DELETE CASCADE
         )`;
 
+        const createBusinessProfileTable = `
+        CREATE TABLE IF NOT EXISTS business_profile (
+          id INT AUTO_INCREMENT PRIMARY KEY,
+          business_name VARCHAR(255) NOT NULL,
+          address VARCHAR(255) NOT NULL,
+          contact_number VARCHAR(50) NOT NULL,
+          email VARCHAR(100) NOT NULL,
+          logo VARCHAR(255) NULL,
+          created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+          updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+        )`;
 
-
-
-      connection.query(createPatientsTable, (err) => {
-        if (err) throw err;
-        console.log('✅ patients table ready.');
-      });
-
-      connection.query(createAppointmentsTable, (err) => {
-        if (err) throw err;
-        console.log('✅ appointments table ready.');
-      });
+      
+      connection.query(createBusinessProfileTable, (err) => {
+        if(err) throw err;
+        console.log(' business_profile table ready.');
+      }
+      );  
+      connection.query(createWebsiteUsersTable, (err) => {
+        if(err) throw err;
+        console.log(' website_users table ready.');
+      }
+      );
 
       connection.query(createUsersTable, (err) => {
         if (err) throw err;
-        console.log('✅ users table ready.');
+        console.log(' users table ready.');
       });
 
       connection.query(createInventoryTable, (err) => {
         if (err) throw err;
-        console.log('✅ inventory table ready.');
-      });
-
-      connection.query(createPurchasesTable, (err) => {
-        if (err) throw err;
-        console.log('✅ purchases table ready.');
-      });
-
-      connection.query(createSalesHistoryTable, (err) => {
-        if (err) throw err;
-        console.log('✅ sales table ready.');
-      });
-
-      connection.query(createSalesItemsTable, (err) => {
-        if (err) throw err;
-        console.log('✅ sale_items table ready.');
+        console.log(' inventory table ready.');
       });
 
       connection.query(createServicesTable, (err) => {
         if(err) throw err;
-        console.log('✅ services table ready.');
+        console.log(' services table ready.');
+      });
+
+      connection.query(createSalesHistoryTable, (err) => {
+        if (err) throw err;
+        console.log(' sales table ready.');
+      });
+
+        connection.query(createPurchasesTable, (err) => {
+        if (err) throw err;
+        console.log(' purchases table ready.');
+      });
+
+      connection.query(createPatientsTable, (err) => {
+        if (err) throw err;
+        console.log(' patients table ready.');
+      });
+
+      connection.query(createAppointmentsTable, (err) => {
+        if (err) throw err;
+        console.log(' appointments table ready.');
+      });
+
+      connection.query(createSalesItemsTable, (err) => {
+        if (err) throw err;
+        console.log('sale_items table ready.');
       });
 
       connection.query(createServiceItemsTable, (err) => {
         if(err) throw err;
-        console.log('✅ service_items table ready.');
+        console.log(' service_items table ready.');
       });
 
       connection.query(createSaleServicesTable, (err) => {
         if(err) throw err;
-        console.log('✅ sale_services table ready.');
+        console.log(' sale_services table ready.');
       });
 
-      connection.query(createWebsiteUsersTable, (err) => {
-        if(err) throw err;
-        console.log('✅ website_users table ready.');
-      }
-      );
+      
       connection.query(createRequestsTable, (err) => {
         if(err) throw err;
-        console.log('✅ requests table ready.');
+        console.log(' requests table ready.');
       }
       );
     });

@@ -102,7 +102,7 @@ function InventoryEditAction({item}) {
     
 
      
-    <div>
+    <div className='edit-inv'>
     <button className="inventory-action-btn inventory-action-edit" onClick={() => setIsOpen(true)}>
       <img src={check} alt="Edit" />
         </button>

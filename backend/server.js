@@ -47,6 +47,7 @@ const loginRoutes = require('./routes/website/login');
 const serviceRoutes = require('./routes/website/services');
 const webAppointmentRoutes = require('./routes/website/webAppointment');
 const notificationRoutes = require('./routes/notification');
+const businessProfileRoutes = require('./routes/businessProfile');
 
 // Use routes
 app.use('/users', userRoutes);
@@ -61,6 +62,7 @@ app.use('/dashboard', dashboardRoutes);
 app.use('/logout', logoutRoutes);
 app.use('/sales', salesRoutes);
 app.use('/notifications', notificationRoutes);
+app.use('/business-profile', businessProfileRoutes);
 app.use('/login', loginRoutes);
 app.use('/website/services', serviceRoutes);
 app.use('/web/appointments', webAppointmentRoutes);

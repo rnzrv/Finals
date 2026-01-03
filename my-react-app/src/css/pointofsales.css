@@ -349,11 +349,12 @@ body {
   gap: 10px;
   display: flex;
   justify-content: space-between;
+  height: 60px;
 }
 
 
 .right-grid{
-  height: calc(100% - 150px); /* Account for search bar and buttons */
+  height: 100%; /* Account for search bar and buttons */
   padding: 15px 15px 15px 5px;
   overflow: hidden;
 }
@@ -431,7 +432,7 @@ body {
   color: #6A6A6A;
 }
 
-.right-bottom{
+/* right-bottom{
   width: 100%;
   background-color: #FFFFFF;
   height: 50px;
@@ -452,7 +453,7 @@ body {
 .right-bottom img{
   cursor: pointer;
   height: 50px;
-}
+} */
 
 .product-image {
   width: 64px;
@@ -507,3 +508,23 @@ body {
 }
 
 
+.right-grid-top .category.product{
+  background-color: var(--primary-color--);
+  color: var(--primary-color--);
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  padding: 4px 8px;
+  color: white;
+}
+
+.category.service{
+  background-color: var(--secondary-color--);
+  color: white;
+}
+
+.payment-section input{
+  padding: 3px;
+}

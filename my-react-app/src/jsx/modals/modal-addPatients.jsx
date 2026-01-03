@@ -112,7 +112,7 @@ function AddPatients({ onPatientAdded }) {
   return (
     <div className="addPatients">
       <button onClick={openModal} className="add-patient-btn">
-        + Add Patient
+          + Patient
       </button>
 
       {isOpen && (

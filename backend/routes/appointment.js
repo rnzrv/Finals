@@ -8,7 +8,7 @@ const db = require('../config/db');
 router.post('/setAppointment', verifyToken, (req, res) => {
   const { patient_id, doctor, date, time, service_type, status, notes } = req.body;
 
-  if (!patient_id || !doctor || !date || !time || !service_type || !status) {
+  if (!patient_id || !date || !time || !service_type ) {
     return res.status(400).json({ error: 'All fields except notes are required' });
   }
 
@@ -28,26 +28,52 @@ router.post('/setAppointment', verifyToken, (req, res) => {
     return res.status(400).json({ error: 'Please enter a valid time in HH:MM format (24-hour)' });
   }
 
-  // Check for duplicate appointment (same patient/date/time)
-  const checkQuery = 'SELECT * FROM appointments WHERE patient_id = ? AND date = ? AND time = ?';
-  db.query(checkQuery, [patient_id, date, time], (err, existingAppointments) => {
+  // Validate that service_type is a valid service ID
+  const serviceCheckQuery = 'SELECT serviceId FROM services WHERE serviceId = ?';
+  db.query(serviceCheckQuery, [service_type], (err, serviceResult) => {
+    if (err) {
+      console.error('Error checking service:', err);
+      return res.status(500).json({ error: 'Internal server error' });
+    }
+    
+    if (serviceResult.length === 0) {
+      return res.status(400).json({ error: 'Invalid service ID' });
+    }
+
+    // Check for duplicate appointment (same patient/date/time/service) and any time slot conflicts
+    const checkQuery = `
+      SELECT id, patient_id, service_type
+      FROM appointments
+      WHERE date = ? AND time = ?
+    `;
+    db.query(checkQuery, [date, time], (err, existingAppointments) => {
     if (err) {
       console.error('Error checking appointments:', err);
       return res.status(500).json({ error: err.sqlMessage || 'Internal server error' });
     }
 
-    if (existingAppointments.length > 0) {
-      return res.status(409).json({ error: 'An appointment already exists for this patient, date, and time' });
+    const incomingPatientId = String(patient_id);
+
+    const slotForSamePatient = existingAppointments.some(
+      (a) => String(a.patient_id) === incomingPatientId
+    );
+    if (slotForSamePatient) {
+      return res.status(409).json({ error: 'You already have an appointment at this date and time' });
     }
 
-    // Insert new appointment
-    const q = `
-      INSERT INTO appointments (patient_id, doctor, date, time, service_type, status, notes)
-      VALUES (?, ?, ?, ?, ?, ?, ?)
-    `;
-    db.query(q, [patient_id, doctor, date, time, service_type, status, notes || null], (err) => {
-      if (err) return res.status(500).json({ error: err.sqlMessage });
-      return res.status(201).json({ message: 'Appointment scheduled successfully' });
+      if (existingAppointments.length > 0) {
+        return res.status(409).json({ error: 'That time slot is already booked' });
+      }
+
+      // Insert new appointment with serviceName
+      const q = `
+        INSERT INTO appointments (patient_id, date, time, service_type, notes)
+        VALUES (?, ?, ?, (SELECT serviceName FROM services WHERE serviceId = ?), ?)
+      `;
+      db.query(q, [patient_id, date, time, service_type, notes || null], (err) => {
+        if (err) return res.status(500).json({ error: err.sqlMessage });
+        return res.status(201).json({ message: 'Appointment scheduled successfully' });
+      });
     });
   });
 });
@@ -141,6 +167,7 @@ router.get('/stats', verifyToken, (req,res) => {
 router.get('/getAppointments/appointmentPage', verifyToken, (req, res) => {
   const q = `
     SELECT 
+      a.id,
       doctor AS doctorName, 
       service_type AS sessionType, 
       p.name AS patientName, 
@@ -162,8 +189,17 @@ router.get('/getAppointments/appointmentPage', verifyToken, (req, res) => {
 
 
 
-// router.get('/getAppointments/')
-
+router.delete('/cancelAppointment/:id', verifyToken, (req, res) => {
+  const appointmentId = req.params.id;
+  const q = 'DELETE FROM appointments WHERE id = ?';
+  db.query(q, [appointmentId], (err, result) => {
+    if (err) return res.status(500).json({ error: 'Database error' });
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ error: 'Appointment not found' });
+    }
+    res.json({ message: 'Appointment cancelled successfully' });
+  });
+});
 
 
 module.exports = router;

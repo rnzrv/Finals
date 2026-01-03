@@ -79,12 +79,13 @@ form {
 
 .inputBox {
   position: relative;
-  margin-bottom: 20px;
+  margin: 0 auto 20px auto;
   width: 100%;
+  max-width: 360px;
 }
 
 .inputBox input {
-  width: 70%;
+  width: 100%;
   padding: 14px 40px;
   font-size: 16px;
   border: none;
@@ -92,6 +93,7 @@ form {
   background: #fff;
   color: #000;
   outline: none;
+  box-sizing: border-box;
 }
 
 /* floating label */
@@ -215,3 +217,5 @@ h6 {
   font-size: 14px;
   margin-top: 20px;
 }
+
+

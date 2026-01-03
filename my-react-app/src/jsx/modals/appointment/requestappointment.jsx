@@ -8,11 +8,18 @@ function RequestAppointmentModal() {
   const [isOpen, setIsOpen] = useState(false);
   const [appointments, setAppointments] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [popupMessage, setPopupMessage] = useState(null); // { text, type }
 
   useEffect(() => {
     document.body.style.overflow = isOpen ? 'hidden' : '';
     return () => (document.body.style.overflow = '');
   }, [isOpen]);
+
+  // Show popup inside modal
+  const showPopup = (text, type = 'success') => {
+    setPopupMessage({ text, type });
+    setTimeout(() => setPopupMessage(null), 3000); // auto-hide after 3 seconds
+  };
 
   const fetchAppointments = async () => {
     try {
@@ -29,6 +36,7 @@ function RequestAppointmentModal() {
       setAppointments(res.data || []);
     } catch (err) {
       console.error('Failed to fetch appointments', err);
+      showPopup('Failed to fetch appointment requests', 'error');
     } finally {
       setLoading(false);
     }
@@ -40,33 +48,31 @@ function RequestAppointmentModal() {
       await axios.put(
         `http://localhost:8081/web/appointments/updateRequestStatus/${id}`,
         {},
-        { headers: { Authorization: `Bearer ${token}` },
-        }
+        { headers: { Authorization: `Bearer ${token}` } }
       );
+      showPopup('Appointment request approved', 'success');
       fetchAppointments();
     } catch (err) {
       console.error('Failed to accept request', err);
+      showPopup('Failed to approve appointment request', 'error');
     }
   };
 
-
   const declineRequest = async (id) => {
-  try {
-    const token = sessionStorage.getItem('accessToken');
-
-    await axios.put(
-      `http://localhost:8081/web/appointments/declineRequest/${id}`,
-      {},
-      {
-        headers: { Authorization: `Bearer ${token}` },
-    });
-
-    fetchAppointments(); // refresh table
-  } catch (err) {
-    console.error('Failed to decline request', err);
-  }
-};
-
+    try {
+      const token = sessionStorage.getItem('accessToken');
+      await axios.put(
+        `http://localhost:8081/web/appointments/declineRequest/${id}`,
+        {},
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      showPopup('Appointment request declined', 'success');
+      fetchAppointments();
+    } catch (err) {
+      console.error('Failed to decline request', err);
+      showPopup('Failed to decline appointment request', 'error');
+    }
+  };
 
   const openModal = () => {
     setIsOpen(true);
@@ -75,11 +81,18 @@ function RequestAppointmentModal() {
 
   const modal = (
     <div className="request-appointment">
-      <div className="request-appointment-container large">
+      <div className="request-appointment-container large" style={{ position: 'relative' }}>
         <div className="request-appointment-title">
           <h2>Appointment Requests</h2>
           <img src={x} alt="close" onClick={() => setIsOpen(false)} />
         </div>
+
+        {/* Popup Message inside modal */}
+        {popupMessage && (
+          <div className={`modal-popup-message ${popupMessage.type}`}>
+            {popupMessage.text}
+          </div>
+        )}
 
         {loading ? (
           <p className="loading">Loading...</p>
@@ -117,7 +130,6 @@ function RequestAppointmentModal() {
                       >
                         Approve
                       </button>
-
                       <button
                         className="decline-btn"
                         onClick={() => declineRequest(a.request_id)}
@@ -126,7 +138,6 @@ function RequestAppointmentModal() {
                       </button>
                     </td>
                   </tr>
-
                 ))
               )}
             </tbody>

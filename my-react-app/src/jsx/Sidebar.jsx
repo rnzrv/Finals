@@ -1,5 +1,5 @@
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import '../css/Sidebar.css';
 import logo from '../assets/logo.png';
 import dashboard from '../icons/dashboard.svg';
@@ -17,7 +17,18 @@ function Sidebar() {
   const location = useLocation();
   const navigate = useNavigate();
   const [showLogout, setShowLogout] = useState(false);
+  const [logoUrl, setLogoUrl] = useState(logo);
   const userRole = sessionStorage.getItem("role"); // Get role
+
+  useEffect(() => {
+    const stored = localStorage.getItem('logoUrl');
+    if (stored) {
+      const normalized = stored.startsWith('http')
+        ? stored
+        : `http://localhost:8081${stored.startsWith('/') ? '' : '/'}${stored}`;
+      setLogoUrl(normalized);
+    }
+  }, []);
 
   const handleLogoutConfirm = () => {
     sessionStorage.clear();
@@ -30,32 +41,37 @@ function Sidebar() {
     setShowLogout(true);
   };
 
-  const isActive = (path) => location.pathname.startsWith(path);
+  
+
+  const isActive = (path) => location.pathname===path;
 
   // Menu items with role-based access
   const menuItems = [
-    { name: "Dashboard", path: "/dashhboard", icon: dashboard, roles: ["ceo"] },
-    { name: "Inventory", path: "/inventory", icon: inventory, roles: ["ceo", "MANAGER"] },
-    { name: "Sales", path: "/sales", icon: sales, roles: ["ceo", "MANAGER", "STAFF"] },
-    { name: "SalesHistory", path: "/salesHistory", icon: sales, roles: ["ceo", "MANAGER", "STAFF"] },
-    { name: "Purchases", path: "/purchases", icon: purchases, roles: ["ceo", "MANAGER"] },
-    { name: "Reports", path: "/reports", icon: reports, roles: ["ceo"] },
-    { name: "Appointments", path: "/appointments", icon: appointments, roles: ["ceo", "MANAGER", "STAFF"] },
-    { name: "Patients", path: "/patients", icon: patients, roles: ["ceo", "MANAGER", "STAFF"] },
+    { name: "Dashboard", path: "/dashhboard", icon: dashboard, roles: ["ADMIN", "ceo"] },
+    { name: "Inventory", path: "/inventory", icon: inventory, roles: ["ceo", "MANAGER", "ADMIN", "CASHIER"] },
+    { name: "Sales", path: "/sales", icon: sales, roles: ["ADMIN", "ceo", "MANAGER", "CASHIER"] },
+    { name: "SalesHistory", path: "/salesHistory", icon: sales, roles: ["ADMIN","ceo", "MANAGER", "CASHIER"] },
+    { name: "Purchases", path: "/purchases", icon: purchases, roles: ["ADMIN", "ceo", "MANAGER"] },
+    { name: "Reports", path: "/reports", icon: reports, roles: ["ceo", "ADMIN"] },
+    { name: "Appointments", path: "/appointments", icon: appointments, roles: ["ADMIN","ceo", "MANAGER", "STAFF", "CASHIER"] },
+    { name: "Patients", path: "/patients", icon: patients, roles: ["ADMIN","ceo", "MANAGER", "STAFF"] },
   ];
 
   const footerItems = [
-    { name: "Settings", path: "/settings", icon: settings, roles: ["ceo"] },
+    { name: "Settings", path: "/settings", icon: settings, roles: ["ceo", "ADMIN"] },
     { name: "Logout", path: "#", icon: logoutIcon, action: handleLogoutClick },
   ];
-
   return (
+
+    
     <div className="sidebar">
+
+      
       <header>
-        <Link to="/dashhboard">
-          <img src={logo} alt="Logo" className="logo" />
+        <Link to="/dashhboard" className="logo-inline">
+          <img src={logoUrl} alt="Logo" className="logo" />
+          <span className="logo-inline-text">Beauwitty</span>
         </Link>
-        <h2>Beauwitty</h2>
       </header>
 
       <div className="sidebar-main-content">

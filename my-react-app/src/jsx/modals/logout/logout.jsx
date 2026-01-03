@@ -42,12 +42,15 @@ function LogoutModal({ open, onConfirm, onCancel }) {
 
         .logout-modal h3 {
           margin: 0 0 8px;
+          font-size: 18px;
         }
 
         .logout-modal p {
           margin: 0 0 16px;
           color: #555;
           font-size: 14px;
+          font-family: Inter, sans-serif;
+          font-weight: 500;
         }
 
         .logout-modal-actions {

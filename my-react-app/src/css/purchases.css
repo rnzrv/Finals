@@ -101,6 +101,11 @@ body {
   margin-right: 6px;
 }
 
+.inventory-date input {
+  border: none;
+  outline: none;
+}
+
 /* BUTTONS */
 
 
@@ -261,5 +266,11 @@ body {
 .inventory-action-btn img {
   width: 18px;
   height: 18px;
+}
+
+.period-export {
+  display: flex;
+  align-items: center;
+  gap: 10px;
 }
 

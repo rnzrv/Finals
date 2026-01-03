@@ -5,6 +5,9 @@ import date from "../icons/date.svg";
 import search from "../icons/search.svg";
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import Notification from './modals/notification/notification';
+import LogoutModal from './modals/logout/logout.jsx';
+
 
 function SalesHistory() {
   const [salesData, setSalesData] = useState([]);
@@ -12,6 +15,8 @@ function SalesHistory() {
   const [endDate, setEndDate] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [showLogoutModal, setShowLogoutModal] = useState(false);
+  const role = sessionStorage.getItem("role") || localStorage.getItem("role");
 
   const getSalesData = async () => {
     try {
@@ -116,8 +121,17 @@ function SalesHistory() {
         <header>
           <h2>SALES HISTORY</h2>
           <div className="salesHistory-account">
-            <img src={user} alt="Admin Icon" />
-            <p>Admin</p>
+           <div className="inventory-account">
+            <Notification /> 
+
+            <button onClick={() => setShowLogoutModal(true)}
+            
+              className="inventory-user-btn">
+            <img src={user} alt="Admin Icon"/>
+            
+            <p>{role}</p>
+            </button>
+          </div>
           </div>
         </header>
 
@@ -176,13 +190,13 @@ function SalesHistory() {
                       <th>Reference</th>
                       <th>Date</th>
                       <th>Customer Name</th>
-                      <th>Payment Method</th>
+                      
                       <th>Sub Total</th>
                       <th>Tax Amount</th>
                       <th>Total Amount</th>
                       <th>Total Payment</th>
                       <th>Changes</th>
-                      <th>Action</th>
+                      <th>Payment Method</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -192,16 +206,14 @@ function SalesHistory() {
                           <td className="salesHistory-reference">{item.reference}</td>
                           <td className="salesHistory-item-text">{item.saleDate ? item.saleDate.slice(0, 10) : "N/A"}</td>
                           <td className="salesHistory-item-text">{item.customerName}</td>
-                          <td className="salesHistory-item-text">{item.paymentMethod}</td>
+                          
                           <td className="salesHistory-item-text">₱{parseFloat(item.subTotal).toFixed(2)}</td>
                           <td className="salesHistory-item-text">₱{parseFloat(item.taxAmount).toFixed(2)}</td>
                           <td className="salesHistory-amount">₱{parseFloat(item.totalAmount).toFixed(2)}</td>
                           <td className="salesHistory-amount">₱{parseFloat(item.totalPayment).toFixed(2)}</td>
                           <td className="salesHistory-item-text">₱{parseFloat(item.changes || 0).toFixed(2)}</td>
                           <td>
-                            <div className="salesHistory-actions-cell">
-                             
-                            </div>
+                            <div className={`salesHistory-item-text ${'aw' + item.paymentMethod.toLowerCase()}`}>{item.paymentMethod}</div>
                           </td>
                         </tr>
                       ))
@@ -221,6 +233,17 @@ function SalesHistory() {
             <span className="pagination-info">Page {currentPage} of {totalPages}</span>
             <button className="pagination-btn" onClick={handleNextPage} disabled={currentPage === totalPages}>Next</button>
           </div>
+
+          {showLogoutModal && (
+                <LogoutModal
+                  open={showLogoutModal}
+                  onCancel={() => setShowLogoutModal(false)}
+                  onConfirm={() => {
+                    sessionStorage.clear();
+                    window.location.href = "/";
+                  }}
+                />
+              )}
         </div>
       </div>
     </div>

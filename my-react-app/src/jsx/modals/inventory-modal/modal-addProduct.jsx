@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from 'react';
+import React, { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import axios from 'axios';
 import "../../../css/modal/addProduct.css";
@@ -23,6 +23,37 @@ function ModalAddProduct({ onProductAdded }) {
     category: '',
     logo: null,
   });
+
+  const resetForm = () => {
+    setFormData({
+      itemName: '',
+      brand: '',
+      code: '',
+      costUnit: '',
+      sellingPrice: '',
+      reference: '',
+      suppliers: '',
+      quantity: '',
+      grandTotal: '',
+      expiryDate: '',
+      category: '',
+      logo: null,
+    });
+    setErrorMessage('');
+    setConfirmMismatch(null);
+  };
+
+  // auto calculate grand total
+  useEffect(() => {
+    const cost = Number(formData.costUnit);
+    const qty = Number(formData.quantity);
+
+    if (Number.isFinite(cost) && Number.isFinite(qty)) {
+      setFormData(f => ({ ...f, grandTotal: (cost * qty).toFixed(2) }));
+    } else {
+      setFormData(f => ({ ...f, grandTotal: '' }));
+    }
+  }, [formData.costUnit, formData.quantity]);
 
   useEffect(() => {
     document.body.style.overflow = isOpen ? "hidden" : "";
@@ -61,19 +92,17 @@ function ModalAddProduct({ onProductAdded }) {
       setErrorMessage("Category must be either 'Product' or 'Service'.");
       return false;
     }
-
-    if (category.trim() === 'Product' || category.trim() === 'Service') {
-      if (!expiryDate.trim() || !regexDate.test(expiryDate.trim())) {
-        setErrorMessage('Expiry date (YYYY-MM-DD) is required for products and services. ');
-        return false;
-      }
-      const today = new Date();
-      const exp = new Date(expiryDate.trim());
-      if (exp < today) {
-        setErrorMessage('Expiry date must be a future date.');
-        return false;
-      }
+    if (!expiryDate.trim() || !regexDate.test(expiryDate.trim())) {
+      setErrorMessage('Expiry date (YYYY-MM-DD) is required.');
+      return false;
     }
+    const today = new Date();
+    const exp = new Date(expiryDate.trim());
+    if (exp < today) {
+      setErrorMessage('Expiry date must be a future date.');
+      return false;
+    }
+
     setErrorMessage('');
     return true;
   };
@@ -95,36 +124,31 @@ function ModalAddProduct({ onProductAdded }) {
     if (forceUpdate) fd.append('forceUpdate', 'true');
     if (formData.logo) fd.append('logo', formData.logo);
 
-    const res = await axios.post('http://localhost:8081/inventory/addInventory', fd, {
+    return await axios.post('http://localhost:8081/inventory/addInventory', fd, {
       headers: { Authorization: `Bearer ${token}` },
     });
-    return res;
   };
 
   const addProductHandle = async (e) => {
     e.preventDefault();
     if (!validate()) return;
+
     setSubmitting(true);
     setErrorMessage('');
-    setConfirmMismatch(null);
 
     try {
       await submitToBackend(false);
       onProductAdded && onProductAdded();
-      setFormData({
-        itemName:'', brand:'', code:'', costUnit:'', sellingPrice:'', reference:'', suppliers:'', quantity:'', grandTotal:'', expiryDate:'', category:'', logo:null
-      });
+      resetForm();
       setIsOpen(false);
     } catch (error) {
       const status = error?.response?.status;
       const data = error?.response?.data;
 
-      // Handle mismatches from backend (409 with canForceUpdate)
       if (status === 409 && data?.canForceUpdate) {
         setConfirmMismatch(data?.mismatches || []);
         setErrorMessage('Existing product code has different details. Confirm to update fields and add quantity.');
       } else if (status === 409) {
-        // legacy duplicate message
         setErrorMessage(data?.error || 'Conflict: duplicate entry.');
       } else if (data?.error) {
         setErrorMessage(data.error);
@@ -142,11 +166,7 @@ function ModalAddProduct({ onProductAdded }) {
     try {
       await submitToBackend(true);
       onProductAdded && onProductAdded();
-      setConfirmMismatch(null);
-      setErrorMessage('');
-      setFormData({
-        itemName:'', brand:'', code:'', costUnit:'', sellingPrice:'', reference:'', suppliers:'', quantity:'', grandTotal:'', expiryDate:'', category:'', logo:null
-      });
+      resetForm();
       setIsOpen(false);
     } catch (error) {
       const data = error?.response?.data;
@@ -169,7 +189,7 @@ function ModalAddProduct({ onProductAdded }) {
           <ul>
             {confirmMismatch.map((m, i) => (
               <li key={i}>
-                <strong>{m.field}:</strong> existing = {String(m.existing)}, incoming = {String(m.incoming)}
+                <strong>{m.field}:</strong> Existing = {String(m.existing)}, Incoming = {String(m.incoming)}
               </li>
             ))}
           </ul>
@@ -188,73 +208,75 @@ function ModalAddProduct({ onProductAdded }) {
     <div className={`addProduct ${isOpen ? 'open' : 'closed'}`}>
       <div className="add-inventory-product">
         <div className="add-inventory-product-title">
-          <h2>Add Product</h2>
+          <h2>Add Purchase</h2>
           <img src={x} alt="close-icon" onClick={() => setIsOpen(false)} />
         </div>
 
         {errorMessage && <div className="form-error">{errorMessage}</div>}
 
         <form className="form" onSubmit={addProductHandle}>
-          <div className="form-left">
-            <div className="item">
-              <h1>Item Name:</h1>
-              <input type="text" value={formData.itemName} onChange={(e)=>setFormData(f=>({...f, itemName:e.target.value}))} required />
+          <div className="form-top">
+            <div className="form-left">
+              <div className="item">
+                <h1>Item Name:</h1>
+                <input type="text" value={formData.itemName} onChange={(e) => setFormData(f => ({ ...f, itemName: e.target.value }))} required />
+              </div>
+              <div className="item">
+                <h1>Brand:</h1>
+                <input type="text" value={formData.brand} onChange={(e) => setFormData(f => ({ ...f, brand: e.target.value }))} required />
+              </div>
+              <div className="item">
+                <h1>Code:</h1>
+                <input type="text" value={formData.code} onChange={(e) => setFormData(f => ({ ...f, code: e.target.value }))} required />
+              </div>
+              <div className="item">
+                <h1>Cost Unit:</h1>
+                <input type="number" step="0.01" min="0" value={formData.costUnit} onChange={(e) => setFormData(f => ({ ...f, costUnit: e.target.value }))} required />
+              </div>
+              <div className="item">
+                <h1>Selling Price:</h1>
+                <input type="number" step="0.01" min="0" value={formData.sellingPrice} onChange={(e) => setFormData(f => ({ ...f, sellingPrice: e.target.value }))} required />
+              </div>
+              <div className="item category-item">
+                <h1>Category</h1>
+                <select value={formData.category} onChange={(e) => setFormData(f => ({ ...f, category: e.target.value }))} required>
+                  <option value="">Select...</option>
+                  <option value="Product">Product</option>
+                  <option value="Service">Service</option>
+                </select>
+              </div>
             </div>
-            <div className="item">
-              <h1>Brand:</h1>
-              <input type="text" value={formData.brand} onChange={(e)=>setFormData(f=>({...f, brand:e.target.value}))} required />
-            </div>
-            <div className="item">
-              <h1>Code:</h1>
-              <input type="text" value={formData.code} onChange={(e)=>setFormData(f=>({...f, code:e.target.value}))} required />
-            </div>
-            <div className="item">
-              <h1>Cost Unit:</h1>
-              <input type="number" step="0.01" min="0" value={formData.costUnit} onChange={(e)=>setFormData(f=>({...f, costUnit:e.target.value}))} required />
-            </div>
-            <div className="item">
-              <h1>Selling Price:</h1>
-              <input type="number" step="0.01" min="0" value={formData.sellingPrice} onChange={(e)=>setFormData(f=>({...f, sellingPrice:e.target.value}))} required />
+
+            <div className="form-right">
+              <div className="item">
+                <h1>Reference:</h1>
+                <input type="text" value={formData.reference} onChange={(e) => setFormData(f => ({ ...f, reference: e.target.value }))} required />
+              </div>
+              <div className="item">
+                <h1>Suppliers:</h1>
+                <input type="text" value={formData.suppliers} onChange={(e) => setFormData(f => ({ ...f, suppliers: e.target.value }))} required />
+              </div>
+              <div className="item">
+                <h1>Quantity</h1>
+                <input type="number" min="0" step="1" value={formData.quantity} onChange={(e) => setFormData(f => ({ ...f, quantity: e.target.value }))} required />
+              </div>
+              <div className="item">
+                <h1>Grand Total:</h1>
+                <input type="number" min="0" step="0.01" value={formData.grandTotal} onChange={(e) => setFormData(f => ({ ...f, grandTotal: e.target.value }))} required />
+              </div>
+              <div className="item">
+                <h1>Expiry Date:</h1>
+                <input type="date" value={formData.expiryDate} onChange={(e) => setFormData(f => ({ ...f, expiryDate: e.target.value }))} required />
+              </div>
+              <div className="item-right">
+                <h1>Logo (Optional)</h1>
+                <input type="file" accept="image/*" onChange={(e) => setFormData(f => ({ ...f, logo: e.target.files?.[0] || null }))} />
+              </div>
             </div>
           </div>
 
-          <div className="form-right">
-            <div className="item">
-              <h1>Reference:</h1>
-              <input type="text" value={formData.reference} onChange={(e)=>setFormData(f=>({...f, reference:e.target.value}))} required />
-            </div>
-            <div className="item">
-              <h1>Suppliers:</h1>
-              <input type="text" value={formData.suppliers} onChange={(e)=>setFormData(f=>({...f, suppliers:e.target.value}))} required />
-            </div>
-            <div className="item">
-              <h1>Quantity</h1>
-              <input type="number" min="0" step="1" value={formData.quantity} onChange={(e)=>setFormData(f=>({...f, quantity:e.target.value}))} required />
-            </div>
-            <div className="item">
-              <h1>Grand Total:</h1>
-              <input type="number" min="0" step="0.01" value={formData.grandTotal} onChange={(e)=>setFormData(f=>({...f, grandTotal:e.target.value}))} required />
-            </div>
-            <div className="item">
-              <h1>Expiry Date:</h1>
-              <input type="date" value={formData.expiryDate} onChange={(e)=>setFormData(f=>({...f, expiryDate:e.target.value}))}  />
-            </div>
-            <div className="item">
-              <h1>Category</h1>
-              <select value={formData.category} onChange={(e)=>setFormData(f=>({...f, category:e.target.value}))} required>
-                <option value="">Select...</option>
-                <option value="Product">Product</option>
-                <option value="Service">Service</option>
-              </select>
-            </div>
-            <div className="item-right">
-              <h1>Logo (Optional)</h1>
-              <input type="file" accept="image/*" onChange={(e)=>setFormData(f=>({...f, logo: e.target.files?.[0] || null}))} />
-            </div>
-          </div>
-
-          <div className="bottom">
-            <button type="button" onClick={()=>setIsOpen(false)} disabled={submitting}>Cancel</button>
+          <div className="form-bottom">
+            <button type="button" className='Cancel' onClick={() => setIsOpen(false)} disabled={submitting}>Cancel</button>
             <button type="submit" disabled={submitting}>{submitting ? 'Saving...' : 'Save Product'}</button>
           </div>
         </form>
@@ -267,11 +289,11 @@ function ModalAddProduct({ onProductAdded }) {
   return (
     <div>
       <button className="inventory-products-btn" onClick={() => setIsOpen(true)}>
-        Add Product
+        <div className="name">+ Add Purchase</div>
       </button>
       {isOpen && createPortal(modalAddProduct, document.body)}
     </div>
   );
 }
 
-export default ModalAddProduct; 
+export default ModalAddProduct;

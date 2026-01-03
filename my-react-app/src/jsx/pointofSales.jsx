@@ -9,6 +9,8 @@ import arrowup from "../icons/arrow-up.svg";
 import axios from 'axios';
 import AddService from "./modals/purchase-modal/add-service.jsx";
 import Notification from './modals/notification/notification.jsx';
+import LogoutModal from './modals/logout/logout.jsx';
+import user from "../icons/user.svg";
 
 function PointOfSales() {
   const [pos, setPOS] = useState([]);
@@ -188,13 +190,26 @@ function PointOfSales() {
     getPOSData();
   }, [activeFilter]);
 
+  const role = sessionStorage.getItem("role") || localStorage.getItem("role");
+  const [showLogoutModal, setShowLogoutModal] = useState(false);
   
   return (
     <div className='point-of-sales'>
       <Sidebar />
       <div className="point-of-sales-content">
         <header><h2>POINT OF SALES</h2>
-        <Notification />
+        <div className="inventory-account">
+            <Notification /> 
+
+            <button onClick={() => setShowLogoutModal(true)}
+            
+              className="inventory-user-btn">
+            <img src={user} alt="Admin Icon"/>
+            
+            <p>{role}</p>
+            </button>
+          </div>
+        
         </header>
         <div className="point-of-sales-main-content">
           <div className="POS-left">
@@ -373,7 +388,7 @@ function PointOfSales() {
                             />
                           </div>
                         )}
-                        <div className="category">{item.category}</div>
+                        <div className={`category ${item.category.toLowerCase()}`}>{item.category}</div>
                       </div>
                       <div className="product-details">
                         <div className="product-title-right">
@@ -391,10 +406,21 @@ function PointOfSales() {
               </div>
             </div>
 
-            <div className="right-bottom">
+            {showLogoutModal && (
+                <LogoutModal
+                  open={showLogoutModal}
+                  onCancel={() => setShowLogoutModal(false)}
+                  onConfirm={() => {
+                    sessionStorage.clear();
+                    window.location.href = "/";
+                  }}
+                />
+              )}
+
+            {/* <div className="right-bottom">
               <h1>Sales History</h1>
               <img src={arrowup} alt="Arrow Up" />
-            </div>
+            </div> */}
           </div>
         </div>
       </div>

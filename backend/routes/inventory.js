@@ -62,6 +62,7 @@ router.post('/addInventory', verifyToken, upload.single('logo'), (req, res) => {
   reference = String(reference || '').trim();
   suppliers = String(suppliers || '').trim();
   category = String(category || '').trim();
+
   const costUnitNum = Number(costUnit);
   const sellingPriceNum = Number(sellingPrice);
   const qtyNum = Number(quantity);
@@ -69,56 +70,89 @@ router.post('/addInventory', verifyToken, upload.single('logo'), (req, res) => {
   const expDate = expiryDate ? String(expiryDate).trim() : null;
   const logo = req.file ? `uploads/${req.file.filename}` : null;
 
-  const cleanupFile = () => { if (req.file) fs.unlink(path.join(__dirname, '..', 'uploads', req.file.filename), () => {}); };
+  const cleanupFile = () => {
+    if (req.file) {
+      fs.unlink(path.join(__dirname, '..', 'uploads', req.file.filename), () => {});
+    }
+  };
 
-  // Validations
+  // ===================== VALIDATIONS =====================
   const ymd = /^\d{4}-\d{2}-\d{2}$/;
+
   if (!itemName || !brand || !code || !reference || !suppliers || !category) {
-    cleanupFile(); return res.status(400).json({ error: 'All fields are required' });
+    cleanupFile();
+    return res.status(400).json({ error: 'All fields are required' });
   }
+
   if (!Number.isFinite(costUnitNum) || costUnitNum <= 0) {
-    cleanupFile(); return res.status(400).json({ error: 'Cost unit must be a number greater than 0' });
+    cleanupFile();
+    return res.status(400).json({ error: 'Cost unit must be greater than 0' });
   }
+
   if (!Number.isFinite(sellingPriceNum) || sellingPriceNum <= 0) {
-    cleanupFile(); return res.status(400).json({ error: 'Selling price must be a number greater than 0' });
+    cleanupFile();
+    return res.status(400).json({ error: 'Selling price must be greater than 0' });
   }
+
   if (!Number.isInteger(qtyNum) || qtyNum < 0) {
-    cleanupFile(); return res.status(400).json({ error: 'Quantity must be an integer ≥ 0' });
+    cleanupFile();
+    return res.status(400).json({ error: 'Quantity must be ≥ 0' });
   }
+
   if (!Number.isFinite(grandTotalNum) || grandTotalNum < 0) {
-    cleanupFile(); return res.status(400).json({ error: 'Grand total must be ≥ 0' });
+    cleanupFile();
+    return res.status(400).json({ error: 'Grand total must be ≥ 0' });
   }
-  // Expiry required for both Product and Service
+
   if (!expDate || !ymd.test(expDate) || Number.isNaN(Date.parse(expDate))) {
-    cleanupFile(); return res.status(400).json({ error: 'Expiry date must be valid YYYY-MM-DD' });
+    cleanupFile();
+    return res.status(400).json({ error: 'Expiry date must be valid YYYY-MM-DD' });
   }
 
   if (category !== 'Product' && category !== 'Service') {
-    cleanupFile(); return res.status(400).json({ error: 'Category must be either Product or Service' });
+    cleanupFile();
+    return res.status(400).json({ error: 'Category must be Product or Service' });
   }
 
-  // 1) Check if inventory item exists by code and detect field mismatches
-  const getInvQ = 'SELECT itemName, brand, code, costUnit, sellingPrice, category, quantity, expiryDate, logo FROM inventory WHERE code = ? LIMIT 1';
-  db.query(getInvQ, [code], (invErr, invRows) => {
-    if (invErr) { cleanupFile(); return res.status(500).json({ error: invErr.sqlMessage }); }
+  // ===================== CHECK EXISTING INVENTORY =====================
+  const getInvQ = `
+    SELECT itemName, brand, costUnit, sellingPrice, category, expiryDate, logo
+    FROM inventory
+    WHERE code = ?
+    LIMIT 1
+  `;
 
-    const existing = invRows && invRows[0] ? invRows[0] : null;
+  db.query(getInvQ, [code], (invErr, invRows) => {
+    if (invErr) {
+      cleanupFile();
+      return res.status(500).json({ error: invErr.sqlMessage });
+    }
+
+    const existing = invRows[0] || null;
     const mismatches = [];
 
     if (existing) {
-      // Compare non-quantity fields; expiryDate can be null
-      if (existing.itemName !== itemName) mismatches.push({ field: 'itemName', existing: existing.itemName, incoming: itemName });
-      if (existing.brand !== brand) mismatches.push({ field: 'brand', existing: existing.brand, incoming: brand });
-      if (Number(existing.costUnit) !== costUnitNum) mismatches.push({ field: 'costUnit', existing: Number(existing.costUnit), incoming: costUnitNum });
-      if (Number(existing.sellingPrice) !== sellingPriceNum) mismatches.push({ field: 'sellingPrice', existing: Number(existing.sellingPrice), incoming: sellingPriceNum });
-      if (existing.category !== category) mismatches.push({ field: 'category', existing: existing.category, incoming: category });
-      const existingExpiry = existing.expiryDate ? existing.expiryDate.toISOString().slice(0, 10) : null;
-      const incomingExpiry = expDate;
-      if (existingExpiry !== incomingExpiry) mismatches.push({ field: 'expiryDate', existing: existingExpiry, incoming: incomingExpiry });
-      if ((existing.logo || null) !== (logo || null)) mismatches.push({ field: 'logo', existing: existing.logo || null, incoming: logo || null });
+      if (existing.itemName !== itemName) mismatches.push({ field: 'Item', existing: existing.itemName, incoming: itemName });
+      if (existing.brand !== brand) mismatches.push({ field: 'Brand', existing: existing.brand, incoming: brand });
+      if (Number(existing.costUnit) !== costUnitNum) mismatches.push({ field: 'Cost Unit', existing: Number(existing.costUnit), incoming: costUnitNum });
+      if (Number(existing.sellingPrice) !== sellingPriceNum) mismatches.push({ field: 'Selling Price', existing: Number(existing.sellingPrice), incoming: sellingPriceNum });
+      if (existing.category !== category) mismatches.push({ field: 'Category', existing: existing.category, incoming: category });
+      const existingExpiry = existing.expiryDate
+        ? existing.expiryDate.toISOString().slice(0, 10)
+        : null;
+
+      if (existingExpiry !== expDate) {
+        mismatches.push({ field: 'expiryDate', existing: existingExpiry, incoming: expDate });
+      }
+
+      if ((existing.logo || null) !== (logo || null)) {
+        mismatches.push({ field: 'logo', existing: existing.logo || null, incoming: logo || null });
+      }
 
       const forced = String(forceUpdate || '').toLowerCase() === 'true';
+
       if (mismatches.length && !forced) {
+        cleanupFile();
         return res.status(409).json({
           error: 'Existing product code has different details. Confirm to update fields and add quantity.',
           code,
@@ -128,23 +162,26 @@ router.post('/addInventory', verifyToken, upload.single('logo'), (req, res) => {
       }
     }
 
-    // 2) Insert into purchases (store expDate as provided)
+    // ===================== INSERT PURCHASE =====================
     const insertPurchase = `
-      INSERT INTO purchases (itemName, brand, code, costUnit, sellingPrice, reference, suppliers, quantity, grandTotal, expiryDate, category, logo)
+      INSERT INTO purchases
+      (itemName, brand, code, costUnit, sellingPrice, reference, suppliers, quantity, grandTotal, expiryDate, category, logo)
       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `;
+
     db.query(
       insertPurchase,
       [itemName, brand, code, costUnitNum, sellingPriceNum, reference, suppliers, qtyNum, grandTotalNum, expDate, category, logo],
       (pErr, pRes) => {
-        if (pErr && pErr.code !== 'ER_DUP_ENTRY') {
+        if (pErr) {
           cleanupFile();
           return res.status(500).json({ error: pErr.sqlMessage });
         }
 
-        // 3) Upsert inventory (store expDate for both Product and Service)
+        // ===================== UPSERT INVENTORY =====================
         const upsertInventory = `
-          INSERT INTO inventory (itemName, brand, code, costUnit, sellingPrice, category, quantity, expiryDate, logo)
+          INSERT INTO inventory
+          (itemName, brand, code, costUnit, sellingPrice, category, quantity, expiryDate, logo)
           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
           ON DUPLICATE KEY UPDATE
             itemName = VALUES(itemName),
@@ -156,6 +193,7 @@ router.post('/addInventory', verifyToken, upload.single('logo'), (req, res) => {
             expiryDate = VALUES(expiryDate),
             logo = COALESCE(VALUES(logo), logo)
         `;
+
         db.query(
           upsertInventory,
           [itemName, brand, code, costUnitNum, sellingPriceNum, category, qtyNum, expDate, logo],
@@ -164,15 +202,18 @@ router.post('/addInventory', verifyToken, upload.single('logo'), (req, res) => {
               cleanupFile();
               return res.status(500).json({ error: iErr.sqlMessage });
             }
+
             return res.status(201).json({
               message: existing
-                ? (mismatches.length ? 'Inventory fields updated and quantity added' : 'Inventory quantity added')
+                ? mismatches.length
+                  ? 'Inventory fields updated and quantity added'
+                  : 'Inventory quantity added'
                 : 'Inventory item created',
               data: {
-                purchaseId: pRes?.insertId || null,
+                purchaseId: pRes.insertId,
                 code,
                 addedQuantity: qtyNum,
-                updatedFields: mismatches.map(m => m.field),
+                updatedFields: mismatches.map(m => m.field)
               }
             });
           }
@@ -182,11 +223,12 @@ router.post('/addInventory', verifyToken, upload.single('logo'), (req, res) => {
   });
 });
 
+
 // UPDATE INVENTORY
 router.put('/updateInventory/:id', verifyToken, upload.single('logo'), (req, res) => {
   const inventoryId = req.params.id;
   let { itemName, brand, code, costUnit, sellingPrice, category, quantity, expiryDate, forceUpdate } = req.body;
-  let logo = req.file ? `/uploads/${req.file.filename}` : null;
+  let logo = req.file ? `uploads/${req.file.filename}` : null;
 
   // normalize
   itemName = String(itemName || '').trim();

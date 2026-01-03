@@ -10,11 +10,9 @@ function ModalSchedulePatient({ patient, onScheduleUpdated }) {
   const [messageType, setMessageType] = useState(null);
   const [formData, setFormData] = useState({
     patient_id: "",
-    doctor: "",
     date: "",
     time: "",
     service_type: "",
-    status: "",
     notes: "",
   });
   const [patientInfo, setPatientInfo] = useState({
@@ -22,6 +20,10 @@ function ModalSchedulePatient({ patient, onScheduleUpdated }) {
     email: "",
     contact: "",
   });
+  const [services, setServices] = useState([]);
+  const [filteredServices, setFilteredServices] = useState([]);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [showDropdown, setShowDropdown] = useState(false);
 
 
   const today = new Date().toISOString().split("T")[0];
@@ -30,6 +32,24 @@ function ModalSchedulePatient({ patient, onScheduleUpdated }) {
 
 
   const patientId = patient?.patient_id || patient?.id;
+
+  // Fetch services on mount
+  useEffect(() => {
+    const fetchServices = async () => {
+      try {
+        const token = sessionStorage.getItem("accessToken");
+        const response = await axios.get("http://localhost:8081/services/services", {
+          headers: { Authorization: `Bearer ${token}` },
+          withCredentials: true,
+        });
+        setServices(response.data || []);
+        setFilteredServices(response.data || []);
+      } catch (error) {
+        console.error("Error fetching services:", error);
+      }
+    };
+    fetchServices();
+  }, []);
 
   useEffect(() => {
     if (isOpen && patientId) {
@@ -57,6 +77,8 @@ function ModalSchedulePatient({ patient, onScheduleUpdated }) {
   useEffect(() => {
     if (isOpen && patientId) {
       setFormData((prev) => ({ ...prev, patient_id: patientId }));
+      setSearchTerm("");
+      setShowDropdown(false);
       setMessage(null);
       setMessageType(null);
     }
@@ -91,6 +113,36 @@ function ModalSchedulePatient({ patient, onScheduleUpdated }) {
     setMessageType(null);
   };
 
+  const handleServiceSearch = (e) => {
+    const value = e.target.value;
+    setSearchTerm(value);
+    setShowDropdown(true);
+    
+    if (value.trim() === "") {
+      setFilteredServices(services);
+    } else {
+      const filtered = services.filter((service) =>
+        service.serviceName.toLowerCase().includes(value.toLowerCase())
+      );
+      setFilteredServices(filtered);
+    }
+  };
+
+  const handleServiceSelect = (service) => {
+    setSearchTerm(service.serviceName);
+    setFormData((prev) => ({ ...prev, service_type: service.serviceId }));
+    setShowDropdown(false);
+    setMessage(null);
+    setMessageType(null);
+  };
+
+  const handleServiceBlur = (e) => {
+    // Delay to allow click event to fire first
+    setTimeout(() => {
+      setShowDropdown(false);
+    }, 200);
+  };
+
   const handleOverlayClick = (e) => {
     if (e.target === e.currentTarget) {
       setIsOpen(false);
@@ -106,11 +158,9 @@ function ModalSchedulePatient({ patient, onScheduleUpdated }) {
 
   if (
     !formData.patient_id ||
-    !formData.doctor ||
     !formData.date ||
     !formData.time ||
-    !formData.service_type ||
-    !formData.status
+    !formData.service_type
   ) {
     setMessage("All fields except notes are required");
     setMessageType("error");
@@ -131,11 +181,9 @@ function ModalSchedulePatient({ patient, onScheduleUpdated }) {
     setMessageType("success");
     setFormData({
       patient_id: patientId,
-      doctor: "",
       date: "",
       time: "",
       service_type: "",
-      status: "",
       notes: "",
     });
 
@@ -177,10 +225,7 @@ function ModalSchedulePatient({ patient, onScheduleUpdated }) {
             <input type="text" value={patientInfo.contact} readOnly />
           </label>
 
-          <label>
-            Doctor
-            <input name="doctor" type="text" value={formData.doctor} onChange={handleInputChange} required />
-          </label>
+          
           <label>
             Date
             <input name="date" min={today} type="date" value={formData.date} onChange={handleInputChange} required />
@@ -191,12 +236,56 @@ function ModalSchedulePatient({ patient, onScheduleUpdated }) {
           </label>
           <label>
             Service Type
-            <input name="service_type" type="text" value={formData.service_type} onChange={handleInputChange} required />
+            <div style={{ position: "relative", width: "100%" }}>
+              <input
+                type="text"
+                value={searchTerm}
+                onChange={handleServiceSearch}
+                onFocus={() => setShowDropdown(true)}
+                onBlur={handleServiceBlur}
+                placeholder="Search service..."
+                autoComplete="off"
+                required
+                style={{width: "100%"}}
+              />
+              {showDropdown && filteredServices.length > 0 && (
+                <div
+                  style={{
+                    position: "absolute",
+                    top: "100%",
+                    left: 0,
+                    right: 0,
+                    background: "#fff",
+                    border: "1px solid #d9d9d9",
+                    borderRadius: "8px",
+                    maxHeight: "200px",
+                    overflowY: "auto",
+                    zIndex: 1000,
+                    marginTop: "4px",
+                    boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
+                  }}
+                >
+                  {filteredServices.map((service) => (
+                    <div
+                      key={service.serviceId}
+                      onClick={() => handleServiceSelect(service)}
+                      style={{
+                        padding: "10px 12px",
+                        cursor: "pointer",
+                        borderBottom: "1px solid #f0f0f0",
+                        transition: "background 0.15s ease",
+                      }}
+                      onMouseEnter={(e) => (e.target.style.background = "#f5f5f5")}
+                      onMouseLeave={(e) => (e.target.style.background = "#fff")}
+                    >
+                      {service.serviceName}
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
           </label>
-          <label>
-            Status
-            <input name="status" type="text" value={formData.status} onChange={handleInputChange} required />
-          </label>
+          
           <label>
             Notes
             <input name="notes" type="text" value={formData.notes} onChange={handleInputChange} />
@@ -215,7 +304,7 @@ function ModalSchedulePatient({ patient, onScheduleUpdated }) {
     <>
       <button
         ref={openButtonRef}
-        className="book-appointment-button"
+        className="book-appointment-button sched"
         onClick={() => setIsOpen(true)}
       >
         Schedule
