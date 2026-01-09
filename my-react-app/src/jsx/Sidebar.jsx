@@ -47,7 +47,7 @@ function Sidebar() {
 
   // Menu items with role-based access
   const menuItems = [
-    { name: "Dashboard", path: "/dashhboard", icon: dashboard, roles: ["ADMIN", "ceo"] },
+    { name: "Dashboard", path: "/dashhboard", icon: dashboard, roles: ["ADMIN", "ceo", "MANAGER", "CASHIER"] },
     { name: "Inventory", path: "/inventory", icon: inventory, roles: ["ceo", "MANAGER", "ADMIN", "CASHIER"] },
     { name: "Sales", path: "/sales", icon: sales, roles: ["ADMIN", "ceo", "MANAGER", "CASHIER"] },
     { name: "SalesHistory", path: "/salesHistory", icon: sales, roles: ["ADMIN","ceo", "MANAGER", "CASHIER"] },

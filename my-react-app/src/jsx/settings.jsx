@@ -471,10 +471,10 @@ const closeDeleteUserModal = () => {
                                     value={editUser.userType}
                                     onChange={(e) => setEditUser((prev) => ({ ...prev, userType: e.target.value }))}
                                 >
-                                    <option value="Administrator">Administrator</option>
-                                    <option value="Staff">Staff</option>
+                                   
                                     <option value="Cashier">Cashier</option>
-                                    <option value="ceo">CEO</option>
+                                    <option value="MANAGER">Manager</option>
+                                    <option value="ADMIN">Admin</option>
                                 </select>
 
                                 <label>New Password (optional)</label>

@@ -93,7 +93,7 @@ router.get('/getDataMonthly', verifyToken, async(req, res) => {
     const totalServiceSales = Number(serviceSalesRow[0]?.totalServiceSales || 0);
     const expenses = Number(expensesRow[0]?.totalExpenses || 0); // adjust if needed
     const cogs = Number(cogsRow[0]?.totalCOGS || 0);
-    const netProfit = totalRevenue - cogs - expenses;
+    const netProfit = totalRevenue - cogs;
     const profitMargin = totalRevenue > 0 ? (netProfit / totalRevenue) * 100 : 0;
 
     // Queries to get total revenue, product sales, and service sales

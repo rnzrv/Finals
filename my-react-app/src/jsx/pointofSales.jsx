@@ -85,6 +85,9 @@ function PointOfSales() {
     return map;
   }, [pos, cart]);
 
+
+
+
   const getRemainingStock = (code) => stockMap[code] || 0;
 
   // ADD to cart
@@ -396,8 +399,14 @@ function PointOfSales() {
                           <h3>{item.code}</h3>
                         </div>
                         <div className="product-price-stock">
-                          <h3>In Stock: {remainingStock === Infinity ? '∞' : remainingStock}</h3>
+                          {remainingStock === Infinity ? (
+                            null
+                          ) : (
+                            <h3>In Stock: {remainingStock}</h3>
+                          )}
+                          
                           <h2>₱{Number(item.sellingPrice || 0).toFixed(2)}</h2>
+
                         </div>
                       </div>
                     </div>

@@ -23,7 +23,7 @@ function App() {
         <Route
           path="/dashhboard"
           element={
-            <RoleProtectedRoute allowedRoles={["ADMIN"]}>
+            <RoleProtectedRoute allowedRoles={["ADMIN", "MANAGER", "CASHIER"]}>
               <Dashhboard />
             </RoleProtectedRoute>
           }

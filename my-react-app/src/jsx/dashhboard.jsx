@@ -10,6 +10,7 @@ import axios from "axios";
 import notificationIcon from "../icons/notification.svg";
 import Notification from './modals/notification/notification';
 import LogoutModal from './modals/logout/logout.jsx';
+import { Link } from 'react-router-dom';
 
 
 function Dashhboard() {
@@ -114,7 +115,7 @@ function Dashhboard() {
             <div className="appointment">
               <div className="appointment-header">
                 <h3>Today's Appointment</h3>
-                <a href="#">View all</a>
+                <Link to="/appointments">View all</Link>
               </div>
 
               <div className="appointment-content">
@@ -134,7 +135,7 @@ function Dashhboard() {
             <div className="recentSales">
               <div className="recent-header">
                 <h3>Recent Sales</h3>
-                <a href="#">View all</a>
+                <Link to="/salesHistory">View all</Link>
               </div>
 
               <div className="recent-content">

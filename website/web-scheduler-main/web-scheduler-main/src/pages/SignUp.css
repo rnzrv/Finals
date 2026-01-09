@@ -187,3 +187,21 @@
         width: 100%;
     }
 }
+
+.signup-form > div[style*="marginTop"] {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.signup-form > div[style*="marginTop"] > div {
+    display: flex;
+    justify-content: center;
+}
+
+.google-signup-container {
+    margin-top: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}

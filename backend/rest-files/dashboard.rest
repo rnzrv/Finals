@@ -3,8 +3,10 @@ POST http://localhost:8081/users/user/login
 Content-Type: application/json
 
 {
+    "userType": "ceo",
     "username": "ceo123",
-    "password": "ceo12"
+    "password": "ceo12",
+    "confirmPassword": "ceo12"
 }
 
 ###

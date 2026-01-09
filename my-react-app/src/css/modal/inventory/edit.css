@@ -132,3 +132,17 @@
 .inventory-edit-actions button[type="button"]{
     background-color: #c73f3f;
 }
+
+
+.inventory-edit-action-bottom label{
+    gap: 8px;
+    color: var(--primary-color--);
+    font-weight: 500;
+}
+
+.inventory-edit-action-bottom label input{
+    width: 100%;
+    border: 1px solid #000000;
+    border-radius: 5px;
+    padding: 8px;
+}

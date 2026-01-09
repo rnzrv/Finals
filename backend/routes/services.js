@@ -22,7 +22,29 @@ const storage = multer.diskStorage({
   }
 });
 
-const upload = multer({ storage });
+const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB limit for uploads
+
+const upload = multer({
+  storage,
+  limits: { fileSize: MAX_FILE_SIZE },
+  fileFilter: (req, file, cb) => {
+    try {
+      if (file.fieldname === "consentForm") {
+        if (file.mimetype !== "application/pdf") {
+          return cb(new Error("Consent form must be a PDF"));
+        }
+      }
+      if (file.fieldname === "logo") {
+        if (!file.mimetype || !file.mimetype.startsWith("image/")) {
+          return cb(new Error("Logo must be an image"));
+        }
+      }
+      cb(null, true);
+    } catch (e) {
+      cb(new Error("Invalid file upload"));
+    }
+  }
+});
 
 
 
@@ -51,72 +73,83 @@ router.get('/services/inventory', verifyToken, (req, res) => {
 router.post(
   "/services",
   verifyToken,
-  upload.fields([
-    { name: "logo", maxCount: 1 },
-    { name: "consentForm", maxCount: 1 }
-  ]),
   (req, res) => {
-    const { serviceName, description, price } = req.body;
-    let { items } = req.body;
-
-    if (!serviceName || !price || !items) {
-      return res.status(400).json({ message: "Missing required fields" });
-    }
-
-    try {
-      items = JSON.parse(items);
-    } catch (err) {
-      return res.status(400).json({ message: "Invalid items format" });
-    }
-
-    if (!Array.isArray(items) || items.length === 0) {
-      return res.status(400).json({ message: "Items cannot be empty" });
-    }
-
-    const logo = req.files.logo ? `uploads/services/${req.files.logo[0].filename}` : null;
-    const consentForm = req.files.consentForm ? `uploads/consent/${req.files.consentForm[0].filename}` : null;
-
-    db.beginTransaction(err => {
-      if (err) return res.status(500).json({ message: "Transaction error", error: err });
-
-      const serviceQ = `
-        INSERT INTO services (serviceName, description, price, logo, consentForm)
-        VALUES (?, ?, ?, ?, ?)
-      `;
-      db.query(serviceQ, [serviceName, description, price, logo, consentForm], (err, serviceData) => {
-        if (err) {
-          return db.rollback(() =>
-            res.status(500).json({ message: "Failed to insert service", error: err })
-          );
+    upload.fields([
+      { name: "logo", maxCount: 1 },
+      { name: "consentForm", maxCount: 1 }
+    ])(req, res, (err) => {
+      if (err) {
+        if (err instanceof multer.MulterError) {
+          if (err.code === "LIMIT_FILE_SIZE") {
+            return res.status(400).json({ message: "File too large. Max size is 5MB." });
+          }
+          return res.status(400).json({ message: err.message || "Upload error" });
         }
+        return res.status(400).json({ message: err.message || "Upload failed" });
+      }
 
-        const serviceId = serviceData.insertId;
-        const values = items.map(item => [
-          serviceId,
-          item.code,
-          item.itemName,
-          item.qty,
-          item.price
-        ]);
+      const { serviceName, description, price } = req.body;
+      let { items } = req.body;
 
-        const itemsQ = `
-          INSERT INTO service_items (serviceId, itemCode, itemName, qty, price)
-          VALUES ?
+      if (!serviceName || !price || !items) {
+        return res.status(400).json({ message: "Missing required fields" });
+      }
+
+      try {
+        items = JSON.parse(items);
+      } catch (parseErr) {
+        return res.status(400).json({ message: "Invalid items format" });
+      }
+
+      if (!Array.isArray(items) || items.length === 0) {
+        return res.status(400).json({ message: "Items cannot be empty" });
+      }
+
+      const logo = req.files && req.files.logo ? `uploads/services/${req.files.logo[0].filename}` : null;
+      const consentForm = req.files && req.files.consentForm ? `uploads/consent/${req.files.consentForm[0].filename}` : null;
+
+      db.beginTransaction(errTx => {
+        if (errTx) return res.status(500).json({ message: "Transaction error", error: errTx });
+
+        const serviceQ = `
+          INSERT INTO services (serviceName, description, price, logo, consentForm)
+          VALUES (?, ?, ?, ?, ?)
         `;
-        db.query(itemsQ, [values], err => {
-          if (err) {
+        db.query(serviceQ, [serviceName, description, price, logo, consentForm], (errSvc, serviceData) => {
+          if (errSvc) {
             return db.rollback(() =>
-              res.status(500).json({ message: "Failed to insert service items", error: err })
+              res.status(500).json({ message: "Failed to insert service", error: errSvc })
             );
           }
 
-          db.commit(err => {
-            if (err) {
+          const serviceId = serviceData.insertId;
+          const values = items.map(item => [
+            serviceId,
+            item.code,
+            item.itemName,
+            item.qty,
+            item.price
+          ]);
+
+          const itemsQ = `
+            INSERT INTO service_items (serviceId, itemCode, itemName, qty, price)
+            VALUES ?
+          `;
+          db.query(itemsQ, [values], errItems => {
+            if (errItems) {
               return db.rollback(() =>
-                res.status(500).json({ message: "Commit failed", error: err })
+                res.status(500).json({ message: "Failed to insert service items", error: errItems })
               );
             }
-            res.status(201).json({ message: "Service created successfully", serviceId });
+
+            db.commit(errCommit => {
+              if (errCommit) {
+                return db.rollback(() =>
+                  res.status(500).json({ message: "Commit failed", error: errCommit })
+                );
+              }
+              res.status(201).json({ message: "Service created successfully", serviceId });
+            });
           });
         });
       });

@@ -134,6 +134,54 @@
     color: var(--primary-gold);
 }
 
+.forgot-password-row {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: var(--spacing-xs);
+}
+
+.forgot-link {
+    color: var(--primary-green);
+    font-weight: 600;
+}
+
+.forgot-link:hover {
+    color: var(--primary-gold);
+}
+
+.login-divider {
+    display: flex;
+    align-items: center;
+    text-align: center;
+    margin: 24px 0 20px;
+    color: var(--gray-500);
+    font-size: 0.875rem;
+}
+
+.login-divider::before,
+.login-divider::after {
+    content: '';
+    flex: 1;
+    border-bottom: 1px solid #e0e0e0;
+}
+
+.login-divider span {
+    padding: 0 12px;
+    font-weight: 500;
+}
+
+.google-login-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 16px;
+}
+
+.google-login-wrapper > div {
+    display: flex;
+    justify-content: center;
+}
+
 /* Responsive */
 @media (max-width: 480px) {
     .login-card {
@@ -142,5 +190,9 @@
 
     .submit-btn {
         width: 100%;
+    }
+    
+    .google-login-wrapper > div {
+        max-width: 100%;
     }
 }

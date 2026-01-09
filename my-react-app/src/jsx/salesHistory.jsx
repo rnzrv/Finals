@@ -139,7 +139,7 @@ function SalesHistory() {
           <div className="salesHistory-utensil">
             <div className="salesHistory-select-period">
               <h3>Select Period:</h3>
-              <div className="salesHistory-date">
+              <div className="salesHistory-date" style={{gap: "5px", display:"flex"}}>
                 <img src={date} alt="Date Icon" />
                 <div className="salesHistory-date-inputs">
                   <input
@@ -147,7 +147,7 @@ function SalesHistory() {
                     value={startDate}
                     onChange={(e) => setStartDate(e.target.value)}
                   />
-                  <span> - </span>
+                  <span style={{color: "black", fontWeight: "200", fontSize: "18px" }}> - </span>
                   <input
                     type="date"
                     value={endDate}

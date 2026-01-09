@@ -133,9 +133,8 @@ router.get('/summary', verifyToken, async (req, res) => {
      const totalRevenue = Number(revenueRow[0]?.totalRevenue || 0);
     const cogs = Number(cogsRow[0]?.cogs || 0);
     const expenses = Number(totalExpenses[0]?.totalExpenses || 0); // adjust if needed
-    const netProfit = totalRevenue - cogs - expenses;
+    const netProfit = totalRevenue - cogs;
     const profitMargin = totalRevenue > 0 ? (netProfit / totalRevenue) * 100 : 0;
-
 
     return res.json({
       totalRevenue,

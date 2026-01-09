@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
+import ForgotPasswordModal from '../components/ForgotPasswordModal';
 import { useApp } from '../context/AppContext';
 import './Login.css';
 import { GoogleLogin } from '@react-oauth/google';
@@ -15,6 +16,7 @@ function Login() {
         password: '',
     });
     const [showPassword, setShowPassword] = useState(false);
+    const [showForgot, setShowForgot] = useState(false);
     const [errors, setErrors] = useState({});
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [authMessage, setAuthMessage] = useState('');
@@ -83,6 +85,7 @@ function Login() {
     };
 
     return (
+        <>
         <div className="login-page">
             <div className="login-container">
                 <div className="login-card">
@@ -140,6 +143,11 @@ function Login() {
                                 </button>
                             </div>
                             {errors.password && <span className="error-text">{errors.password}</span>}
+                            <div className="forgot-password-row">
+                                <button type="button" className="forgot-link" onClick={() => setShowForgot(true)}>
+                                    Forgot your password?
+                                </button>
+                            </div>
                         </div>
 
                         {/* Submit Button */}
@@ -150,15 +158,23 @@ function Login() {
                         >
                             {isSubmitting ? 'Logging in...' : 'Login'}
                         </button>
-
-                        {/* Google Login */}
-                        <div style={{ marginTop: '20px', textAlign: 'center' }}>
-                            <GoogleLogin
-                                onSuccess={handleGoogleLogin}
-                                onError={() => console.log('Google login failed')}
-                            />
-                        </div>
                     </form>
+
+                    {/* Divider */}
+                    <div className="login-divider">
+                        <span>or continue with</span>
+                    </div>
+
+                    {/* Google Login */}
+                    <div className="google-login-wrapper" style={{display: "flex", alignItems:"center", justifyContent:"center"}}>
+                        <GoogleLogin
+                            onSuccess={handleGoogleLogin}
+                            onError={() => console.log('Google login failed')}
+                            size="large"
+                            width="100%"
+                            theme="outline"
+                        />
+                    </div>
 
                     <p className="login-footer">
                         Don't have an account? <Link to="/signup" className="link">Register Now</Link>
@@ -166,6 +182,8 @@ function Login() {
                 </div>
             </div>
         </div>
+        <ForgotPasswordModal open={showForgot} onClose={() => setShowForgot(false)} />
+        </>
     );
 }
 

@@ -6,7 +6,7 @@ const db = require('../config/db');
 
 
 router.post('/setAppointment', verifyToken, (req, res) => {
-  const { patient_id, doctor, date, time, service_type, status, notes } = req.body;
+  const { patient_id, date, time, service_type, status, notes } = req.body;
 
   if (!patient_id || !date || !time || !service_type ) {
     return res.status(400).json({ error: 'All fields except notes are required' });
@@ -168,7 +168,6 @@ router.get('/getAppointments/appointmentPage', verifyToken, (req, res) => {
   const q = `
     SELECT 
       a.id,
-      doctor AS doctorName, 
       service_type AS sessionType, 
       p.name AS patientName, 
       DATE_FORMAT(date, '%Y-%m-%d') AS date, 

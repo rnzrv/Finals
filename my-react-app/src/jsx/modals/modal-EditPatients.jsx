@@ -228,6 +228,8 @@ function EditPatients({ patient, onPatientUpdated }) {
             <input
               name="age"
               type="number"
+              min="0"
+              max="150"
               value={formData.age}
               onChange={handleInputChange}
               onBlur={handleInputBlur}

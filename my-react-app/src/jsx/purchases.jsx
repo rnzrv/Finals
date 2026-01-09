@@ -168,7 +168,7 @@ function Purchases() {
             <div className="inventory-select-period">
               <h3>Select Period:</h3>
 
-              <div className="inventory-date">
+              <div className="inventory-date" style={{gap: "5px", display:"flex"}}>
                 <img src={date} alt="Date Icon" />
 
                 <input
@@ -176,7 +176,7 @@ function Purchases() {
                   value={startDate}
                   onChange={(e) => setStartDate(e.target.value)}
                 />
-                <span>
+                <span style={{color: "black", fontWeight: "200", fontSize: "18px" }}>
                   -
                 </span>
                 <input

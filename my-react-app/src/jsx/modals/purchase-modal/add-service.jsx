@@ -13,6 +13,7 @@ function AddServiceAction({ onSuccess }) {
   const [consentForm, setConsentForm] = useState(null); // ✅ Add consent form state
   const [inventory, setInventory] = useState([]);
   const [selectedItems, setSelectedItems] = useState([]);
+  const MAX_CONSENT_MB = 5; // keep in sync with backend
 
   const token = sessionStorage.getItem("accessToken");
 
@@ -47,6 +48,18 @@ function AddServiceAction({ onSuccess }) {
     if (!serviceName || !price || selectedItems.length === 0) {
       alert("Fill all required fields");
       return;
+    }
+
+    // Client-side validation for consent form size and type
+    if (consentForm) {
+      if (consentForm.type !== "application/pdf") {
+        alert("Consent form must be a PDF file");
+        return;
+      }
+      if (consentForm.size > MAX_CONSENT_MB * 1024 * 1024) {
+        alert(`Consent form is too large. Max ${MAX_CONSENT_MB}MB.`);
+        return;
+      }
     }
 
     const formData = new FormData();
@@ -93,7 +106,8 @@ function AddServiceAction({ onSuccess }) {
       setSelectedItems([]);
     } catch (err) {
       console.error(err);
-      alert("Failed to add service");
+      const msg = err?.response?.data?.message || "Failed to add service";
+      alert(msg);
     }
   };
 

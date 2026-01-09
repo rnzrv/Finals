@@ -13,8 +13,9 @@ Content-Type: application/json
 
 {
     "userType": "ceo",
-    "username": "ceo123",
-    "password": "ceo12"
+    "username": "ceo1234",
+    "password": "ceo123",
+    "confirmPassword": "ceo123"
 }
 
 ### Get All Users

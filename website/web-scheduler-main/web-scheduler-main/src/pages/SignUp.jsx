@@ -226,7 +226,7 @@ function SignUp() {
                             <p className="signup-api-error">{apiError}</p>
                         )}
 
-                        <div style={{ marginTop: '20px', textAlign: 'center' }}>
+                        <div className="google-signup-container">
                             <GoogleLogin
                                 onSuccess={handleGoogleSignup}
                                 onError={() => console.log('Google signup/login failed')}

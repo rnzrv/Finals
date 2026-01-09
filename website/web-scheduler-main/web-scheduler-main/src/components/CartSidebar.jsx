@@ -18,6 +18,7 @@ function CartSidebar() {
             const token = localStorage.getItem('token');
             if (!token) {
                 setFetchError('You need to log in to view appointments.');
+                setCartItems([]); // Clear cart when no token
                 return;
             }
             const res = await axios.get(
@@ -32,11 +33,25 @@ function CartSidebar() {
             console.error('Failed to fetch scheduled appointments', error);
             const msg = error.response?.data?.message || 'Failed to fetch scheduled appointments';
             setFetchError(msg);
+            // Clear cart on error (e.g., invalid token)
+            setCartItems([]);
         }
     };
 
     useEffect(() => {
         getScheduledAppointments();
+        
+        // Poll for changes every 5 seconds while sidebar is open
+        const interval = setInterval(() => {
+            const token = localStorage.getItem('token');
+            if (token) {
+                getScheduledAppointments();
+            } else {
+                setCartItems([]); // Clear cart if token removed
+            }
+        }, 5000);
+        
+        return () => clearInterval(interval);
     }, []);
 
     const toggleSidebar = () => {

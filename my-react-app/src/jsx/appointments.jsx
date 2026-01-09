@@ -20,16 +20,20 @@ function Appointments() {
   const [selectedWeek, setSelectedWeek] = useState(Math.ceil(new Date().getDate() / 7));
   const [showLogoutModal, setShowLogoutModal] = useState(false);
   const currentYear = new Date().getFullYear();
+  const [selectedYear, setSelectedYear] = useState(currentYear);
   const [daysInMonth, setDaysInMonth] = useState([]);
   const role = sessionStorage.getItem("role") || localStorage.getItem("role");
+
+  // Generate years: 5 years back to 5 years forward
+  const years = Array.from({ length: 11 }, (_, i) => currentYear - 5 + i);
 
   const Week = [1, 2, 3, 4, 5];
 
   useEffect(() => {
     const monthIndex = Months.indexOf(selectedMonth);
-    const days = new Date(currentYear, monthIndex + 1, 0).getDate();
+    const days = new Date(selectedYear, monthIndex + 1, 0).getDate();
     setDaysInMonth(Array.from({ length: days }, (_, i) => i + 1));
-  }, [selectedMonth, currentYear]);
+  }, [selectedMonth, selectedYear]);
 
   const timeSlots = [
     "9:00 AM", "10:00 AM", "11:00 AM", "12:00 PM", "1:00 PM", "2:00 PM",
@@ -52,7 +56,7 @@ function Appointments() {
     if (daysInMonth.length === 0) return;
     
     const monthIndex = Months.indexOf(selectedMonth);
-    const firstDayOfMonth = new Date(currentYear, monthIndex, 1);
+    const firstDayOfMonth = new Date(selectedYear, monthIndex, 1);
     const firstDayWeekday = firstDayOfMonth.getDay();
     
     const mondayOffset = firstDayWeekday === 0 ? 6 : firstDayWeekday - 1;
@@ -64,7 +68,7 @@ function Appointments() {
       
       if (dayNum < 1 || dayNum > daysInMonth.length) continue;
       
-      const date = new Date(currentYear, monthIndex, dayNum);
+      const date = new Date(selectedYear, monthIndex, dayNum);
       
       if (date.getMonth() === monthIndex && date.getDate() === dayNum) {
         days.push({ 
@@ -74,7 +78,7 @@ function Appointments() {
     }
     
     setWeekDays(days);
-  }, [selectedWeek, selectedMonth, currentYear, daysInMonth]);
+  }, [selectedWeek, selectedMonth, selectedYear, daysInMonth]);
 
   useEffect(() => {
     const fetchAppointments = async () => {
@@ -112,7 +116,7 @@ function Appointments() {
     // day format: "05 Fri", we need to extract day number and match with date
     const dayNum = parseInt(day.split(' ')[0]);
     const monthIndex = Months.indexOf(selectedMonth);
-    const appointmentDate = `${currentYear}-${(monthIndex + 1).toString().padStart(2, '0')}-${dayNum.toString().padStart(2, '0')}`;
+    const appointmentDate = `${selectedYear}-${(monthIndex + 1).toString().padStart(2, '0')}-${dayNum.toString().padStart(2, '0')}`;
     
     return appointments.find(a => {
       // Convert date from DB format (might be datetime object)
@@ -159,8 +163,8 @@ function Appointments() {
                 {/* Passing object of the Month and Week */} 
                  
                  
-                <h3>{selectedMonth} {currentYear}</h3>
-                {/* Month + current year */}
+                <h3>{selectedMonth} {selectedYear}</h3>
+                {/* Month + selected year */}
                 <div className="month">
                   <select id="choices" value={selectedMonth} onChange={(e) => setSelectedMonth(e.target.value)}>
                     {Months.map((month, index) => (
@@ -185,7 +189,15 @@ function Appointments() {
                         <option key={index} value={weekNumber}>{weekNumber}</option>
                       ))}
                     </select>
-                  </div>
+                </div>
+                <div className="week">Year</div>
+                <div className="week">
+                  <select name="week"value={selectedYear} onChange={(e) => setSelectedYear(Number(e.target.value))}>
+                    {years.map((year) => (
+                      <option key={year} value={year}>{year}</option>
+                    ))}
+                  </select>
+                </div>
                 
             </div>
             <div className="search-bar">

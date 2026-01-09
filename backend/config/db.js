@@ -50,12 +50,12 @@ connection.connect((err) => {
           ON DELETE CASCADE
       )`;
 
+      
 
       const createAppointmentsTable = `
         CREATE TABLE IF NOT EXISTS appointments (
           id INT AUTO_INCREMENT PRIMARY KEY,
           patient_id INT NOT NULL,
-          doctor VARCHAR(100) NOT NULL,
           date DATE NOT NULL,
           time TIME NOT NULL,
           service_type VARCHAR(100) NOT NULL,
@@ -201,6 +201,18 @@ connection.connect((err) => {
           FOREIGN KEY (service_requested) REFERENCES services(serviceId) ON DELETE CASCADE
         )`;
 
+        const createPasswordResetTokensTable = `
+        CREATE TABLE IF NOT EXISTS password_reset_tokens (
+          id INT AUTO_INCREMENT PRIMARY KEY,
+          user_id INT NOT NULL,
+          token_hash VARCHAR(255) NOT NULL,
+          expires_at DATETIME NOT NULL,
+          used TINYINT(1) NOT NULL DEFAULT 0,
+          created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+          FOREIGN KEY (user_id) REFERENCES website_users(id) ON DELETE CASCADE,
+          INDEX (token_hash)
+        )`;
+
         const createBusinessProfileTable = `
         CREATE TABLE IF NOT EXISTS business_profile (
           id INT AUTO_INCREMENT PRIMARY KEY,
@@ -281,6 +293,12 @@ connection.connect((err) => {
         console.log(' requests table ready.');
       }
       );
+
+      connection.query(createPasswordResetTokensTable, (err) => {
+        if(err) throw err;
+        console.log(' password_reset_tokens table ready.');
+      });
+
     });
   });
 });
