@@ -262,7 +262,7 @@ function ModalAddProduct({ onProductAdded }) {
               </div>
               <div className="item">
                 <h1>Grand Total:</h1>
-                <input type="number" min="0" step="0.01" value={formData.grandTotal} onChange={(e) => setFormData(f => ({ ...f, grandTotal: e.target.value }))} required />
+                <input  disabled type="number" min="0" step="0.01" value={formData.grandTotal} onChange={(e) => setFormData(f => ({ ...f, grandTotal: e.target.value }))} required />
               </div>
               <div className="item">
                 <h1>Expiry Date:</h1>

@@ -28,7 +28,7 @@ router.get('/pos', verifyToken, async (req, res) => {
 
     if (!services || product === 'true') {
       const productQ = `
-        SELECT itemName, code, quantity, sellingPrice,
+        SELECT itemName, code, costUnit, quantity, sellingPrice,
                logo, category
         FROM inventory
         WHERE quantity > 0 AND category = 'Product'

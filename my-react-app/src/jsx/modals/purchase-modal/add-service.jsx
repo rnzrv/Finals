@@ -10,9 +10,10 @@ function AddServiceAction({ onSuccess }) {
   const [description, setDescription] = useState("");
   const [price, setPrice] = useState("");
   const [logo, setLogo] = useState(null);
-  const [consentForm, setConsentForm] = useState(null); // ✅ Add consent form state
+  const [consentForm, setConsentForm] = useState(null);
   const [inventory, setInventory] = useState([]);
   const [selectedItems, setSelectedItems] = useState([]);
+  const [priceError, setPriceError] = useState("");
   const MAX_CONSENT_MB = 5; // keep in sync with backend
 
   const token = sessionStorage.getItem("accessToken");
@@ -32,7 +33,7 @@ function AddServiceAction({ onSuccess }) {
     if (exists) {
       setSelectedItems(selectedItems.filter(i => i.code !== item.code));
     } else {
-      setSelectedItems([...selectedItems, { ...item, qty: 1, price: item.sellingPrice }]);
+      setSelectedItems([...selectedItems, { ...item, qty: 1, price: item.sellingPrice, costUnit: item.costUnit || 0 }]);
     }
   };
 
@@ -42,11 +43,38 @@ function AddServiceAction({ onSuccess }) {
     );
   };
 
+  const calculateTotalCost = () => {
+    return selectedItems.reduce((sum, item) => {
+      return sum + ((item.costUnit || 0) * item.qty);
+    }, 0);
+  };
+
+  const validatePrice = (priceValue) => {
+    const totalCost = calculateTotalCost();
+    if (selectedItems.length > 0 && Number(priceValue) < totalCost) {
+      setPriceError(`Price must be >= ${totalCost.toFixed(2)} (total cost)`);
+      return false;
+    }
+    setPriceError("");
+    return true;
+  };
+
+  const handlePriceChange = (e) => {
+    const value = e.target.value;
+    setPrice(value);
+    if (value) validatePrice(value);
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     if (!serviceName || !price || selectedItems.length === 0) {
       alert("Fill all required fields");
+      return;
+    }
+
+    if (!validatePrice(price)) {
+      alert(priceError);
       return;
     }
 
@@ -137,8 +165,9 @@ function AddServiceAction({ onSuccess }) {
             placeholder="Service Price"
             type="number"
             value={price}
-            onChange={e => setPrice(e.target.value)}
+            onChange={handlePriceChange}
           />
+          {priceError && <span style={{ color: 'red', fontSize: '12px' }}>{priceError}</span>}
         </div>
 
         <div className="add-service-bottom">
@@ -153,7 +182,7 @@ function AddServiceAction({ onSuccess }) {
           <input
             type="file"
             accept="application/pdf"
-            onChange={(e) => setConsentForm(e.target.files[0])} // ✅ Handle change
+            onChange={(e) => setConsentForm(e.target.files[0])}
           />
         </div>
       </div>
@@ -162,7 +191,7 @@ function AddServiceAction({ onSuccess }) {
           <div className="inventory-list">
             {inventory.map(item => (
               <div key={item.code} className="inventory-item">
-                <label>{item.itemName} (Stock: {item.quantity})</label>
+                <label>{item.itemName} (Stock: {item.quantity} , Cost Unit: {item.costUnit})</label>
                 <input
                   type="checkbox"
                   checked={selectedItems.some(i => i.code === item.code)}

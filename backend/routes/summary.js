@@ -45,7 +45,7 @@ router.get('/summary', verifyToken, async (req, res) => {
     const revenueRow = await q(`SELECT COALESCE(SUM(totalAmount), 0) AS totalRevenue FROM sales s ${where}`, params);
 
     // COGS (products)
-    const cogsRow = await q(
+        const productCogsRow = await q(
       `SELECT COALESCE(SUM(si.qty * inv.costUnit), 0) AS cogs
        FROM sale_items si
        JOIN sales s ON si.saleId = s.saleId
@@ -53,6 +53,20 @@ router.get('/summary', verifyToken, async (req, res) => {
        ${where}`,
       params
     );
+
+    // COGS (services → consumed inventory items)
+    const serviceCogsRow = await q(
+      `SELECT COALESCE(SUM(ss.quantity * si.qty * inv.costUnit), 0) AS cogs
+       FROM sale_services ss
+       JOIN sales s ON ss.saleId = s.saleId
+       JOIN service_items si ON si.serviceId = ss.serviceId
+       JOIN inventory inv ON inv.code = si.itemCode
+       ${where}`,
+      params
+    );
+
+
+    
 
    
     // Revenue by service
@@ -114,11 +128,27 @@ router.get('/summary', verifyToken, async (req, res) => {
     );
 
     // Sales trends
-    const salesTrendsRaw = await q(
-      `SELECT DATE_FORMAT(s.saleDate, ?) AS label, SUM(s.totalAmount) AS sales, SUM(si.qty * inv.costUnit) AS expenses
+const salesTrendsRaw = await q(
+      `SELECT 
+         DATE_FORMAT(s.saleDate, ?) AS label,
+         SUM(s.totalAmount) AS sales,
+         SUM(
+           COALESCE((
+             SELECT SUM(si.qty * inv.costUnit)
+             FROM sale_items si
+             JOIN inventory inv ON inv.code = si.itemCode
+             WHERE si.saleId = s.saleId
+           ), 0)
+           +
+           COALESCE((
+             SELECT SUM(ss.quantity * si2.qty * inv2.costUnit)
+             FROM sale_services ss
+             JOIN service_items si2 ON si2.serviceId = ss.serviceId
+             JOIN inventory inv2 ON inv2.code = si2.itemCode
+             WHERE ss.saleId = s.saleId
+           ), 0)
+         ) AS cogs
        FROM sales s
-       LEFT JOIN sale_items si ON si.saleId = s.saleId
-       LEFT JOIN inventory inv ON inv.code = si.itemCode
        ${where}
        GROUP BY label
        ORDER BY MIN(s.saleDate)`,
@@ -131,7 +161,7 @@ router.get('/summary', verifyToken, async (req, res) => {
     );
 
      const totalRevenue = Number(revenueRow[0]?.totalRevenue || 0);
-    const cogs = Number(cogsRow[0]?.cogs || 0);
+    const cogs = Number(productCogsRow[0]?.cogs || 0) + Number(serviceCogsRow[0]?.cogs || 0);
     const expenses = Number(totalExpenses[0]?.totalExpenses || 0); // adjust if needed
     const netProfit = totalRevenue - cogs;
     const profitMargin = totalRevenue > 0 ? (netProfit / totalRevenue) * 100 : 0;
@@ -139,7 +169,7 @@ router.get('/summary', verifyToken, async (req, res) => {
     return res.json({
       totalRevenue,
       netProfit,
-      totalExpenses: totalExpenses[0]?.totalExpenses || 0,
+      totalExpenses: expenses,
       profitMargin,
       revenueByService,
       customerSegmentation: {
@@ -195,7 +225,7 @@ router.get('/summary', verifyToken, async (req, res) => {
         labels: salesTrendsRaw.map((s) => s.label),
         datasets: [
           { label: "Sales", data: salesTrendsRaw.map((s) => Number(s.sales || 0)) },
-          { label: "Expenses", data: salesTrendsRaw.map((s) => Number(s.expenses || 0)) },
+          { label: "COGS", data: salesTrendsRaw.map((s) => Number(s.cogs || 0)) },
         ],
       },
     });

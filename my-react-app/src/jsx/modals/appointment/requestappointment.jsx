@@ -36,7 +36,7 @@ function RequestAppointmentModal() {
       setAppointments(res.data || []);
     } catch (err) {
       console.error('Failed to fetch appointments', err);
-      showPopup('Failed to fetch appointment requests', 'error');
+      showPopup(err.response?.data?.message || 'Failed to fetch appointment requests', 'error');
     } finally {
       setLoading(false);
     }
@@ -54,7 +54,7 @@ function RequestAppointmentModal() {
       fetchAppointments();
     } catch (err) {
       console.error('Failed to accept request', err);
-      showPopup('Failed to approve appointment request', 'error');
+      showPopup(err.response?.data?.error || err.response?.data?.message || 'Failed to approve appointment request', 'error');
     }
   };
 
@@ -70,7 +70,7 @@ function RequestAppointmentModal() {
       fetchAppointments();
     } catch (err) {
       console.error('Failed to decline request', err);
-      showPopup('Failed to decline appointment request', 'error');
+      showPopup(err.response?.data?.message || 'Failed to decline appointment request', 'error');
     }
   };
 

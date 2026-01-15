@@ -53,6 +53,24 @@ router.post('/google-login', async (req, res) => {
                         );
                     }
 
+                    // ✅ Ensure patient record exists
+                    db.query(
+                        'SELECT id FROM patients WHERE email = ? LIMIT 1',
+                        [email],
+                        (err, patientResults) => {
+                            if (!err && patientResults.length === 0) {
+                                // Create patient record if doesn't exist
+                                db.query(
+                                    'INSERT INTO patients (user_id, name, email) VALUES (?, ?, ?)',
+                                    [user.id, fullName, email],
+                                    (err) => {
+                                        if (err) console.error('Error inserting patient:', err);
+                                    }
+                                );
+                            }
+                        }
+                    );
+
                     const tokenJWT = jwt.sign(
                         { id: user.id, email },
                         process.env.JWT_SECRET,
@@ -82,12 +100,12 @@ router.post('/google-login', async (req, res) => {
 
                         const userId = result.insertId;
 
-                        // ✅ INSERT INTO patients
+                        // ✅ INSERT INTO patients with user_id link
                         db.query(
-                            'INSERT INTO patients ( name, email, google_id) VALUES (?, ?, ?)',
-                            [fullName, email, googleId],
+                            'INSERT INTO patients (user_id, name, email) VALUES (?, ?, ?)',
+                            [userId, fullName, email],
                             (err) => {
-                                if (err) console.error(err);
+                                if (err) console.error('Error inserting patient:', err);
                             }
                         );
 

@@ -188,7 +188,7 @@ function InventoryEditAction({ item, onUpdate }) {
                           name="code"
                           value={formData.code}
                           onChange={handleChange}
-                          required
+                          disabled
                         />
                       </label>
 
