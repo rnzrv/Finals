@@ -7,7 +7,7 @@ import TopProduct from "./topProduct.jsx";
 import AppointmentCard from "./dashboardAppointment.jsx";
 import RecentCard from "./dashboardRecent.jsx";
 import axios from "axios";
-import notificationIcon from "../icons/notification.svg";
+// import notificationIcon from "../icons/notification.svg";
 import Notification from './modals/notification/notification';
 import LogoutModal from './modals/logout/logout.jsx';
 import { Link } from 'react-router-dom';

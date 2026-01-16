@@ -120,6 +120,7 @@ connection.connect((err) => {
         paymentMethod ENUM('Cash', 'GCash', 'Card') NOT NULL,
         subTotal DECIMAL(10,2) NOT NULL,
         taxAmount DECIMAL(10,2) NOT NULL,
+        discount DECIMAL(10,2),
         totalAmount DECIMAL(10,2) NOT NULL,
         totalPayment DECIMAL(10,2) NOT NULL,
         changes DECIMAL(10,2) NOT NULL,

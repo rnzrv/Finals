@@ -197,6 +197,7 @@ function SalesHistory() {
                       <th>Total Payment</th>
                       <th>Changes</th>
                       <th>Payment Method</th>
+                      <th>Discount</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -215,6 +216,7 @@ function SalesHistory() {
                           <td>
                             <div className={`salesHistory-item-text ${'aw' + item.paymentMethod.toLowerCase()}`}>{item.paymentMethod}</div>
                           </td>
+                          <td className="salesHistory-item-text">{parseFloat(item.discount || 0).toFixed(2)} % </td>
                         </tr>
                       ))
                     ) : (

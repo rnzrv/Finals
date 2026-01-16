@@ -67,6 +67,7 @@ function ModalAddProduct({ onProductAdded }) {
     const qtyNum = Number(quantity);
     const grandTotalNum = Number(grandTotal);
     const regexDate = /^\d{4}-\d{2}-\d{2}$/;
+    
 
     if (!itemName.trim() || !brand.trim() || !code.trim() || !reference.trim() || !suppliers.trim() || !category.trim()) {
       setErrorMessage('All fields are required.');
@@ -96,12 +97,19 @@ function ModalAddProduct({ onProductAdded }) {
       setErrorMessage('Expiry date (YYYY-MM-DD) is required.');
       return false;
     }
+
+    if (costUnitNum > sellingPriceNum){
+      setErrorMessage('Selling price must be higher than cost unit');
+      return false;
+    }
     const today = new Date();
     const exp = new Date(expiryDate.trim());
     if (exp < today) {
       setErrorMessage('Expiry date must be a future date.');
       return false;
     }
+
+    
 
     setErrorMessage('');
     return true;

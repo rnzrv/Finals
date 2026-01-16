@@ -5,7 +5,6 @@ import x from "../icons/x.svg";
 import trash from "../icons/trash.svg";
 import card from "../icons/card.svg";
 import logs from "../icons/logo.svg";
-import arrowup from "../icons/arrow-up.svg";
 import axios from 'axios';
 import AddService from "./modals/purchase-modal/add-service.jsx";
 import Notification from './modals/notification/notification.jsx';
@@ -17,15 +16,15 @@ function PointOfSales() {
   const [cart, setCart] = useState([]);
   const [search, setSearch] = useState('');
   const [activeFilter, setActiveFilter] = useState('all');
-
-  // Payment & change
-  const [totalPayment, setTotalPayment] = useState(''); // keep as string
+  const [pwd, setIsPwd] = useState(false);
+  const [totalPayment, setTotalPayment] = useState('');
   const [change, setChange] = useState(0);
+  const [discountPercentage, setDiscountPercentage] = useState('');
 
-  // get customers
   const [customers, setCustomers] = useState([]);
   const [selectedCustomer, setSelectedCustomer] = useState('');
 
+  // Fetch customers
   useEffect(() => {
     try {
       const token = sessionStorage.getItem('accessToken');
@@ -41,7 +40,7 @@ function PointOfSales() {
     }
   }, []);
 
-  // FETCH POS data
+  // Fetch POS data
   const getPOSData = async () => {
     try {
       const token = sessionStorage.getItem('accessToken');
@@ -56,15 +55,10 @@ function PointOfSales() {
     }
   };
 
-  useEffect(() => {
-    getPOSData();
-  }, []);
+  useEffect(() => { getPOSData(); }, []);
+  useEffect(() => { getPOSData(); }, [activeFilter]);
 
- useEffect(() => {
-    getPOSData();
-  }, [activeFilter]);
-
-  // FILTER POS by search
+  // Filter POS
   const q = search.trim().toLowerCase();
   const filteredPos = pos.filter(p => {
     const name = String(p?.itemName ?? '').toLowerCase();
@@ -73,42 +67,31 @@ function PointOfSales() {
     return name.includes(q) || code.includes(q) || cat.includes(q);
   });
 
-  // Remaining stock map
+  // Stock map
   const stockMap = useMemo(() => {
     const map = {};
     pos.forEach(product => {
       const cartItem = cart.find(c => c.code === product.code);
       const cartQty = cartItem?.quantity || 0;
-      if (product.quantity == null) map[product.code] = Infinity; // services
-      else map[product.code] = product.quantity - cartQty;
+      map[product.code] = product.quantity == null ? Infinity : product.quantity - cartQty;
     });
     return map;
   }, [pos, cart]);
 
-
-
-
   const getRemainingStock = (code) => stockMap[code] || 0;
 
-  // ADD to cart
+  // Cart functions
   const addToCart = (item) => {
     const existing = cart.find(c => c.code === item.code);
     const remainingStock = getRemainingStock(item.code);
-
     if (existing) {
       if (remainingStock > 0 || remainingStock === Infinity) {
-        setCart(cart.map(c =>
-          c.code === item.code ? { ...c, quantity: c.quantity + 1 } : c
-        ));
-      } else {
-        alert('Not enough stock available!');
-      }
+        setCart(cart.map(c => c.code === item.code ? { ...c, quantity: c.quantity + 1 } : c));
+      } else alert('Not enough stock available!');
     } else {
       if (item.quantity > 0 || item.quantity == null) {
         setCart([...cart, { ...item, quantity: 1 }]);
-      } else {
-        alert('Out of stock!');
-      }
+      } else alert('Out of stock!');
     }
   };
 
@@ -119,43 +102,55 @@ function PointOfSales() {
     const maxAllowed = remainingStock === Infinity ? Infinity : remainingStock + currentQty;
 
     if (qty <= 0) setCart(cart.filter(c => c.code !== code));
-    else if (qty <= maxAllowed) setCart(cart.map(c =>
-      c.code === code ? { ...c, quantity: qty } : c
-    ));
+    else if (qty <= maxAllowed) setCart(cart.map(c => c.code === code ? { ...c, quantity: qty } : c));
     else alert(`Only ${maxAllowed} items available in stock!`);
   };
 
   const removeFromCart = (code) => setCart(cart.filter(c => c.code !== code));
-  const clearCart = () => setCart([]);
 
+  const clearCart = () => {
+    setCart([]);
+    setDiscountPercentage(0);
+    setIsPwd(false);
+  };
+
+  // Totals
   const subtotal = cart.reduce((sum, item) => sum + (Number(item.sellingPrice || 0) * item.quantity), 0);
-  const tax = subtotal * 0.1;
-  const total = subtotal + tax;
+  const tax = pwd ? 0 : subtotal * 0.1;
+  const discount = subtotal * (discountPercentage / 100);
+  const total = subtotal + tax - discount;
 
-  // Calculate change dynamically
+  // Change
   useEffect(() => {
-    const payment = parseFloat(totalPayment) || 0; // convert empty string to 0
+    const payment = parseFloat(totalPayment) || 0;
     setChange(payment - total);
   }, [totalPayment, total]);
 
-  // COMPLETE SALE
-  const handleCompleteSale = async (paymentMethod = 'Cash') => {
-    if (cart.length === 0) {
-      alert('Cart is empty!');
-      return;
+  // PWD Discount toggle
+  const handlePWDDiscount = () => {
+    if (cart.length === 0) return;
+    if (!pwd) {
+      setDiscountPercentage(20);
+      setIsPwd(true);
+    } else {
+      setDiscountPercentage(0);
+      setIsPwd(false);
     }
+  };
+
+  // Complete Sale
+  const handleCompleteSale = async (paymentMethod = 'Cash') => {
+    if (cart.length === 0) return alert('Cart is empty!');
 
     const payment = parseFloat(totalPayment) || 0;
-    if (payment < total) {
-      alert('Payment is not enough!');
-      return;
-    }
+    if (payment < total) return alert('Payment is not enough!');
 
     const saleData = {
       customerName: selectedCustomer || '',
       paymentMethod,
       subTotal: subtotal,
       taxAmount: tax,
+      discount: discountPercentage,
       totalAmount: total,
       totalPayment: payment,
       changes: change,
@@ -169,17 +164,12 @@ function PointOfSales() {
 
     try {
       const token = sessionStorage.getItem('accessToken');
-      const res = await axios.post(
-        'http://localhost:8081/pos/sales',
-        saleData,
-        {
-          headers: { Authorization: `Bearer ${token}` },
-          withCredentials: true,
-        }
-      );
-
+      const res = await axios.post('http://localhost:8081/pos/sales', saleData, {
+        headers: { Authorization: `Bearer ${token}` },
+        withCredentials: true,
+      });
       alert(`Sale completed! Reference: ${res.data.reference}`);
-      setCart([]);
+      clearCart();
       setTotalPayment('');
       getPOSData();
     } catch (err) {
@@ -188,33 +178,26 @@ function PointOfSales() {
     }
   };
 
-
-  useEffect(() => {
-    getPOSData();
-  }, [activeFilter]);
-
   const role = sessionStorage.getItem("role") || localStorage.getItem("role");
   const [showLogoutModal, setShowLogoutModal] = useState(false);
-  
+
   return (
     <div className='point-of-sales'>
       <Sidebar />
       <div className="point-of-sales-content">
-        <header><h2>POINT OF SALES</h2>
-        <div className="inventory-account">
-            <Notification /> 
-
-            <button onClick={() => setShowLogoutModal(true)}
-            
-              className="inventory-user-btn">
-            <img src={user} alt="Admin Icon"/>
-            
-            <p>{role}</p>
+        <header>
+          <h2>POINT OF SALES</h2>
+          <div className="inventory-account">
+            <Notification />
+            <button onClick={() => setShowLogoutModal(true)} className="inventory-user-btn">
+              <img src={user} alt="Admin Icon"/>
+              <p>{role}</p>
             </button>
           </div>
-        
         </header>
+
         <div className="point-of-sales-main-content">
+          {/* LEFT PANEL */}
           <div className="POS-left">
             {/* Customer selection */}
             <div className="POS-left-top">
@@ -230,29 +213,20 @@ function PointOfSales() {
                   value={selectedCustomer}
                   onChange={e => setSelectedCustomer(e.target.value)}
                   className='customers-item'
-  
                 >
                   <option value="">Select Customer</option>
                   {customers
-                    .filter(customer =>
-                      customer.customerName.toLowerCase().includes(selectedCustomer.toLowerCase())
-                    )
-                    .map(customer => (
-                      <option key={customer.id} value={customer.customerName}>
-                        {customer.customerName}
-                      </option>
-                    ))}
+                    .filter(c => c.customerName.toLowerCase().includes(selectedCustomer.toLowerCase()))
+                    .map(c => <option key={c.id} value={c.customerName}>{c.customerName}</option>)}
                 </select>
               </div>
             </div>
 
             <div className="br"></div>
 
-            {/* Cart */}
+            {/* Cart items */}
             <div className="POS-product-list">
-              {cart.length === 0 ? (
-                <p style={{ padding: '20px', textAlign: 'center', color: '#999', fontFamily: 'DmSans', fontWeight: '500' }}>Cart is empty</p>
-              ) : (
+              {cart.length === 0 ? <p style={{ padding: '20px', textAlign: 'center', color: '#999' }}>Cart is empty</p> :
                 cart.map(item => (
                   <div className="cart-items" key={item.code}>
                     <div className="product-title-top">
@@ -278,7 +252,7 @@ function PointOfSales() {
                     </div>
                   </div>
                 ))
-              )}
+              }
             </div>
 
             {/* Cart summary */}
@@ -292,10 +266,32 @@ function PointOfSales() {
                   <h2>₱{subtotal.toFixed(2)}</h2>
                 </div>
                 <div className="tax">
-                  <h1>Tax(10%)</h1>
+                  <h1>Tax (10%)</h1>
                   <h2>₱{tax.toFixed(2)}</h2>
                 </div>
+                <div className="tax discount" style={{'display': 'flex', 'gap': '2px'}}>
+                  <h1 style={{'display': 'flex', 'gap': '2px'}}>
+                    Discount 
+                    <input
+                      style={{'padding': '2px'}}
+                      type="number"
+                      min="0"
+                      max="100"
+                      value={discountPercentage}
+                      onChange={(e) => {
+                        const val = e.target.value;
+                        if (val === '') {
+                          setDiscountPercentage(''); // allow empty input temporarily
+                        } else {
+                          setDiscountPercentage(Math.max(0, Math.min(100, parseFloat(val))));
+                        }
+                      }}
+                    />%
+                  </h1>
+                  Amount: ₱{discount.toFixed(2)}
+                </div>
               </div>
+
               <div className="product-total">
                 <h1>Total</h1>
                 <h2>₱{total.toFixed(2)}</h2>
@@ -303,14 +299,8 @@ function PointOfSales() {
 
               <div className="payment-section">
                 <label>Total Payment:</label>
-                <input
-                  type="number"
-                  min="0"
-                  value={totalPayment}
-                  onChange={e => setTotalPayment(e.target.value)} // keep string
-                />
+                <input type="number" min="0" value={totalPayment} onChange={e => setTotalPayment(e.target.value)} />
               </div>
-
               <div className="payment-section">
                 <label>Change:</label>
                 <h2>₱{change.toFixed(2)}</h2>
@@ -319,15 +309,17 @@ function PointOfSales() {
               <div className="complete-sale">
                 <button disabled={cart.length === 0} onClick={() => handleCompleteSale('Cash')}>Complete Sale</button>
               </div>
+
               <div className="payment-method">
                 <button onClick={() => handleCompleteSale('Cash')}>₱ Cash</button>
                 <button onClick={() => handleCompleteSale('Card')}><img src={card} alt="Card Icon" />Card</button>
                 <button onClick={() => handleCompleteSale('GCash')}><img src={card} alt="Card Icon" />GCash</button>
+                <button onClick={handlePWDDiscount}>PWD</button>
               </div>
             </div>
           </div>
 
-          {/* POS right panel */}
+          {/* RIGHT PANEL */}
           <div className="POS-right">
             <div className="right-content">
               <input
@@ -339,35 +331,11 @@ function PointOfSales() {
             </div>
             <div className="right-buttons">
               <div className="left">
-                <button
-                id='all'
-                  className={`filter-btn ${activeFilter === 'all' ? 'active' : ''}`}
-                  onClick={() => setActiveFilter('all')}
-                >
-                  All
-                </button>
-
-                <button
-                id='category'
-                  className={`filter-btn ${activeFilter === 'product' ? 'active' : ''}`}
-                  onClick={() => setActiveFilter('product')}
-                >
-                  Product
-                </button>
-
-
-                <button
-                  id='category'
-                  className={`filter-btn ${activeFilter === 'services' ? 'active' : ''}`}
-                  onClick={() => setActiveFilter('services')}
-                >
-                  Services
-                </button>
-
+                <button className={`filter-btn ${activeFilter === 'all' ? 'active' : ''}`} onClick={() => setActiveFilter('all')}>All</button>
+                <button className={`filter-btn ${activeFilter === 'product' ? 'active' : ''}`} onClick={() => setActiveFilter('product')}>Product</button>
+                <button className={`filter-btn ${activeFilter === 'services' ? 'active' : ''}`} onClick={() => setActiveFilter('services')}>Services</button>
               </div>
-              <div className="pos-rightButtons">
-                <AddService/>
-              </div>
+              <div className="pos-rightButtons"><AddService /></div>
             </div>
 
             <div className="right-grid">
@@ -375,12 +343,7 @@ function PointOfSales() {
                 {filteredPos.map((item, index) => {
                   const remainingStock = getRemainingStock(item.code);
                   return (
-                    <div
-                      className="right-grid-item"
-                      key={item.code || index}
-                      onClick={() => addToCart(item)}
-                      style={{ cursor: 'pointer' }}
-                    >
+                    <div className="right-grid-item" key={item.code || index} onClick={() => addToCart(item)} style={{ cursor: 'pointer' }}>
                       <div className="right-grid-top">
                         {item?.logo && (
                           <div className="product-image">
@@ -399,14 +362,8 @@ function PointOfSales() {
                           <h3>{item.code}</h3>
                         </div>
                         <div className="product-price-stock">
-                          {remainingStock === Infinity ? (
-                            null
-                          ) : (
-                            <h3>In Stock: {remainingStock}</h3>
-                          )}
-                          
+                          {remainingStock !== Infinity && <h3>In Stock: {remainingStock}</h3>}
                           <h2>₱{Number(item.sellingPrice || 0).toFixed(2)}</h2>
-
                         </div>
                       </div>
                     </div>
@@ -416,20 +373,15 @@ function PointOfSales() {
             </div>
 
             {showLogoutModal && (
-                <LogoutModal
-                  open={showLogoutModal}
-                  onCancel={() => setShowLogoutModal(false)}
-                  onConfirm={() => {
-                    sessionStorage.clear();
-                    window.location.href = "/";
-                  }}
-                />
-              )}
-
-            {/* <div className="right-bottom">
-              <h1>Sales History</h1>
-              <img src={arrowup} alt="Arrow Up" />
-            </div> */}
+              <LogoutModal
+                open={showLogoutModal}
+                onCancel={() => setShowLogoutModal(false)}
+                onConfirm={() => {
+                  sessionStorage.clear();
+                  window.location.href = "/";
+                }}
+              />
+            )}
           </div>
         </div>
       </div>

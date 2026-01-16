@@ -77,7 +77,7 @@ router.get('/getPatients/Customers', verifyToken, (req, res) => {
 
 // POST sale (products + services)
 router.post('/sales', verifyToken, async (req, res) => {
-  const { customerName, paymentMethod, subTotal, taxAmount, totalAmount, totalPayment, changes, items } = req.body;
+  const { customerName, paymentMethod, subTotal, taxAmount, totalAmount, discount, totalPayment, changes, items } = req.body;
 
   if (!items || items.length === 0) {
     return res.status(400).json({ message: "Cart is empty!" });
@@ -163,8 +163,8 @@ router.post('/sales', verifyToken, async (req, res) => {
 
       // Insert sale
       const saleResult = await q(
-        "INSERT INTO sales (reference, customerName, paymentMethod, subTotal, taxAmount, totalAmount, totalPayment, changes) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
-        [reference, finalCustomerName, paymentMethod, subTotal, taxAmount, totalAmount, totalPayment, changes]
+        "INSERT INTO sales (reference, customerName, paymentMethod, subTotal, taxAmount, discount, totalAmount, totalPayment, changes) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
+        [reference, finalCustomerName, paymentMethod, subTotal, taxAmount, discount, totalAmount, totalPayment, changes]
       );
       const saleId = saleResult.insertId;
 

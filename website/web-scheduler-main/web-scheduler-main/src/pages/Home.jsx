@@ -35,11 +35,8 @@ function Home() {
                 <div className="hero-content">
                     <h1 className="hero-title">TAGLINE HERE</h1>
                     <p className="hero-description">
-                        Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-                        Pellentesque porttitor velit neque, at eleifend metus vestibulum sed.
-                        Phasellus tempor tortor eu mi lacinia, sed placerat eros porta.
-                        Fusce vel magna eu justo blandit imperdiet a eget ligula.
-                        Suspendisse potenti.
+                        Your Beauty is our project!
+                        Lorem ipsum dolor sit amet, consectetur adipisicing elit. Ut, aspernatur modi rem, inventore minima, suscipit nobis vel itaque fugiat delectus ab assumenda iure consequuntur maiores architecto commodi excepturi ad neque!
                     </p>
                     <Link to="/appointment" className="btn btn-green hero-cta">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="20" height="20">

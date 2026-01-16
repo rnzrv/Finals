@@ -98,7 +98,7 @@ function Sidebar() {
             (!item.roles || item.roles.includes(userRole)) && (
               <div
                 key={item.name}
-                className={`side sidebar-${item.name.toLowerCase()}`}
+                className={`side sidebar-${item.name.toLowerCase()} ${isActive(item.path) ? "active" : ""}`}
               >
                 <li onClick={item.action ? item.action : undefined} style={{ cursor: item.action ? "pointer" : "default" }}>
                   <img src={item.icon} alt={`${item.name}-icon`} />
