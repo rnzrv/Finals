@@ -112,6 +112,7 @@ router.get('/summary', verifyToken, async (req, res) => {
        ${where}`,
       params
     );
+    
     const averageTransactionValueRow = await q(`SELECT AVG(totalAmount) AS avgTransaction FROM sales s ${where}`, params);
 
     // Payment methods breakdown

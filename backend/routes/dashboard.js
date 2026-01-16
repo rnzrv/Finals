@@ -70,7 +70,7 @@ router.get('/getDataMonthly', verifyToken, async(req, res) => {
         LIMIT 5`);
 
     const todayAppointments = await q(` SELECT 
-        p.id AS patientId, p.name AS patientName, a.date AS appointmentDate, a.time AS appointmentTime, a.service_type AS serviceType
+        p.id AS patientId, p.name AS patientName, a.date AS appointmentDate,  TIME_FORMAT(a.time, '%h:%i %p') AS appointmentTime, a.service_type AS serviceType
         FROM patients p
         JOIN appointments a ON p.id = a.patient_id
         WHERE DATE(a.date) = CURDATE()

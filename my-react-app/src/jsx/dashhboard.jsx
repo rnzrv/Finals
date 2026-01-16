@@ -124,7 +124,7 @@ function Dashhboard() {
                     key={i}
                     name={a.patientName}
                     treatment={a.serviceType}
-                    time={a.appointmentTime}
+                    time={a.appointmentTime }
                     status="Confirmed"
                   />
                 ))}
