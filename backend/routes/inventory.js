@@ -391,11 +391,11 @@ router.get('/getInventory', verifyToken, (req, res) => {
   if (startDate || endDate) {
     const conditions = [];
     if (startDate) {
-      conditions.push('DATE(created_at) >= ?');
+      conditions.push('DATE(expiryDate) >= ?');
       params.push(startDate);
     }
     if (endDate) {
-      conditions.push('DATE(created_at) <= ?');
+      conditions.push('DATE(expiryDate) <= ?');
       params.push(endDate);
     }
     if (conditions.length > 0) {
